@@ -1,11 +1,16 @@
 const path = require("path")
 const CopyPlugin = require("copy-webpack-plugin")
 
+
 module.exports = {
   entry: "./src/index.ts",
   output: {
     path: path.resolve(__dirname, "./build"),
     filename: "bundle.js",
+    libraryTarget:'umd', 
+            library:'initBabylonScene',
+            umdNamedDefine: true,
+            libraryExport: 'default'
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".glsl"],

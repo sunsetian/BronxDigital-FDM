@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --config webpack.config.dev.js --progress --colors --open",
-    "build": "webpack --config webpack.config.prod.js --watch --colors",
+    "build": "webpack --config webpack.config.prod.js --colors",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

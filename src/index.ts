@@ -1,3 +1,5 @@
+
+
 import 'pepjs'
 import '@babylonjs/loaders'
 //import * as cannon from 'cannon';
@@ -312,7 +314,14 @@ function toggle_camera(){
 }
 
 }
-
-//Start the program from html
-main();
-
+export default function initBabylonScene(){
+  main();
+}
+/*
+module.exports = {
+  initBabylonScene: function () {
+    console.log('run from library');
+    main();
+  }
+};
+*/
