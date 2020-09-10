@@ -7,10 +7,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "./build"),
     filename: "bundle.js",
-    libraryTarget:'umd', 
-    library:'initBabylonScene',
-    umdNamedDefine: true,
-    libraryExport: 'default'
+    library: 'virualInsanity'
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".glsl"],

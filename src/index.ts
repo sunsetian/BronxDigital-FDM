@@ -6,8 +6,7 @@ import { Artist } from './Artist';
 import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera } from '@babylonjs/core'
 import { createEngine, createScene, createSkybox, createArcRotateCamera } from './babylon'
 
-// Import stylesheets
-// import './index.css';
+//import * as viAPI from './virtualInsanityAPI'
 
 const canvas: HTMLCanvasElement = document.getElementById('virtualInsanityCanvas') as HTMLCanvasElement
 const engine = createEngine(canvas)
@@ -29,11 +28,147 @@ const cameraSpeed: number = 0.03;
 
 let cameraSetted: boolean = false;
 
+var URL_SCENE_JS:string;//Todo pasar a archivo de importacion API
+
+const camera = createArcRotateCamera() as ArcRotateCamera;
+var oldTargetPosition: Vector3;
+var oldTargetCameraPosition: Vector3;
+
+
+class guiSceneBabylon{
+  constructor(){}
+  
+  getArtistPositionsByID(id:number): Vector3{
+
+    let newArtistPos: Vector3 = new Vector3();
+
+    artist.forEach(artistElement => {
+        if(artistElement.id === id) newArtistPos = artistElement.position;
+    });
+
+    return newArtistPos;
+  }
+
+  getArtistIndexByName(name: string):number{
+
+    let newIndex: number = -1;
+
+    artist.forEach(artistElement => {
+      if(artistElement.name === name) newIndex = artistElement.arrayIndex;
+    });
+
+    return newIndex;
+  }
+
+  getArtistPositionsByName(name: string):Vector3{
+
+    let newPos: Vector3 = new Vector3();
+
+    artist.forEach(artistElement => {
+      if(artistElement.name === name) newPos = artistElement.position;
+    });
+
+    return newPos;
+  }
+
+  getCuadroIndexByID(id: number, artist: Artist):number{
+
+    let newIndex: number = -1;
+    //let cuadroID: number = id;
+
+    artist.cuadro.forEach(cuadroElement => {
+      if(cuadroElement.order === id) newIndex = cuadroElement.arrayIndex;
+    });
+
+    return newIndex;
+  }
+
+  getArtistViewPositionsByName(name: string):Vector3{
+
+    let newPos: Vector3 = new Vector3();
+
+    artist.forEach(artistElement => {
+      if(artistElement.name === name) newPos = artistElement.viewerPosition;
+    });
+
+    return newPos;
+  }
+
+  getArtistViewerPositionsByID(id:number): Vector3{
+
+    let newPos: Vector3 = new Vector3();
+
+    artist.forEach(artistElement => {
+        if(artistElement.id === id) newPos = artistElement.viewerPosition;
+    });
+
+    return newPos;
+  }
+
+  selectArtist(artistID: number): void{
+
+    let pos = this.getArtistPositionsByID(artistID);
+    let viewPos = this.getArtistViewerPositionsByID(artistID);
+
+    actualArtist = artistID;
+
+    console.log("actualArtist: " + actualArtist);
+    targetPosition = new Vector3(pos.x, pos.y, pos.z);
+    targetCameraPosition = new Vector3(viewPos.x, viewPos.y, viewPos.z);
+    camera.useAutoRotationBehavior = false;
+
+  }
+
+  prev_artist(): void{
+
+    if(actualArtist > 0){
+      actualArtist = (actualArtist + (numArtists-1))%numArtists;
+    }
+    else{
+      actualArtist = numArtists - 1; 
+    }
+    
+    this.selectArtist(actualArtist);
+    
+  }
+
+  next_artist(): void{
+    actualArtist = (actualArtist + 1)%numArtists;
+
+    this.selectArtist(actualArtist);
+  }
+
+  center_camera(){
+  
+  targetPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
+  targetCameraPosition = camera.position;
+  oldTargetCameraPosition = targetCameraPosition;
+
+  camera.useAutoRotationBehavior = true;
+
+  if(camera.autoRotationBehavior !== null){
+    camera.autoRotationBehavior.idleRotationSpeed = 0.18;}
+  }
+
+  toggle_camera(){
+
+    if(scene.activeCamera !== null){
+      if( scene.activeCamera.name === "ArcCamera"){
+        //scene.activeCamera = camera02;
+      }
+      else if( scene.activeCamera.name === "FreeCamera"){
+        //scene.activeCamera = camera01;
+      }
+    }
+
+  }
+}
+
+var guiVI= new guiSceneBabylon()
+
 // main function that is async so we can call the scene manager with await
 const main = async () => {
-
   createSkybox(URL_SCENE_JS);
-  const camera = createArcRotateCamera() as ArcRotateCamera;
 
   const light = new HemisphericLight("light1", new Vector3(0, 2, 0), scene);
 
@@ -49,8 +184,6 @@ const main = async () => {
 
   var ventana: Mesh[] = [];
 
-  var oldTargetPosition: Vector3;
-  var oldTargetCameraPosition: Vector3;
 
   SceneLoader.ImportMesh(
     "",
@@ -193,9 +326,9 @@ const main = async () => {
 
               if(hit.pickedMesh.parent != null){
                  
-                 currentArtistPos = getArtistPositionsByName(hit.pickedMesh.parent.name);
-                 currentArtistViewPos = getArtistViewPositionsByName(hit.pickedMesh.parent.name);
-                 currentArtistIndex = getArtistIndexByName(hit.pickedMesh.parent.name);
+                 currentArtistPos = guiVI.getArtistPositionsByName(hit.pickedMesh.parent.name);
+                 currentArtistViewPos = guiVI.getArtistViewPositionsByName(hit.pickedMesh.parent.name);
+                 currentArtistIndex = guiVI.getArtistIndexByName(hit.pickedMesh.parent.name);
 
                  console.log("hit.pickedMesh.parent.name: "+ hit.pickedMesh.parent.name);
               }
@@ -209,21 +342,22 @@ const main = async () => {
               }
               else{
 
-                let cuadroIndex:number = getCuadroIndexByID(iCuadro, artist[currentArtistIndex]);
+                let cuadroIndex:number = guiVI.getCuadroIndexByID(iCuadro, artist[currentArtistIndex]);
                 let currentCuadro = artist[currentArtistIndex].cuadro[cuadroIndex];
 
-                //console.log("currentCuadro.slug: " + currentCuadro.slug)
+                console.log("currentCuadro.slug: " + currentCuadro.slug)
                 console.log("currentCuadro.id: " + currentCuadro.id)
 
                 targetCameraPosition = new Vector3(currentCuadro.viewerPosition.x, currentCuadro.viewerPosition.y, currentCuadro.viewerPosition.z);
                 targetPosition = new Vector3(currentCuadro.position.x, currentCuadro.position.y, currentCuadro.position.z);
-
+          
+                globalThis.bronxControl.showInfoByPostSlug(currentCuadro.slug,175);
               }
               /* if(actualCuadro !== iCuadro){
                   actualCuadro = iCuadro;
                   targetCameraPosition = new Vector3(cuadroUser[iCuadro].position.x, cuadroUser[iCuadro].position.y, cuadroUser[iCuadro].position.z);
               } */
-
+              
               console.log("Artist selected id: " + artist[currentArtistIndex].id);
               camera.useAutoRotationBehavior = false;
 
@@ -269,13 +403,12 @@ const main = async () => {
     scene.render()
   });
 
-///////////// HTML INTERFACING
 
   // Resize
   window.addEventListener("resize", function () {
     engine.resize();
   });
-
+/*
   let prevArrowDOM: HTMLElement = document.getElementById("prev_arrow") as HTMLElement;
   if(prevArrowDOM) prevArrowDOM.addEventListener("click", prev_artist);
 
@@ -287,141 +420,42 @@ const main = async () => {
 
   let togglecameraDOM: HTMLElement = document.getElementById("toggle_camera") as HTMLElement;
   if(togglecameraDOM) togglecameraDOM.addEventListener("click", toggle_camera);
-
-
-  function getArtistPositionsByID(id:number): Vector3{
-
-    let newArtistPos: Vector3 = new Vector3();
-
-    artist.forEach(artistElement => {
-        if(artistElement.id === id) newArtistPos = artistElement.position;
-    });
-
-    return newArtistPos;
-  }
-
-  function getArtistIndexByName(name: string):number{
-
-    let newIndex: number = -1;
-
-    artist.forEach(artistElement => {
-      if(artistElement.name === name) newIndex = artistElement.arrayIndex;
-    });
-
-    return newIndex;
-  }
-
-  function getArtistPositionsByName(name: string):Vector3{
-
-    let newPos: Vector3 = new Vector3();
-
-    artist.forEach(artistElement => {
-      if(artistElement.name === name) newPos = artistElement.position;
-    });
-
-    return newPos;
-  }
-
-  function getCuadroIndexByID(id: number, artist: Artist):number{
-
-    let newIndex: number = -1;
-    //let cuadroID: number = id;
-
-    artist.cuadro.forEach(cuadroElement => {
-      if(cuadroElement.order === id) newIndex = cuadroElement.arrayIndex;
-    });
-
-    return newIndex;
-  }
-
-  function getArtistViewPositionsByName(name: string):Vector3{
-
-    let newPos: Vector3 = new Vector3();
-
-    artist.forEach(artistElement => {
-      if(artistElement.name === name) newPos = artistElement.viewerPosition;
-    });
-
-    return newPos;
-  }
-
-  function getArtistViewerPositionsByID(id:number): Vector3{
-
-    let newPos: Vector3 = new Vector3();
-
-    artist.forEach(artistElement => {
-        if(artistElement.id === id) newPos = artistElement.viewerPosition;
-    });
-
-    return newPos;
-  }
-
-  function selectArtist(artistID: number): void{
-
-    let pos = getArtistPositionsByID(artistID);
-    let viewPos = getArtistViewerPositionsByID(artistID);
-
-    actualArtist = artistID;
-
-    console.log("actualArtist: " + actualArtist);
-    targetPosition = new Vector3(pos.x, pos.y, pos.z);
-    targetCameraPosition = new Vector3(viewPos.x, viewPos.y, viewPos.z);
-    camera.useAutoRotationBehavior = false;
-
-  }
-
-  function prev_artist(): void{
-
-    if(actualArtist > 0){
-      actualArtist = (actualArtist + (numArtists-1))%numArtists;
-    }
-    else{
-      actualArtist = numArtists - 1; 
-    }
-    
-    selectArtist(actualArtist);
-    
-  }
-
-  function next_artist(): void{
-    actualArtist = (actualArtist + 1)%numArtists;
-
-    selectArtist(actualArtist);
-  }
-
-  function center_camera(){
-
-  
-  targetPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
-  targetCameraPosition = camera.position;
-  oldTargetCameraPosition = targetCameraPosition;
-
-  camera.useAutoRotationBehavior = true;
-
-  if(camera.autoRotationBehavior !== null){
-    camera.autoRotationBehavior.idleRotationSpeed = 0.18;}
-  }
-
-  function toggle_camera(){
-
-    if(scene.activeCamera !== null){
-      if( scene.activeCamera.name === "ArcCamera"){
-        //scene.activeCamera = camera02;
-      }
-      else if( scene.activeCamera.name === "FreeCamera"){
-        //scene.activeCamera = camera01;
-      }
-    }
-
-  }
-
+*/
+///////////// HTML INTERFACING
 }
 
-// start the program
-var URL_SCENE_JS:string;//Todo pasar a 
-export default function initBabylonScene(srcScene:string){
+/** Buttons events */
+globalThis.virtualInButtonClick = function(buttonClickData){
+  let buttonId = buttonClickData.id;
+  switch(buttonId) { 
+    case 'VI_GUI_Left': { 
+      guiVI.prev_artist();
+       break; 
+    } 
+    case 'VI_GUI_Right': { 
+      guiVI.next_artist();
+       break; 
+    } 
+    case 'VI_GUI_Center': { 
+      guiVI.center_camera();
+       break; 
+    } 
+    case 'VI_GUI_Toggle': { 
+      guiVI.toggle_camera();
+       break; 
+    } 
+  } 
+  console.log("Button clicked: "+buttonId);
+}
+
+export {
+  initBabylonScene
+}
+
+function initBabylonScene(srcScene:string){
   //alert(srcScene);
   URL_SCENE_JS = srcScene;
   main();
 }
+
 
