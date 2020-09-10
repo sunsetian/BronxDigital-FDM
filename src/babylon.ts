@@ -57,7 +57,7 @@ export const createArcRotateCamera = () => {
     camera.minZ = 0.1;
     camera.lowerBetaLimit = Math.PI * 1.8/ 4;
     camera.upperBetaLimit = Math.PI * 2.2 / 4;
-    camera.lowerRadiusLimit = 4;
+    camera.lowerRadiusLimit = 0.5;
     camera.upperRadiusLimit = 14;
     camera.allowUpsideDown = false;
     camera.wheelPrecision = 250;
@@ -99,12 +99,12 @@ export const createArcRotateCamera = () => {
     return camera
 }
 
-export const createSkybox = () => {
-  
+export const createSkybox = (urlScene:string) => {
+
   var skybox = Mesh.CreateBox("skyBox", 100.0, scene);
   var skyboxMaterial = new StandardMaterial("skyBox", scene);
   skyboxMaterial.backFaceCulling = false;
-  skyboxMaterial.reflectionTexture = new CubeTexture("assets/models/skybox", scene);
+  skyboxMaterial.reflectionTexture = new CubeTexture(urlScene+"data/models/skybox", scene);
   skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
   skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
   skyboxMaterial.specularColor = new Color3(0, 0, 0);

@@ -7,7 +7,7 @@ The html inside the public folder is just an example of how to call javascript f
 
 The starting point of this starter has been Tim Okolowski's repository at https://github.com/oktinaut/babylonjs-typescript-starter with modifications in the webpack configuration, the update and inclusion of babylonjs libraries and the creation of connection interfaces of some functions with the outside world.
 
-* Missing assets folder in public and build folder.
+* Missing data folder in public and build folder.
 
 ## Setup
 

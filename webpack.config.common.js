@@ -8,9 +8,9 @@ module.exports = {
     path: path.resolve(__dirname, "./build"),
     filename: "bundle.js",
     libraryTarget:'umd', 
-            library:'initBabylonScene',
-            umdNamedDefine: true,
-            libraryExport: 'default'
+    library:'initBabylonScene',
+    umdNamedDefine: true,
+    libraryExport: 'default'
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".glsl"],
@@ -29,6 +29,6 @@ module.exports = {
     }),
   ],
   externals: {
-    "babylonjs": "BABYLON",
+    "babylonjs": "BABYLON"
   },
 }
