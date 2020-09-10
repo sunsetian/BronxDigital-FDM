@@ -1,9 +1,10 @@
-import { Mesh, AbstractMesh, Vector3 } from "@babylonjs/core";
+import { Mesh, AbstractMesh, Vector3, Scene } from "@babylonjs/core";
 
 export class Artist {
 
     public wall: string = "";
     public id: number = 0;
+    public slug: string = "";
     public name: string = "";
     public numCuadros: number = 0;
     public cuadro: Cuadro[] = [];
@@ -13,11 +14,16 @@ export class Artist {
     public arrayIndex: number = -1;
     private closeDistance = 5;
 
-    constructor(cuadrosGroup: AbstractMesh, arrayIndex: number) {
+    constructor(cuadrosGroup: AbstractMesh, arrayIndex: number, scene: Scene) {
 
         this.arrayIndex = arrayIndex;
 
         this.id = parseInt(cuadrosGroup.name.split(".")[1]);
+
+        if(cuadrosGroup.name.split(".")[2] !== null){
+            this.slug = cuadrosGroup.name.split(".")[2].toLowerCase();
+            //console.log("artist slug. " + this.slug);
+        }
 
         let cuadrosArray : AbstractMesh[] = cuadrosGroup.getChildMeshes(true);
 
@@ -25,7 +31,7 @@ export class Artist {
 
         this.numCuadros = cuadrosArray.length;
 
-        console.log("·············· id: " + this.id);
+        //console.log("·············· id: " + this.id);
 
         this.position = cuadrosGroup.position;
 
@@ -73,7 +79,7 @@ export class Artist {
         let cuadroIndex = 0;
 
         cuadrosArray.forEach(newCuadro => {
-            this.cuadro.push(new Cuadro(newCuadro as Mesh, this.wall, this.id, this.position, cuadroIndex));
+            this.cuadro.push(new Cuadro(newCuadro as Mesh, this.wall, this.id, this.slug, this.position, cuadroIndex, scene));
             cuadroIndex++;
         });
 
@@ -92,22 +98,20 @@ export class Cuadro {
     public viewerPosition:  Vector3 = new Vector3();
     public mesh: Mesh = new Mesh("");
 
-    private closeDistance = 1.5;
+    private closeDistance = 1.8;
 
     public arrayIndex: number = -1;
     public name: string = "";
     
-
-    constructor(cuadro: Mesh, wall: string, idArtist: number, ubicacion: Vector3, arrayIndex: number) {
-
+    constructor(cuadro: Mesh, wall: string, idArtist: number, slugArtista:string, ubicacion: Vector3, arrayIndex: number, scene: Scene) {
         this.name = cuadro.name;
         this.arrayIndex = arrayIndex;
-
-        this.slug = cuadro.name.split(".")[1];
-        console.log("cuadro.name: " + cuadro.name)
-        this.id = idArtist + "_" + this.slug.split("_")[2];
-        console.log("cuadro.id: " + this.id)
-        this.order = parseInt(this.slug.split("_")[2])-1;
+        this.order = parseInt(cuadro.name.split("@")[1])-1;
+        this.slug = slugArtista + "_" + (this.order + 1);
+        //console.log("cuadr slug.: " + this.slug);
+        this.id = idArtist + "_" + cuadro.name.split("@")[1];
+        //console.log("cuadro.id: " + this.id)
+        //this.order = parseInt(this.slug.split("_")[2])-1;
 
         this.mesh = cuadro;
 

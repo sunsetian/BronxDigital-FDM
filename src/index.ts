@@ -1,5 +1,5 @@
 import 'pepjs';
-import '@babylonjs/loaders';
+//import '@babylonjs/loaders';
 import { Artist } from './Artist';
 //import * as cannon from 'cannon';
 
@@ -23,8 +23,8 @@ let actualArtist: number = -1;
 
 const numVentanas: number = 0;
 
-const targetSpeed: number = 0.02;
-const cameraSpeed: number = 0.03;
+const targetSpeed: number = 0.03;
+const cameraSpeed: number = 0.04;
 
 let cameraSetted: boolean = false;
 
@@ -34,8 +34,8 @@ const camera = createArcRotateCamera() as ArcRotateCamera;
 var oldTargetPosition: Vector3;
 var oldTargetCameraPosition: Vector3;
 
-
-class guiSceneBabylon{
+/* **************************************** GUI SCENE CLASS **************************************** */
+class GuiSceneBabylon{
   constructor(){}
   
   getArtistPositionsByID(id:number): Vector3{
@@ -145,6 +145,7 @@ class guiSceneBabylon{
   oldTargetCameraPosition = targetCameraPosition;
 
   camera.useAutoRotationBehavior = true;
+  camera.angularSensibilityX = -5000;
 
   if(camera.autoRotationBehavior !== null){
     camera.autoRotationBehavior.idleRotationSpeed = 0.18;}
@@ -164,31 +165,34 @@ class guiSceneBabylon{
   }
 }
 
-var guiVI= new guiSceneBabylon()
+/* ++++++++++++++++++++++++++++++++++++++ SCENE GUI CLASS END +++++++++++++++++++++++++++++++++++++++  */
+
+var guiVI= new GuiSceneBabylon()
 
 // main function that is async so we can call the scene manager with await
 const main = async () => {
   createSkybox(URL_SCENE_JS);
 
-  const light = new HemisphericLight("light1", new Vector3(0, 2, 0), scene);
+  const light01 = new HemisphericLight("light1", new Vector3(3, 1, 1), scene);
+  const light02 = new HemisphericLight("light2", new Vector3(-3, 1, -1), scene);
+  const light03 = new HemisphericLight("light3", new Vector3(0, 1, 0), scene);
 
   //const light = new PointLight("pointLight1",  new Vector3(3, 2, 3), scene);
 
-  light.intensity = 0.8
+  light01.intensity = 0.8
+  light02.intensity = 0.8
+  light03.intensity = 0.8
 
-  //var paintings;
-  var floor:Mesh;
-  var ceiling01:Mesh;
-  var door:Mesh;
-  var room01:Mesh;
+  var room:Mesh;
+  var limits:Mesh;
 
-  var ventana: Mesh[] = [];
+  //var ventana: Mesh[] = [];
 
 
   SceneLoader.ImportMesh(
     "",
     URL_SCENE_JS+"data/models/",
-    "SalaDos_07.babylon",
+    "thisBronxScene.babylon",
     scene,
     function (importedMeshes) {
 
@@ -198,7 +202,7 @@ const main = async () => {
         
         let meshNames: string[] = newMesh.name.split(".");
         if( meshNames[0] === "Artist" ){
-          artist.push(new Artist(newMesh, index));
+          artist.push(new Artist(newMesh, index, scene));
           index++;
         }
       });
@@ -215,57 +219,38 @@ const main = async () => {
         //cuadroUser[i].visibility = 0;
       //}
 
-      for(let i = 0; i < numVentanas; i++){
-          ventana.push(scene.getMeshByName("Ventana.00"+i) as Mesh);
-          ventana[i].visibility = 0;
-          ventana[i].checkCollisions = true;
-          ventana[i].metadata = "ventanta0"+i;
+      
+
+      if(scene.getMeshByName("Limits.000")){
+        limits = scene.getMeshByName("Limits.000") as Mesh;
+        limits.metadata = "limits";
+        limits.checkCollisions = true;
+        limits.freezeWorldMatrix();
+        
+      
       }
 
-      if(scene.getMeshByName("Floor.000")){
-        floor = scene.getMeshByName("Floor.000") as Mesh;
-        floor.metadata = "floor";
-        floor.checkCollisions = true;
-        floor.freezeWorldMatrix();
-        
-      
-      }
-      if(scene.getMeshByName("Ceiling.000")){
-        ceiling01 = scene.getMeshByName("Ceiling.000") as Mesh;
-        ceiling01.metadata = "techo01";
-        ceiling01.checkCollisions = true;
-        ceiling01.freezeWorldMatrix() ;
-        
-      
-      }
       if(scene.getMeshByName("Room.000")){
-        room01 = scene.getMeshByName("Room.000") as Mesh;
-        room01.metadata = "sala01";
-        room01.checkCollisions = true;
-        room01.freezeWorldMatrix();
+        room = scene.getMeshByName("Room.000") as Mesh;
+        room.metadata = "sala01";
+        room.checkCollisions = true;
+        room.freezeWorldMatrix();
         
       
       }
-      if(scene.getMeshByName("Door.000")){
-        door = scene.getMeshByName("Door.000") as Mesh;
-        door.metadata = "door";
-        door.checkCollisions = true;
-        door.freezeWorldMatrix();
-        
-      }
-      
+
       //console.log("metadata setted");
 
       
       
-      targetPosition = new Vector3(floor.position.x, floor.position.y + 1.7, floor.position.z);
-      targetCameraPosition = new Vector3(floor.position.x, floor.position.y + 1.7, floor.position.z);
-      oldTargetPosition = new Vector3(floor.position.x, floor.position.y + 1.7, floor.position.z);
+      targetPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
+      targetCameraPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
+      oldTargetPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
       oldTargetCameraPosition = targetCameraPosition;
-      roomCenter = new Vector3(floor.position.x, floor.position.y + 1.7, floor.position.z);
+      roomCenter = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
 
       targetBox = Mesh.CreateBox("TargetBox.000", 0.5, scene);
-      var baseMat = new StandardMaterial("BaseMaterial", scene);
+      let baseMat = new StandardMaterial("BaseMaterial", scene);
 
       baseMat.alpha = 0.0;
 
@@ -317,7 +302,9 @@ const main = async () => {
               let iArtist = parseInt(currentMesh.id.split("_")[0]);
               let iCuadro = parseInt(currentMesh.id.split("_")[1])-1;
 
-              console.log("currentMesh.id: " + currentMesh.id);
+              camera.angularSensibilityX = 5000;
+
+              //console.log("currentMesh.id: " + currentMesh.id);
 
               //let currentArtist :AbstractMesh = new AbstractMesh("");
               let currentArtistPos: Vector3 = new Vector3();
@@ -330,9 +317,9 @@ const main = async () => {
                  currentArtistViewPos = guiVI.getArtistViewPositionsByName(hit.pickedMesh.parent.name);
                  currentArtistIndex = guiVI.getArtistIndexByName(hit.pickedMesh.parent.name);
 
-                 console.log("hit.pickedMesh.parent.name: "+ hit.pickedMesh.parent.name);
+                 //console.log("hit.pickedMesh.parent.name: "+ hit.pickedMesh.parent.name);
               }
-              console.log("currentArtistID: " + currentArtistIndex);
+              //console.log("currentArtistID: " + currentArtistIndex);
 
               if(actualArtist !== iArtist){
                 actualArtist = iArtist;
@@ -346,7 +333,7 @@ const main = async () => {
                 let currentCuadro = artist[currentArtistIndex].cuadro[cuadroIndex];
 
                 console.log("currentCuadro.slug: " + currentCuadro.slug)
-                console.log("currentCuadro.id: " + currentCuadro.id)
+                //console.log("currentCuadro.id: " + currentCuadro.id)
 
                 targetCameraPosition = new Vector3(currentCuadro.viewerPosition.x, currentCuadro.viewerPosition.y, currentCuadro.viewerPosition.z);
                 targetPosition = new Vector3(currentCuadro.position.x, currentCuadro.position.y, currentCuadro.position.z);
@@ -408,19 +395,7 @@ const main = async () => {
   window.addEventListener("resize", function () {
     engine.resize();
   });
-/*
-  let prevArrowDOM: HTMLElement = document.getElementById("prev_arrow") as HTMLElement;
-  if(prevArrowDOM) prevArrowDOM.addEventListener("click", prev_artist);
 
-  let nextArrowDOM: HTMLElement = document.getElementById("next_arrow") as HTMLElement;
-  if(nextArrowDOM) nextArrowDOM.addEventListener("click", next_artist);
-
-  let cameracenterDOM: HTMLElement = document.getElementById("center_camera") as HTMLElement;
-  if(cameracenterDOM) cameracenterDOM.addEventListener("click", center_camera);
-
-  let togglecameraDOM: HTMLElement = document.getElementById("toggle_camera") as HTMLElement;
-  if(togglecameraDOM) togglecameraDOM.addEventListener("click", toggle_camera);
-*/
 ///////////// HTML INTERFACING
 }
 
