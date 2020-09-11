@@ -1,3 +1,4 @@
+//imports
 import 'pepjs';
 //import '@babylonjs/loaders';
 import { Artist } from './Artist';
@@ -34,7 +35,7 @@ const camera = createArcRotateCamera() as ArcRotateCamera;
 var oldTargetPosition: Vector3;
 var oldTargetCameraPosition: Vector3;
 
-/* **************************************** GUI SCENE CLASS **************************************** */
+/**GUI SCENE CLASS*/
 class GuiSceneBabylon{
   constructor(){}
   
@@ -165,7 +166,7 @@ class GuiSceneBabylon{
   }
 }
 
-/* ++++++++++++++++++++++++++++++++++++++ SCENE GUI CLASS END +++++++++++++++++++++++++++++++++++++++  */
+/**SCENE GUI CLASS END */ 
 
 var guiVI= new GuiSceneBabylon()
 
@@ -396,7 +397,6 @@ const main = async () => {
     engine.resize();
   });
 
-///////////// HTML INTERFACING
 }
 
 /** Buttons events */
