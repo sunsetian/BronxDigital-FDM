@@ -71,7 +71,7 @@ export const createArcRotateCamera = () => {
 
     camera.useAutoRotationBehavior = true;
     if(camera.autoRotationBehavior != null){
-      camera.autoRotationBehavior.idleRotationSpeed = 0.2;
+      camera.autoRotationBehavior.idleRotationSpeed = 0.05;
     }
 
     //console.log("camera01.pinchPrecision: " + camera.pinchPrecision );
