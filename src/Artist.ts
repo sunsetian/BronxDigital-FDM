@@ -84,6 +84,8 @@ export class Artist {
         });
 
         //console.log("this.wall: " + this.wall);
+
+        /*  ESTE ES UN COMENTARIO PAR COMMIT */
         
     }
 }
