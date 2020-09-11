@@ -1,4 +1,4 @@
-import { Mesh, AbstractMesh, Vector3, Scene } from "@babylonjs/core";
+import { Mesh, AbstractMesh, Vector3, Scene, PBRMetallicRoughnessMaterial } from "@babylonjs/core";
 
 export class Artist {
 
@@ -76,11 +76,12 @@ export class Artist {
 
         this.viewerPosition = calculateViewerPosition();
 
-        let cuadroIndex = 0;
+       let cuadroIndex = 0;
 
         cuadrosArray.forEach(newCuadro => {
             this.cuadro.push(new Cuadro(newCuadro as Mesh, this.wall, this.id, this.slug, this.position, cuadroIndex, scene));
             cuadroIndex++;
+       
         });
 
         //console.log("this.wall: " + this.wall);
@@ -95,6 +96,7 @@ export class Cuadro {
     public slug: string = "";
     public id: string = "";
     public order: number = -1;
+    public absoluteIndex: number = 0;
     //public material: StandardMaterial;
     public position: Vector3 = new Vector3();
     public viewerPosition:  Vector3 = new Vector3();
@@ -112,6 +114,8 @@ export class Cuadro {
         this.slug = slugArtista + "_" + (this.order + 1);
         //console.log("cuadr slug.: " + this.slug);
         this.id = idArtist + "_" + cuadro.name.split("@")[1];
+
+        //this.absoluteIndex = absoluteIndex + cuadro.name.split("@")[1];
         //console.log("cuadro.id: " + this.id)
         //this.order = parseInt(this.slug.split("_")[2])-1;
 
@@ -120,6 +124,13 @@ export class Cuadro {
         this.mesh.name = this.slug;
         this.mesh.metadata = "cuadro";
         this.mesh.id = this.id;
+
+        let meshMaterial = new PBRMetallicRoughnessMaterial("cuadrosMat", scene);
+        meshMaterial = this.mesh.material as PBRMetallicRoughnessMaterial;
+
+        meshMaterial.roughness = 0.9;
+        meshMaterial.metallic = 0.1;
+        //meshMaterial.emissiveColor = 1;
 
         this.position.copyFromFloats(cuadro.position.x + ubicacion.x, cuadro.position.y + ubicacion.y, cuadro.position.z + ubicacion.z);
 

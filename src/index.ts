@@ -4,7 +4,7 @@ import 'pepjs';
 import { Artist } from './Artist';
 //import * as cannon from 'cannon';
 
-import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera } from '@babylonjs/core'
+import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, VideoTexture, Texture, ActionManager, ExecuteCodeAction, KeyboardEventTypes } from '@babylonjs/core'
 import { createEngine, createScene, createSkybox, createArcRotateCamera } from './babylon'
 
 //import * as viAPI from './virtualInsanityAPI'
@@ -13,6 +13,9 @@ const canvas: HTMLCanvasElement = document.getElementById('virtualInsanityCanvas
 const engine = createEngine(canvas)
 const scene = createScene()
 
+let room:Mesh;
+let limits:Mesh;
+
 let targetBox: Mesh;
 let targetPosition: Vector3;
 let targetCameraPosition: Vector3;
@@ -20,12 +23,15 @@ let roomCenter: Vector3;
 
 let artist: Artist[]  = [];
 let numArtists: number =  0;
+let numCuadros: number =  0;
 let actualArtist: number = -1;
+let actualCuadroID: number = -1;
+
 
 const numVentanas: number = 0;
 
-const targetSpeed: number = 0.03;
-const cameraSpeed: number = 0.04;
+const targetSpeed: number = 0.015;
+const cameraSpeed: number = 0.03;
 
 let cameraSetted: boolean = false;
 
@@ -36,6 +42,8 @@ var oldTargetPosition: Vector3;
 var oldTargetCameraPosition: Vector3;
 
 /**GUI SCENE CLASS*/
+/* ******************************* GUI SCENE BABYLON CLASS ***************************** */
+
 class GuiSceneBabylon{
   constructor(){}
   
@@ -72,18 +80,6 @@ class GuiSceneBabylon{
     return newPos;
   }
 
-  getCuadroIndexByID(id: number, artist: Artist):number{
-
-    let newIndex: number = -1;
-    //let cuadroID: number = id;
-
-    artist.cuadro.forEach(cuadroElement => {
-      if(cuadroElement.order === id) newIndex = cuadroElement.arrayIndex;
-    });
-
-    return newIndex;
-  }
-
   getArtistViewPositionsByName(name: string):Vector3{
 
     let newPos: Vector3 = new Vector3();
@@ -106,6 +102,46 @@ class GuiSceneBabylon{
     return newPos;
   }
 
+  getCuadroIndexByID(id: number, artist: Artist):number{
+
+    let newIndex: number = -1;
+    //let cuadroID: number = id;
+
+    artist.cuadro.forEach(cuadroElement => {
+      if(cuadroElement.order === id) newIndex = cuadroElement.arrayIndex;
+    });
+
+    return newIndex;
+  }
+
+  getCuadroPositionsByID(id:number): Vector3{
+
+    let newCuadroPos: Vector3 = new Vector3();
+
+    artist.forEach(artistElement => {
+      artistElement.cuadro.forEach(cuadroElement =>{
+        if(cuadroElement.absoluteIndex === id) newCuadroPos = cuadroElement.position;
+      });
+        
+    });
+
+    return newCuadroPos;
+  }
+
+  getCuadroViewerPositionsByID(id:number): Vector3{
+
+    let newCuadroPos: Vector3 = new Vector3();
+
+    artist.forEach(artistElement => {
+      artistElement.cuadro.forEach(cuadroElement =>{
+        if(cuadroElement.absoluteIndex === id) newCuadroPos = cuadroElement.viewerPosition;
+      });
+        
+    });
+
+    return newCuadroPos;
+  }
+
   selectArtist(artistID: number): void{
 
     let pos = this.getArtistPositionsByID(artistID);
@@ -113,10 +149,10 @@ class GuiSceneBabylon{
 
     actualArtist = artistID;
 
-    console.log("actualArtist: " + actualArtist);
+    //console.log("actualArtist: " + actualArtist);
     targetPosition = new Vector3(pos.x, pos.y, pos.z);
     targetCameraPosition = new Vector3(viewPos.x, viewPos.y, viewPos.z);
-    camera.useAutoRotationBehavior = false;
+    //camera.useAutoRotationBehavior = false;
 
   }
 
@@ -139,21 +175,71 @@ class GuiSceneBabylon{
     this.selectArtist(actualArtist);
   }
 
+  selectCuadro(cuadroID: number): void{
+
+    let pos = this.getCuadroPositionsByID(cuadroID);
+    let viewPos = this.getCuadroViewerPositionsByID(cuadroID);
+
+    actualCuadroID = cuadroID;
+
+    console.log("cuadroID: " + cuadroID);
+    targetPosition = new Vector3(pos.x, pos.y, pos.z);
+    targetCameraPosition = new Vector3(viewPos.x, viewPos.y, viewPos.z);
+    //camera.useAutoRotationBehavior = false;
+
+  }
+
+  next_cuadro(): void{
+    actualCuadroID = (actualCuadroID + 1)% numCuadros;
+    this.selectCuadro(actualCuadroID);
+  }
+
+  prev_cuadro(): void{
+    if(actualCuadroID > 0){
+      actualCuadroID = (actualCuadroID + (numCuadros-1))%numCuadros;
+    }
+    else{
+      actualCuadroID = numCuadros - 1; 
+    }
+    this.selectCuadro(actualCuadroID);
+  }
+
+  
+
+  
+
   center_camera(){
   
-  targetPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
-  targetCameraPosition = camera.position;
-  oldTargetCameraPosition = targetCameraPosition;
+    targetPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
+    targetCameraPosition = camera.position;
+    oldTargetCameraPosition = targetCameraPosition;
 
-  camera.useAutoRotationBehavior = true;
-  camera.angularSensibilityX = -5000;
+    camera.useAutoRotationBehavior = true;
+    camera.angularSensibilityX = -5000;
 
-  if(camera.autoRotationBehavior !== null){
-    camera.autoRotationBehavior.idleRotationSpeed = 0.18;}
+    if(camera.autoRotationBehavior !== null){
+      camera.autoRotationBehavior.idleRotationSpeed = 0.1;
+    }
+  }
+
+  /** AUTO PLAY CAMERA */
+
+  private intervalID: NodeJS.Timeout;
+
+  setCameraAutoPlay(set: boolean){
+    if(set){
+      this.intervalID = setInterval( function() {
+
+        guiVI.next_artist();
+        
+      }, 8000);
+    }
+    else{
+      clearInterval(this.intervalID);
+    }
   }
 
   toggle_camera(){
-
     if(scene.activeCamera !== null){
       if( scene.activeCamera.name === "ArcCamera"){
         //scene.activeCamera = camera02;
@@ -166,9 +252,12 @@ class GuiSceneBabylon{
   }
 }
 
-/**SCENE GUI CLASS END */ 
+/** SCENE GUI CLASS END */ 
 
-var guiVI= new GuiSceneBabylon()
+var guiVI = new GuiSceneBabylon()
+
+/** MAIN SCENE */
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 // main function that is async so we can call the scene manager with await
 const main = async () => {
@@ -178,17 +267,16 @@ const main = async () => {
   const light02 = new HemisphericLight("light2", new Vector3(-3, 1, -1), scene);
   const light03 = new HemisphericLight("light3", new Vector3(0, 1, 0), scene);
 
-  //const light = new PointLight("pointLight1",  new Vector3(3, 2, 3), scene);
+  light01.intensity = 0.8;
+  light02.intensity = 0.8;
+  light03.intensity = 0.8;
 
-  light01.intensity = 0.8
-  light02.intensity = 0.8
-  light03.intensity = 0.8
-
-  var room:Mesh;
-  var limits:Mesh;
-
-  //var ventana: Mesh[] = [];
-
+  /** IMPORTACIÓN DE LA ESCENA DE BLENDER 
+   * 
+   * Las mallas que llegan importadas desde Blender deben ser 
+   * manipuladas dentro de la misma función que las importa.
+   * 
+  */
 
   SceneLoader.ImportMesh(
     "",
@@ -199,36 +287,34 @@ const main = async () => {
 
       //console.log("importedMeshes[0].name: " + importedMeshes[0].name);
       let index = 0;
+      let cuadroAbsoluteIndex = 0;
       importedMeshes.forEach(newMesh => {
         
         let meshNames: string[] = newMesh.name.split(".");
         if( meshNames[0] === "Artist" ){
           artist.push(new Artist(newMesh, index, scene));
           index++;
+          
         }
       });
+      
+      for(let i=0; i < artist.length; i++){
+        for(let j=0; j < artist[i].cuadro.length; j++){
+          artist[i].cuadro[j].absoluteIndex = cuadroAbsoluteIndex ;
+          cuadroAbsoluteIndex ++
+        }
+      }
+      
 
       numArtists = artist.length;
-      
-      //for(let i = 0; i < numCuadros; i++){
-
-        //cuadro.push(scene.getMeshByName("Cuadro.00"+i) as Mesh);
-        //cuadro[i].metadata = "cuadro0"+(i);
-
-        //cuadroUser.push(scene.getMeshByName("CuadroUser.00"+i) as Mesh);
-
-        //cuadroUser[i].visibility = 0;
-      //}
-
-      
-
+      numCuadros = cuadroAbsoluteIndex;
+    
       if(scene.getMeshByName("Limits.000")){
         limits = scene.getMeshByName("Limits.000") as Mesh;
         limits.metadata = "limits";
+        limits.name = "limits";
         limits.checkCollisions = true;
         limits.freezeWorldMatrix();
-        
-      
       }
 
       if(scene.getMeshByName("Room.000")){
@@ -240,10 +326,6 @@ const main = async () => {
       
       }
 
-      //console.log("metadata setted");
-
-      
-      
       targetPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
       targetCameraPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
       oldTargetPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
@@ -259,21 +341,19 @@ const main = async () => {
 
       targetBox.position = targetPosition;
 
-      //finally, say which mesh will be collisionable
-
-      
-
-      //console.log("Camera Setted");
-
       if(camera !== undefined && targetBox !== undefined && cameraSetted === false){
         camera.setTarget(targetBox);
         cameraSetted = true;
   
       }
 
+      /** FUNCION DE OBSERVACION DE EVENTOS DE CLICK
+       * 
+       * Aqui se determina que mesh fue clickeado
+       * 
+       */
+
       scene.onPointerDown = function selectMesh() {
-        // check if we are under a mesh
-        //var pickInfo = scene.pick(scene.pointerX, scene.pointerY, function (mesh) { return mesh !== cuadro09; }, true, camera);
 
         function predicate(mesh: AbstractMesh){
           if (mesh === targetBox){
@@ -302,6 +382,8 @@ const main = async () => {
 
               let iArtist = parseInt(currentMesh.id.split("_")[0]);
               let iCuadro = parseInt(currentMesh.id.split("_")[1])-1;
+
+              //actualCuadroID = currentMesh.;
 
               camera.angularSensibilityX = 5000;
 
@@ -332,6 +414,7 @@ const main = async () => {
 
                 let cuadroIndex:number = guiVI.getCuadroIndexByID(iCuadro, artist[currentArtistIndex]);
                 let currentCuadro = artist[currentArtistIndex].cuadro[cuadroIndex];
+                actualCuadroID = artist[currentArtistIndex].cuadro[cuadroIndex].absoluteIndex;
 
                 console.log("currentCuadro.slug: " + currentCuadro.slug)
                 //console.log("currentCuadro.id: " + currentCuadro.id)
@@ -341,20 +424,43 @@ const main = async () => {
           
                 globalThis.bronxControl.showInfoByPostSlug(currentCuadro.slug,175);
               }
-              /* if(actualCuadro !== iCuadro){
-                  actualCuadro = iCuadro;
-                  targetCameraPosition = new Vector3(cuadroUser[iCuadro].position.x, cuadroUser[iCuadro].position.y, cuadroUser[iCuadro].position.z);
-              } */
               
-              console.log("Artist selected id: " + artist[currentArtistIndex].id);
-              camera.useAutoRotationBehavior = false;
-
+              //console.log("Artist selected id: " + artist[currentArtistIndex].id);
             }
           }
         }
       }
     }
   );
+
+  /** VIDEO SCREENS */
+  /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+  
+  let videoScreen = Mesh.CreateBox("videoScreen", 1, scene);
+
+  videoScreen.scaling = new Vector3(1.6*2.5, 0.9*2.5, 0.02);
+
+ //videoScreen.rotate(new Vector3(0, 1, 0), Tools.ToRadians(90));
+
+  videoScreen.position = new Vector3(2.6, 2.2, 7.5);
+
+  var videoMat01 = new StandardMaterial("videoMat01", scene);
+
+  var videoTexture = new VideoTexture("video", [URL_SCENE_JS + "data/movies/movie01.mp4"], scene, true, false);
+  var preVideoTexture = new Texture(URL_SCENE_JS + "data/images/premovie01.png", scene, true, true);
+
+  videoMat01.diffuseTexture = preVideoTexture;
+  videoScreen.material = videoMat01;
+
+  scene.onPointerUp = function () {
+    videoTexture.video.play();
+    videoMat01.diffuseTexture = videoTexture;
+  }
+
+  
+
+  /** Animation Loop */
+ /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
   scene.registerBeforeRender(function() {
 
@@ -381,25 +487,63 @@ const main = async () => {
           }
 
       }
+
+
+      /** Camera colides with wall and return */
+      camera.onCollide = function(collider) {
+        if(collider.name === 'limits') {
+            console.log('onCollide', collider.name);
+            camera.autoRotationBehavior.idleRotationSpeed = camera.autoRotationBehavior.idleRotationSpeed*(-1)
+      
+        }
+        
+      }
+    }
+
+    if(map["c"]){
+      guiVI.center_camera();
     }
 
   });
 
 
-  // Start the scene
+  /** RUN RENDER LOOP */
   engine.runRenderLoop(() => {
     scene.render()
   });
 
 
-  // Resize
+  /** RESIZE */
   window.addEventListener("resize", function () {
     engine.resize();
   });
 
 }
 
+
+
+/** Action Events */
+
+
+
+/*
+cuadros.actionManager.registerAction(
+  new SetValueAction(
+      {
+          trigger: ActionManager.OnIntersectionEnterTrigger,
+          parameter: limits
+      },
+      camera,
+      'autoRotationBehavior.idleRotationSpeed',
+      camera.autoRotationBehavior.idleRotationSpeed*(-1)
+  )
+);
+*/
+
+
 /** Buttons events */
+ /**************************** CONTROL NAVIGATION BUTTONS ************************************************/
+
 globalThis.virtualInButtonClick = function(buttonClickData){
   let buttonId = buttonClickData.id;
   switch(buttonId) { 
@@ -422,6 +566,58 @@ globalThis.virtualInButtonClick = function(buttonClickData){
   } 
   console.log("Button clicked: "+buttonId);
 }
+
+/** Keyboard events */
+ /**************************** Key Control Multiple Keys ************************************************/
+
+ var map = {}; //object for multiple key presses
+ scene.actionManager = new ActionManager(scene);
+
+ scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyDownTrigger, function (evt) {
+     map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+
+ }));
+
+ scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyUpTrigger, function (evt) {
+     map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+ }));
+
+ scene.onKeyboardObservable.add((kbInfo) => {
+  switch (kbInfo.type) {
+      case KeyboardEventTypes.KEYDOWN:
+          console.log("KEY DOWN: ", kbInfo.event.key);
+          switch (kbInfo.event.key){
+            case "c":
+              guiVI.center_camera();
+              break;
+            case "ArrowRight":
+              guiVI.next_artist();
+              break;
+            case "ArrowLeft":
+              guiVI.prev_artist();
+              break;
+            case "w":
+              guiVI.next_cuadro();
+              break;
+            case "q":
+              guiVI.prev_cuadro();
+              break;
+            case "p":
+              guiVI.setCameraAutoPlay(true);
+              break;
+            case "s":
+              guiVI.setCameraAutoPlay(false);
+              break;
+            default:
+              break;
+
+          }       
+          break;
+  }
+});
+
+
+ /** INIT SCENE */
 
 export {
   initBabylonScene
