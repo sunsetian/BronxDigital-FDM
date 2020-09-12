@@ -1,10 +1,10 @@
 //imports
 import 'pepjs';
 //import '@babylonjs/loaders';
-import { Artist } from './Artist';
+import { Artist, Movie } from './Artist';
 //import * as cannon from 'cannon';
 
-import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, VideoTexture, Texture, ActionManager, ExecuteCodeAction, KeyboardEventTypes } from '@babylonjs/core'
+import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, VideoTexture, Texture, ActionManager, ExecuteCodeAction, KeyboardEventTypes, VideoTextureSettings } from '@babylonjs/core'
 import { createEngine, createScene, createSkybox, createArcRotateCamera } from './babylon'
 
 //import * as viAPI from './virtualInsanityAPI'
@@ -26,6 +26,9 @@ let numArtists: number =  0;
 let numCuadros: number =  0;
 let actualArtist: number = -1;
 let actualCuadroID: number = -1;
+let movies: Movie[] = []
+let numMovies: number = 0;
+let actualMovie: number = -1;
 
 
 const numVentanas: number = 0;
@@ -101,6 +104,55 @@ class GuiSceneBabylon{
 
     return newPos;
   }
+
+  getMoviePositionsByName(name: string):Vector3{
+
+    let newPos: Vector3 = new Vector3();
+
+    movies.forEach(movieElement => {
+      if(movieElement.name === name) newPos = movieElement.position;
+    });
+
+    return newPos;
+  }
+  
+  getMovieViewPositionsByName(name: string):Vector3{
+
+    let newPos: Vector3 = new Vector3();
+
+    movies.forEach(movieElement => {
+      if(movieElement.name === name) newPos = movieElement.viewerPosition;
+    });
+
+    return newPos;
+  }
+  
+  getMovieIndexByName(name: string):number{
+
+    let newIndex: number = -1;
+
+    
+
+    movies.forEach(movieElement => {
+      console.log("movieElement.name  " + movieElement.name + " : name " + name);
+      if(movieElement.name === name) newIndex = movieElement.arrayIndex;
+      
+    });
+
+    return newIndex;
+  }
+
+  getMovieViewerPositionsByID(id:number): Vector3{
+
+    let newPos: Vector3 = new Vector3();
+
+    movies.forEach(moviesElement => {
+        if(moviesElement.id === id) newPos = moviesElement.viewerPosition;
+    });
+
+    return newPos;
+  }
+  
 
   getCuadroIndexByID(id: number, artist: Artist):number{
 
@@ -204,8 +256,17 @@ class GuiSceneBabylon{
     this.selectCuadro(actualCuadroID);
   }
 
-  
+  getMovieIndexByID(id: number, movies: Movie[]):number{
 
+    let newIndex: number = -1;
+    //let cuadroID: number = id;
+
+    movies.forEach(movieElement => {
+      if(movieElement.id === id) newIndex = movieElement.arrayIndex;
+    });
+
+    return newIndex;
+  }
   
 
   center_camera(){
@@ -287,6 +348,7 @@ const main = async () => {
 
       //console.log("importedMeshes[0].name: " + importedMeshes[0].name);
       let index = 0;
+      let movieIndex = 0;
       let cuadroAbsoluteIndex = 0;
       importedMeshes.forEach(newMesh => {
         
@@ -296,6 +358,12 @@ const main = async () => {
           index++;
           
         }
+
+        if( meshNames[0] === "Movie" ){
+          movies.push(new Movie(newMesh as Mesh, movieIndex, URL_SCENE_JS, scene));
+          movieIndex++;
+          console.log("movieIndex: " + movieIndex);
+        }
       });
       
       for(let i=0; i < artist.length; i++){
@@ -304,10 +372,10 @@ const main = async () => {
           cuadroAbsoluteIndex ++
         }
       }
-      
 
       numArtists = artist.length;
       numCuadros = cuadroAbsoluteIndex;
+      numMovies = movies.length;
     
       if(scene.getMeshByName("Limits.000")){
         limits = scene.getMeshByName("Limits.000") as Mesh;
@@ -347,6 +415,16 @@ const main = async () => {
   
       }
 
+      /** LOAD VIDEO SCREENS */
+
+      
+    
+        
+          
+        //videoMat01.diffuseTexture = videoTexture;
+      
+
+
       /** FUNCION DE OBSERVACION DE EVENTOS DE CLICK
        * 
        * Aqui se determina que mesh fue clickeado
@@ -362,10 +440,10 @@ const main = async () => {
           return true;
         }
 
-        var pickMesh: Ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);
-        var hit: PickingInfo = scene.pickWithRay(pickMesh, predicate) as PickingInfo;
+        let pickMesh: Ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);
+        let hit: PickingInfo = scene.pickWithRay(pickMesh, predicate) as PickingInfo;
 
-        var cuadrosName = "cuadro";
+        let cuadrosName = "cuadro";
 
         if(hit.pickedMesh != null){
           if(hit.pickedMesh.metadata != null){
@@ -427,6 +505,51 @@ const main = async () => {
               
               //console.log("Artist selected id: " + artist[currentArtistIndex].id);
             }
+
+            let moviesName = "movie";
+
+            if (hit.pickedMesh && hit.pickedMesh.metadata === moviesName) {
+
+              let currentMoviePos: Vector3 = new Vector3();
+              let currentMovieViewPos: Vector3 = new Vector3();
+              let currentMovieIndex: number = -1;
+
+              if(hit.pickedMesh != null){
+
+                console.log("hit.pickedMesh.name " + hit.pickedMesh.name);
+                 
+                currentMoviePos = guiVI.getMoviePositionsByName(hit.pickedMesh.name);
+                currentMovieViewPos = guiVI.getMovieViewPositionsByName(hit.pickedMesh.name);
+                currentMovieIndex = guiVI.getMovieIndexByName(hit.pickedMesh.name);
+
+                console.log("currentMovieIndex: " + currentMovieIndex);
+
+                //console.log("hit.pickedMesh.parent.name: "+ hit.pickedMesh.parent.name);
+             }
+
+              let movieIndex:number = guiVI.getMovieIndexByID(parseInt(hit.pickedMesh.id), movies);
+
+              if(actualMovie !== movieIndex){
+                actualMovie = movieIndex;
+                targetCameraPosition = new Vector3(currentMovieViewPos.x, currentMovieViewPos.y, currentMovieViewPos.z);
+              
+                targetPosition = new Vector3(currentMoviePos.x, currentMoviePos.y, currentMoviePos.z);
+              }
+
+              console.log("movies[movieIndex].videoTexturePlaying " + movies[movieIndex].videoTexturePlaying);
+
+              if(!movies[movieIndex].videoTexturePlaying){
+                movies[movieIndex].videoTexture.video.play();
+                movies[movieIndex].videoTexturePlaying = true;
+              }
+              else{
+                movies[movieIndex].videoTexture.video.pause();
+                movies[movieIndex].videoTexturePlaying = false;
+              }
+
+            }
+
+
           }
         }
       }
@@ -436,7 +559,7 @@ const main = async () => {
   /** VIDEO SCREENS */
   /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
   
-  let videoScreen = Mesh.CreateBox("videoScreen", 1, scene);
+  /* let videoScreen = Mesh.CreateBox("videoScreen", 1, scene);
 
   videoScreen.scaling = new Vector3(1.6*2.5, 0.9*2.5, 0.02);
 
@@ -444,19 +567,31 @@ const main = async () => {
 
   videoScreen.position = new Vector3(2.6, 2.2, 7.5);
 
-  var videoMat01 = new StandardMaterial("videoMat01", scene);
+  let videoMat01 = new StandardMaterial("videoMat01", scene);
 
-  var videoTexture = new VideoTexture("video", [URL_SCENE_JS + "data/movies/movie01.mp4"], scene, true, false);
-  var preVideoTexture = new Texture(URL_SCENE_JS + "data/images/premovie01.png", scene, true, true);
+  let myVideoSettings: VideoTextureSettings = new Object({autoPlay: false, autoUpdateTexture: true, loop: false, clickToPlay: true, poster: URL_SCENE_JS + "data/images/premovie01.png"}) as VideoTextureSettings;
 
-  videoMat01.diffuseTexture = preVideoTexture;
+  let videoTexture = new VideoTexture("video01", [URL_SCENE_JS + "data/movies/movie01.mp4"], scene, true, false, VideoTexture.TRILINEAR_SAMPLINGMODE, myVideoSettings);
+  //let preVideoTexture = new Texture(URL_SCENE_JS + "data/images/premovie01.png", scene, true, true);
+
+  videoMat01.diffuseTexture = videoTexture;
   videoScreen.material = videoMat01;
 
-  scene.onPointerUp = function () {
-    videoTexture.video.play();
-    videoMat01.diffuseTexture = videoTexture;
-  }
+  let videoTexturePlaying = false;
 
+  scene.onPointerUp = function () {
+    if(!videoTexturePlaying){
+      videoTexture.video.play();
+      videoTexturePlaying = true;
+    }
+    else{
+      videoTexture.video.pause();
+      videoTexturePlaying = false;
+    }
+      
+    //videoMat01.diffuseTexture = videoTexture;
+  }
+ */
   
 
   /** Animation Loop */
@@ -492,7 +627,7 @@ const main = async () => {
       /** Camera colides with wall and return */
       camera.onCollide = function(collider) {
         if(collider.name === 'limits') {
-            console.log('onCollide', collider.name);
+            //console.log('onCollide', collider.name);
             camera.autoRotationBehavior.idleRotationSpeed = camera.autoRotationBehavior.idleRotationSpeed*(-1)
       
         }

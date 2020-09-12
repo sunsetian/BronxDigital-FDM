@@ -1,4 +1,4 @@
-import { Mesh, AbstractMesh, Vector3, Scene, PBRMetallicRoughnessMaterial } from "@babylonjs/core";
+import { Mesh, AbstractMesh, Vector3, Scene, PBRMetallicRoughnessMaterial, StandardMaterial, VideoTextureSettings, VideoTexture } from "@babylonjs/core";
 
 export class Artist {
 
@@ -84,10 +84,6 @@ export class Artist {
        
         });
 
-        //console.log("this.wall: " + this.wall);
-
-        /*  ESTE ES UN COMENTARIO PAR COMMIT */
-        /*  ESTE ES OTRO COMENTARIO PAR COMMIT */
     }
 }
 
@@ -157,4 +153,100 @@ export class Cuadro {
 
 
     }
+}
+
+export class Movie {
+
+    public wall: string = "";
+    public id: number = 0;
+    public slug: string = "";
+    public name: string = "";
+    public numMovies: number = 0;
+    public position: Vector3 = new Vector3();
+    public viewerPosition: Vector3 = new Vector3();
+    public firstBoundingBox: Vector3  = new Vector3();
+    public arrayIndex: number = -1;
+    private closeDistance = 5;
+
+    public mesh: Mesh = new Mesh("");
+    public videoTexturePlaying: boolean = false;
+    public videoTexture: VideoTexture;
+    
+    constructor(movieMesh: Mesh, arrayIndex: number,  scenePath: string, scene: Scene) {
+
+        this.arrayIndex = arrayIndex;
+
+        this.id = parseInt(movieMesh.name.split(".")[1]);
+
+        this.name = movieMesh.name;
+
+        this.mesh = movieMesh;
+
+        this.mesh.name = movieMesh.name;
+        this.mesh.metadata = "movie";
+        this.mesh.id = this.id + "";
+
+        //console.log("·············· id: " + this.id);
+
+        this.position = movieMesh.position;
+
+        let videoMaterial: StandardMaterial = new StandardMaterial("videoMat" + this.id, scene);
+
+        let myVideoSettings: VideoTextureSettings = new Object({autoPlay: false, autoUpdateTexture: true, loop: false, clickToPlay: true, poster: scenePath + "data/images/premovie_"+ this.id +".jpg"}) as VideoTextureSettings;
+    
+        this.videoTexture = new VideoTexture("video" + this.id, [scenePath + "data/movies/movie_" + this.id + ".mp4"], scene, true, false, VideoTexture.TRILINEAR_SAMPLINGMODE, myVideoSettings);
+        //let preVideoTexture = new Texture(URL_SCENE_JS + "data/images/premovie01.png", scene, true, true);
+    
+        videoMaterial.diffuseTexture = this.videoTexture;
+        movieMesh.material = videoMaterial;
+    
+        this.videoTexturePlaying = false;
+    
+
+
+        this.firstBoundingBox = movieMesh.getBoundingInfo().boundingBox.extendSize;
+
+        const calculateViewerPosition = (): Vector3 => {
+
+            let newViewerPosition: Vector3 = new Vector3();
+            newViewerPosition.copyFromFloats(movieMesh.position.x, movieMesh.position.y, movieMesh.position.z);
+
+
+            if(this.firstBoundingBox.x >= this.firstBoundingBox.z){
+
+                if(movieMesh.position.z > 0){
+                    this.wall = "east"
+                    newViewerPosition.z = newViewerPosition.z - this.closeDistance;
+                    
+                }
+                else{
+                    this.wall = "west";
+                    newViewerPosition.z = newViewerPosition.z + this.closeDistance;
+                    
+                } 
+            }
+            else{
+                if(movieMesh.position.x > 0){
+                    this.wall = "north";
+                    newViewerPosition.x = newViewerPosition.x - this.closeDistance;
+                    
+                }
+                else{
+                    this.wall = "south";
+                    newViewerPosition.x = newViewerPosition.x + this.closeDistance;
+                    
+                }
+            }
+
+            //console.log("newViewerPosition: " + newViewerPosition);
+
+            return newViewerPosition;
+        }
+
+        this.viewerPosition = calculateViewerPosition();
+
+       
+
+    }
+
 }

@@ -79,7 +79,7 @@ export const createArcRotateCamera = () => {
     camera.pinchPrecision = 1000;
 
     camera.checkCollisions = true // make the camera collide with meshes
-    camera.collisionRadius = new Vector3(1.7, 1.7, 1.7) // how close can the camera go to other meshes
+    camera.collisionRadius = new Vector3(1.7, 0.2, 1.7) // how close can the camera go to other meshes
 
     //camera.applyGravity = true;
 
