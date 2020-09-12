@@ -192,7 +192,7 @@ export class Movie {
 
         let videoMaterial: StandardMaterial = new StandardMaterial("videoMat" + this.id, scene);
 
-        let myVideoSettings: VideoTextureSettings = new Object({autoPlay: false, autoUpdateTexture: true, loop: false, clickToPlay: true, poster: scenePath + "data/images/premovie_"+ this.id +".jpg"}) as VideoTextureSettings;
+        let myVideoSettings: VideoTextureSettings = new Object({autoPlay: false, autoUpdateTexture: true, loop: false, clickToPlay: true, poster: scenePath + "data/models/premovie_" + this.id + ".jpg"}) as VideoTextureSettings;
     
         this.videoTexture = new VideoTexture("video" + this.id, [scenePath + "data/movies/movie_" + this.id + ".mp4"], scene, true, false, VideoTexture.TRILINEAR_SAMPLINGMODE, myVideoSettings);
         //let preVideoTexture = new Texture(URL_SCENE_JS + "data/images/premovie01.png", scene, true, true);
