@@ -5,7 +5,7 @@ import { Artist, Movie } from './Artist';
 //import * as cannon from 'cannon';
 
 import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, VideoTexture, Texture, ActionManager, ExecuteCodeAction, KeyboardEventTypes, VideoTextureSettings } from '@babylonjs/core'
-import { createEngine, createScene, createSkybox, createArcRotateCamera } from './babylon'
+import { createEngine, createScene, createSkybox, createArcRotateCamera, setObjShader } from './babylon'
 
 //import * as viAPI from './virtualInsanityAPI'
 
@@ -130,8 +130,6 @@ class GuiSceneBabylon{
   getMovieIndexByName(name: string):number{
 
     let newIndex: number = -1;
-
-    
 
     movies.forEach(movieElement => {
       console.log("movieElement.name  " + movieElement.name + " : name " + name);
@@ -284,7 +282,6 @@ class GuiSceneBabylon{
   }
 
   /** AUTO PLAY CAMERA */
-
   private intervalID: NodeJS.Timeout;
 
   setCameraAutoPlay(set: boolean){
@@ -351,6 +348,8 @@ const main = async () => {
       let movieIndex = 0;
       let cuadroAbsoluteIndex = 0;
       importedMeshes.forEach(newMesh => {
+        /**Material Sahder */
+        setObjShader(newMesh);
         
         let meshNames: string[] = newMesh.name.split(".");
         if( meshNames[0] === "Artist" ){
@@ -388,18 +387,14 @@ const main = async () => {
       if(scene.getMeshByName("Room.000")){
         room = scene.getMeshByName("Room.000") as Mesh;
         room.metadata = "sala01";
-        room.checkCollisions = true;
         room.freezeWorldMatrix();
-        
-      
       }
-
       targetPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
       targetCameraPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
       oldTargetPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
       oldTargetCameraPosition = targetCameraPosition;
       roomCenter = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
-
+      
       targetBox = Mesh.CreateBox("TargetBox.000", 0.5, scene);
       let baseMat = new StandardMaterial("BaseMaterial", scene);
 

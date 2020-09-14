@@ -1,11 +1,14 @@
-import { Engine, Scene, ArcRotateCamera, Vector3, CubeTexture, Color4, Mesh, StandardMaterial, Texture, Color3 } from '@babylonjs/core';
+import { Engine, Scene, ArcRotateCamera, Vector3, CubeTexture, Color4, Mesh, StandardMaterial, Texture, Color3, GlowLayer, AbstractMesh } from '@babylonjs/core';
 //import '@babylonjs/inspector';
+import { SampleMaterial } from "./Materials/SampleMaterial"
 
 export let canvas: HTMLCanvasElement
 export let engine: Engine
 export let scene: Scene
 export let camera: ArcRotateCamera
 let handleResize: any
+
+var shaderMaterial:SampleMaterial
 
 export const createEngine = (hostCanvas: HTMLCanvasElement) => {
   canvas = hostCanvas
@@ -30,9 +33,15 @@ export const createScene = () => {
   scene.collisionsEnabled = true;
 
   scene.enablePhysics(new Vector3(0, -0.9, 0));
+  
+  var gl = new GlowLayer("glow",scene);
+
+  /**Material Shaders*/
+  shaderMaterial =  new SampleMaterial("material", scene);
+
 
   // show the inspector when pressing shift + alt + I
-  /* scene.onKeyboardObservable.add(({ event }) => {
+  scene.onKeyboardObservable.add(({ event }) => {
     if (event.ctrlKey && event.shiftKey && event.code === 'KeyI') {
       if (scene.debugLayer.isVisible()) {
         scene.debugLayer.hide()
@@ -40,7 +49,7 @@ export const createScene = () => {
         scene.debugLayer.show()
       }
     }
-  }) */
+  }) 
 
   return scene
 }
@@ -99,4 +108,8 @@ export const createSkybox = (urlScene:string) => {
   skybox.material = skyboxMaterial;
   
   return skybox
+}
+
+export const setObjShader = (mesh: AbstractMesh) => {
+  mesh.material = shaderMaterial;
 }
