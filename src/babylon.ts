@@ -1,4 +1,4 @@
-import { Engine, Scene, ArcRotateCamera, Vector3, CubeTexture, Color4, Mesh, StandardMaterial, Texture, Color3 } from '@babylonjs/core';
+import { Engine, Scene, ArcRotateCamera, Vector3, CubeTexture, Color4, Mesh, StandardMaterial, Texture, Color3, GlowLayer } from '@babylonjs/core';
 //import '@babylonjs/inspector';
 
 export let canvas: HTMLCanvasElement
@@ -31,6 +31,8 @@ export const createScene = () => {
 
   scene.enablePhysics(new Vector3(0, -0.9, 0));
 
+  var gl = new GlowLayer("glow",scene);
+  
   // show the inspector when pressing shift + alt + I
   /* scene.onKeyboardObservable.add(({ event }) => {
     if (event.ctrlKey && event.shiftKey && event.code === 'KeyI') {
