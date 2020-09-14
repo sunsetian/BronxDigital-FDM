@@ -373,6 +373,12 @@ const main = async () => {
         }
       }
 
+      /**Glow light */
+      /*
+      if(scene.getMeshesByTags("glow")){
+
+      }*/
+
       numArtists = artist.length;
       numCuadros = cuadroAbsoluteIndex;
       numMovies = movies.length;
@@ -388,10 +394,7 @@ const main = async () => {
       if(scene.getMeshByName("Room.000")){
         room = scene.getMeshByName("Room.000") as Mesh;
         room.metadata = "sala01";
-        room.checkCollisions = true;
         room.freezeWorldMatrix();
-        
-      
       }
 
       targetPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
@@ -399,6 +402,7 @@ const main = async () => {
       oldTargetPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
       oldTargetCameraPosition = targetCameraPosition;
       roomCenter = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
+
 
       targetBox = Mesh.CreateBox("TargetBox.000", 0.5, scene);
       let baseMat = new StandardMaterial("BaseMaterial", scene);
