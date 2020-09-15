@@ -23,12 +23,20 @@ export class SampleMaterial extends ShaderMaterial {
 
         const startTime = Date.now()
 
+        
+        scene.onBeforeRenderObservable.add(() => {
+            const currentTime = Date.now()
+            const time = currentTime - startTime
+
+            this.time = time / 10000
+        })
+        /*
         scene.registerBeforeRender(() => {
             const currentTime = Date.now()
             const time = currentTime - startTime
 
-            this.time = time / 1000
-        })
+            this.time = time / 10000
+        })*/
     }
 
     set time(value: number) {

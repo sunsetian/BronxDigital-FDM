@@ -110,6 +110,11 @@ export const createSkybox = (urlScene:string) => {
   return skybox
 }
 
-export const setObjShader = (mesh: AbstractMesh) => {
+
+
+export const setObjShader = (mesh: AbstractMesh, texture: Texture) => {
+  //shaderMaterial.setTexture("uDiffuseMap", cloudTexture);
+  shaderMaterial.setTexture("uHeightMap", texture);
+  shaderMaterial.backFaceCulling = false;
   mesh.material = shaderMaterial;
 }

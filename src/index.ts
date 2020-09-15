@@ -335,7 +335,7 @@ const main = async () => {
    * manipuladas dentro de la misma función que las importa.
    * 
   */
-
+  console.log("Inicio");
   SceneLoader.ImportMesh(
     "",
     URL_SCENE_JS+"data/models/",
@@ -348,8 +348,12 @@ const main = async () => {
       let movieIndex = 0;
       let cuadroAbsoluteIndex = 0;
       importedMeshes.forEach(newMesh => {
+        
         /**Material Sahder */
-        setObjShader(newMesh);
+        console.log("CARGADO "+newMesh.name);
+        var textureTesting = newMesh.material.getActiveTextures[0];
+        setObjShader(newMesh,textureTesting);
+        
         
         let meshNames: string[] = newMesh.name.split(".");
         if( meshNames[0] === "Artist" ){
@@ -550,6 +554,7 @@ const main = async () => {
       }
     }
   );
+  console.log("fin");
 
   /** VIDEO SCREENS */
   /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
