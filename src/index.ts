@@ -388,7 +388,7 @@ const main = async () => {
       if(scene.getMeshByName("Room.000")){
         room = scene.getMeshByName("Room.000") as Mesh;
         room.metadata = "sala01";
-        room.checkCollisions = true;
+        //room.checkCollisions = true;
         room.freezeWorldMatrix();
         
       
