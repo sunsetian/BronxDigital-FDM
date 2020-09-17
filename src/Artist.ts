@@ -12,7 +12,7 @@ export class Artist {
     public viewerPosition: Vector3 = new Vector3();
     public firstBoundingBox: Vector3  = new Vector3();
     public arrayIndex: number = -1;
-    private closeDistance = 5;
+    private closeDistance = 4;
 
     constructor(cuadrosGroup: AbstractMesh, arrayIndex: number, scene: Scene) {
 
@@ -98,7 +98,7 @@ export class Cuadro {
     public viewerPosition:  Vector3 = new Vector3();
     public mesh: Mesh = new Mesh("");
 
-    private closeDistance = 1.8;
+    private closeDistance = 1.71;
 
     public arrayIndex: number = -1;
     public name: string = "";
