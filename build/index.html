@@ -20,13 +20,35 @@
         height: 100%;
         margin: 0;
         padding: 0;
+        background-color: black;
 
      }
     #virtualInsanityCanvas {
         width: 100%;
         height: 100%;
         touch-action: none;
+        position: absolute;
+        left: 0px;
     }
+
+    #virtualInsanityCanvas.horizTranslate {
+        -webkit-transition: 3s;
+        -moz-transition: 3s;
+        -ms-transition: 3s;
+        -o-transition: 3s;
+        transition: 3s;
+        left: -250px;
+     }
+
+     #virtualInsanityCanvas.resetPosition {
+        -webkit-transition: 3s;
+        -moz-transition: 3s;
+        -ms-transition: 3s;
+        -o-transition: 3s;
+        transition: 3s;
+        left: 0px;
+     }
+
     </style>
     
 </head>
@@ -38,8 +60,6 @@
             var urlScene = "http://localhost:9000/";
             console.log(window.virualInsanity);
             window.virualInsanity.initBabylonScene(urlScene);
-            //++initBabylonScene(urlScene);
-            //virtualInsanity.initBabylonScene();
         };
       </script>
 </body>

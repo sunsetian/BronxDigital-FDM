@@ -26,7 +26,7 @@ export const createScene = () => {
   scene.autoClear = false;
   scene.autoClearDepthAndStencil = false;
 
-  scene.gravity = new Vector3(0, -0.9, 0);
+  //scene.gravity = new Vector3(0, -0.9, 0);
   scene.collisionsEnabled = true;
 
   scene.enablePhysics(new Vector3(0, -0.9, 0));
@@ -53,7 +53,7 @@ export const createArcRotateCamera = () => {
     const startRadius = 3
     const startPosition = new Vector3(0, 1.9, 0)
     const camera = new ArcRotateCamera('camera', startAlpha, startBeta, startRadius, startPosition, scene, true)
-    camera.attachControl(canvas, false)
+    //camera.attachControl(canvas, false)
 
     // Set some basic camera settings
     camera.minZ = 0.1;

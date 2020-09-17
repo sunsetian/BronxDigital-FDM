@@ -33,8 +33,8 @@ let actualMovie: number = -1;
 
 const numVentanas: number = 0;
 
-const targetSpeed: number = 0.015;
-const cameraSpeed: number = 0.03;
+const targetSpeed: number = 0.03;
+const cameraSpeed: number = 0.015;
 
 let cameraSetted: boolean = false;
 
@@ -204,7 +204,10 @@ class GuiSceneBabylon{
     //console.log("actualArtist: " + actualArtist);
     targetPosition = new Vector3(pos.x, pos.y, pos.z);
     targetCameraPosition = new Vector3(viewPos.x, viewPos.y, viewPos.z);
-    //camera.useAutoRotationBehavior = false;
+    camera.useAutoRotationBehavior = false;
+
+    canvas.classList.remove('horizTranslate');
+    canvas.classList.add('resetPosition');
 
   }
 
@@ -237,7 +240,10 @@ class GuiSceneBabylon{
     console.log("cuadroID: " + cuadroID);
     targetPosition = new Vector3(pos.x, pos.y, pos.z);
     targetCameraPosition = new Vector3(viewPos.x, viewPos.y, viewPos.z);
-    //camera.useAutoRotationBehavior = false;
+    camera.useAutoRotationBehavior = false;
+
+    canvas.classList.remove('horizTranslate');
+    canvas.classList.add('resetPosition');
 
   }
 
@@ -267,7 +273,6 @@ class GuiSceneBabylon{
 
     return newIndex;
   }
-  
 
   center_camera(){
   
@@ -275,28 +280,36 @@ class GuiSceneBabylon{
     targetCameraPosition = camera.position;
     oldTargetCameraPosition = targetCameraPosition;
 
+    canvas.classList.remove('horizTranslate');
+    canvas.classList.add('resetPosition');
+
     camera.useAutoRotationBehavior = true;
     camera.angularSensibilityX = -5000;
 
     if(camera.autoRotationBehavior !== null){
       camera.autoRotationBehavior.idleRotationSpeed = 0.1;
-    }
+    } 
   }
 
   /** AUTO PLAY CAMERA */
 
   private intervalID: NodeJS.Timeout;
+  private autoPlaySetted: boolean = false;
 
   setCameraAutoPlay(set: boolean){
-    if(set){
+    if(set && !this.autoPlaySetted){
       this.intervalID = setInterval( function() {
-
         guiVI.next_artist();
-        
       }, 8000);
+      this.autoPlaySetted = true;
+      guiVI.next_artist();
+      //console.log("start auto play")
     }
     else{
       clearInterval(this.intervalID);
+      this.autoPlaySetted = false;
+      //console.log("stop auto play")
+      
     }
   }
 
@@ -394,6 +407,7 @@ const main = async () => {
       if(scene.getMeshByName("Room.000")){
         room = scene.getMeshByName("Room.000") as Mesh;
         room.metadata = "sala01";
+        //room.checkCollisions = true;
         room.freezeWorldMatrix();
       }
 
@@ -437,6 +451,9 @@ const main = async () => {
 
       scene.onPointerDown = function selectMesh() {
 
+        canvas.classList.remove('horizTranslate');
+        canvas.classList.add('resetPosition');
+
         function predicate(mesh: AbstractMesh){
           if (mesh === targetBox){
             return false;
@@ -448,6 +465,7 @@ const main = async () => {
         let hit: PickingInfo = scene.pickWithRay(pickMesh, predicate) as PickingInfo;
 
         let cuadrosName = "cuadro";
+        let moviesName = "movie";
 
         if(hit.pickedMesh != null){
           if(hit.pickedMesh.metadata != null){
@@ -493,26 +511,47 @@ const main = async () => {
                 targetPosition = new Vector3(currentArtistPos.x, currentArtistPos.y, currentArtistPos.z);
               }
               else{
-
                 let cuadroIndex:number = guiVI.getCuadroIndexByID(iCuadro, artist[currentArtistIndex]);
                 let currentCuadro = artist[currentArtistIndex].cuadro[cuadroIndex];
-                actualCuadroID = artist[currentArtistIndex].cuadro[cuadroIndex].absoluteIndex;
 
-                console.log("currentCuadro.slug: " + currentCuadro.slug)
-                //console.log("currentCuadro.id: " + currentCuadro.id)
+                if(actualCuadroID !== artist[currentArtistIndex].cuadro[cuadroIndex].absoluteIndex){
+                  
+                  canvas.classList.remove('horizTranslate');
+                  canvas.classList.add('resetPosition');
+                  
 
-                targetCameraPosition = new Vector3(currentCuadro.viewerPosition.x, currentCuadro.viewerPosition.y, currentCuadro.viewerPosition.z);
-                targetPosition = new Vector3(currentCuadro.position.x, currentCuadro.position.y, currentCuadro.position.z);
+                  actualCuadroID = artist[currentArtistIndex].cuadro[cuadroIndex].absoluteIndex;
+
+                  console.log("currentCuadro.slug: " + currentCuadro.slug)
+                  console.log("actualCuadroID: " + currentCuadro.id)
+                  
+                  targetCameraPosition = new Vector3(currentCuadro.viewerPosition.x, currentCuadro.viewerPosition.y, currentCuadro.viewerPosition.z);
+                  targetPosition = new Vector3(currentCuadro.position.x, currentCuadro.position.y, currentCuadro.position.z);
           
-                globalThis.bronxControl.showInfoByPostSlug(currentCuadro.slug,175);
+                }
+                else{
+                  console.log("show Cuadro info");
+                  //canvas.width = canvas.width - 500;
+                  canvas.classList.remove('resetPosition');
+                  canvas.classList.add('horizTranslate');
+                  
+
+                  try {
+                    globalThis.bronxControl.showInfoByPostSlug(currentCuadro.slug,175);
+                  } catch (error) {
+                    console.log("No hay informacion detallada del cuadro")
+                  }
+                  
+                  
+                }
+
+                
+                
               }
               
               //console.log("Artist selected id: " + artist[currentArtistIndex].id);
             }
-
-            let moviesName = "movie";
-
-            if (hit.pickedMesh && hit.pickedMesh.metadata === moviesName) {
+            else if (hit.pickedMesh && hit.pickedMesh.metadata === moviesName) {
 
               let currentMoviePos: Vector3 = new Vector3();
               let currentMovieViewPos: Vector3 = new Vector3();
@@ -551,6 +590,10 @@ const main = async () => {
                 movies[movieIndex].videoTexturePlaying = false;
               }
 
+            }
+            else{
+              canvas.classList.remove('horizTranslate');
+              canvas.classList.add('resetPosition');
             }
 
 
@@ -629,14 +672,14 @@ const main = async () => {
 
 
       /** Camera colides with wall and return */
-      camera.onCollide = function(collider) {
+      /* camera.onCollide = function(collider) {
         if(collider.name === 'limits') {
             //console.log('onCollide', collider.name);
             camera.autoRotationBehavior.idleRotationSpeed = camera.autoRotationBehavior.idleRotationSpeed*(-1)
       
         }
         
-      }
+      } */
     }
 
     if(map["c"]){
@@ -665,8 +708,8 @@ const main = async () => {
 
 
 
-/*
-cuadros.actionManager.registerAction(
+
+/* cuadros.actionManager.registerAction(
   new SetValueAction(
       {
           trigger: ActionManager.OnIntersectionEnterTrigger,
@@ -676,8 +719,8 @@ cuadros.actionManager.registerAction(
       'autoRotationBehavior.idleRotationSpeed',
       camera.autoRotationBehavior.idleRotationSpeed*(-1)
   )
-);
-*/
+); */
+
 
 
 /** Buttons events */
@@ -722,6 +765,10 @@ globalThis.virtualInButtonClick = function(buttonClickData){
  }));
 
  scene.onKeyboardObservable.add((kbInfo) => {
+
+  canvas.classList.remove('horizTranslate');
+  canvas.classList.add('resetPosition');
+
   switch (kbInfo.type) {
       case KeyboardEventTypes.KEYDOWN:
           console.log("KEY DOWN: ", kbInfo.event.key);
@@ -734,6 +781,12 @@ globalThis.virtualInButtonClick = function(buttonClickData){
               break;
             case "ArrowLeft":
               guiVI.prev_artist();
+              break;
+            case "ArrowUp":
+              guiVI.next_cuadro();
+              break;
+            case "ArrowDown":
+              guiVI.prev_cuadro();
               break;
             case "w":
               guiVI.next_cuadro();
