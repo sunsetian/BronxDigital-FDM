@@ -7,7 +7,7 @@ Effect.ShadersStore["sampleVertexShader"] = sampleVertexShader
 Effect.ShadersStore["sampleFragmentShader"] = sampleFragmentShader
 
 export class SampleMaterial extends ShaderMaterial {
-
+    isEnded = false;
     constructor(name: string, scene: Scene) {
         super(name, scene, { vertex: "sample", fragment: "sample" }, {
             uniforms: [
@@ -24,19 +24,17 @@ export class SampleMaterial extends ShaderMaterial {
         const startTime = Date.now()
 
         
-        scene.onBeforeRenderObservable.add(() => {
+        let startShader = scene.onBeforeRenderObservable.add(() => {
             const currentTime = Date.now()
             const time = currentTime - startTime
 
             this.time = time / 10000
+            if(this.time>1){
+                scene.onBeforeRenderObservable.remove(startShader);
+                this.isEnded=true;
+            }
         })
-        /*
-        scene.registerBeforeRender(() => {
-            const currentTime = Date.now()
-            const time = currentTime - startTime
-
-            this.time = time / 10000
-        })*/
+        
     }
 
     set time(value: number) {

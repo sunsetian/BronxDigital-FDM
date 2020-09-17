@@ -23,15 +23,15 @@ uniform float time;
 void main(void)
 {
     float height = texture2D(uHeightMap, vUV).r;
-    //vec4 color= texture2D(uDiffuseMap, vUV);
+    //vec4 color=vec4(1, 0, 0, 1.0);
+    vec4 color= texture2D(uDiffuseMap, vUV);
     
     if (height > time) {
         discard;
     }
-    vec4 color = vec4(0, 1, 0, 1.0);
-    /*
-    if (height < (time+0.04)) {
+    
+    if (height > (time-0.04)) {
         color = vec4(0, 1, 0, 1.0);
-    }*/
+    }
     gl_FragColor = color;
 }

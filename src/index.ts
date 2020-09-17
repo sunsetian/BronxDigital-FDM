@@ -5,7 +5,9 @@ import { Artist, Movie } from './Artist';
 //import * as cannon from 'cannon';
 
 import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, VideoTexture, Texture, ActionManager, ExecuteCodeAction, KeyboardEventTypes, VideoTextureSettings } from '@babylonjs/core'
-import { createEngine, createScene, createSkybox, createArcRotateCamera, setObjShader } from './babylon'
+import { createEngine, createScene, createSkybox, createArcRotateCamera, getMeshesMaterials, setMeshesMaterials } from './babylon'
+
+import { SampleMaterial } from "./Materials/SampleMaterial"
 
 //import * as viAPI from './virtualInsanityAPI'
 
@@ -48,7 +50,9 @@ var oldTargetCameraPosition: Vector3;
 /* ******************************* GUI SCENE BABYLON CLASS ***************************** */
 
 class GuiSceneBabylon{
-  constructor(){}
+  constructor(){
+    canvas.style.backgroundColor = 'black';
+  }
   
   getArtistPositionsByID(id:number): Vector3{
 
@@ -319,7 +323,7 @@ var guiVI = new GuiSceneBabylon()
 
 // main function that is async so we can call the scene manager with await
 const main = async () => {
-  createSkybox(URL_SCENE_JS);
+  //createSkybox(URL_SCENE_JS);
 
   const light01 = new HemisphericLight("light1", new Vector3(3, 1, 1), scene);
   const light02 = new HemisphericLight("light2", new Vector3(-3, 1, -1), scene);
@@ -332,10 +336,9 @@ const main = async () => {
   /** IMPORTACIÓN DE LA ESCENA DE BLENDER 
    * 
    * Las mallas que llegan importadas desde Blender deben ser 
-   * manipuladas dentro de la misma función que las importa.
+   * manipuladas dentro de la función que se ejecuta al terminar la importacion.
    * 
   */
-  console.log("Inicio");
   SceneLoader.ImportMesh(
     "",
     URL_SCENE_JS+"data/models/",
@@ -347,19 +350,47 @@ const main = async () => {
       let index = 0;
       let movieIndex = 0;
       let cuadroAbsoluteIndex = 0;
+
+      /** shaders */
+      /*
+      var shaderMaterial = new 
+      SampleMaterial("material", scene);
+      var textureTest = new Texture(URL_SCENE_JS+"data/models/1.jpg", scene);
+      shaderMaterial.setTexture("uHeightMap", textureTest);
+      shaderMaterial.backFaceCulling = false;*/
+      let sceneMaterials = getMeshesMaterials(importedMeshes);
+      //setMeshesMaterials(importedMeshes,shaderMaterial);
+      setTimeout(function(){
+        setMeshesMaterials(importedMeshes,sceneMaterials);
+        createSkybox(URL_SCENE_JS);
+      },11000);
+      //setMeshesMaterials(importedMeshes,sceneMaterials);
+
+      var myMaterial = new StandardMaterial("myMaterial", scene);
+
       importedMeshes.forEach(newMesh => {
-        
-        /**Material Sahder */
-        console.log("CARGADO "+newMesh.name);
-        var textureTesting = newMesh.material.getActiveTextures[0];
-        setObjShader(newMesh,textureTesting);
-        
-        
+        if(newMesh.material){
+          let meshTexture = newMesh.material.getActiveTextures()[0] as Texture;
+          console.log(newMesh.material.getActiveTextures());
+          if(meshTexture){
+            var shaderMaterial = new SampleMaterial("material", scene);
+            /*Los mejores:
+             loadingShader1.jpg
+             loadingShader2.jpg */
+            var textureTest = new Texture(URL_SCENE_JS+"data/loadingMeshImage/loadingShader0.jpg", scene);
+            shaderMaterial.backFaceCulling = false;
+            shaderMaterial.setTexture("uHeightMap", textureTest);
+            shaderMaterial.setTexture("uDiffuseMap", meshTexture);
+            newMesh.material = shaderMaterial;
+          }
+        }
+        /***************/
+
+
         let meshNames: string[] = newMesh.name.split(".");
         if( meshNames[0] === "Artist" ){
           artist.push(new Artist(newMesh, index, scene));
           index++;
-          
         }
 
         if( meshNames[0] === "Movie" ){
@@ -413,16 +444,6 @@ const main = async () => {
         cameraSetted = true;
   
       }
-
-      /** LOAD VIDEO SCREENS */
-
-      
-    
-        
-          
-        //videoMat01.diffuseTexture = videoTexture;
-      
-
 
       /** FUNCION DE OBSERVACION DE EVENTOS DE CLICK
        * 
@@ -554,7 +575,6 @@ const main = async () => {
       }
     }
   );
-  console.log("fin");
 
   /** VIDEO SCREENS */
   /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
