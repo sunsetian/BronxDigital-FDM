@@ -106,7 +106,7 @@ export const createSkybox = (urlScene:string) => {
   return skybox
 }
 
-/**Trabajo con materiales */
+/**Trabajo con el indice de materiales del archivo importado*/
 export const getMeshesMaterials = (meshes:AbstractMesh[]) => {
   var materials:Material[] = new Array();
   meshes.forEach(mesh => {

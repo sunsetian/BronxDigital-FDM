@@ -4,7 +4,7 @@ import 'pepjs';
 import { Artist, Movie } from './Artist';
 //import * as cannon from 'cannon';
 
-import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, VideoTexture, Texture, ActionManager, ExecuteCodeAction, KeyboardEventTypes, VideoTextureSettings } from '@babylonjs/core'
+import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, VideoTexture, Texture, ActionManager, ExecuteCodeAction, KeyboardEventTypes, VideoTextureSettings, AssetsManager } from '@babylonjs/core'
 import { createEngine, createScene, createSkybox, createArcRotateCamera, getMeshesMaterials, setMeshesMaterials } from './babylon'
 
 import { SampleMaterial } from "./Materials/SampleMaterial"
@@ -53,6 +53,14 @@ class GuiSceneBabylon{
   constructor(){
     canvas.style.backgroundColor = 'black';
   }
+  /*
+  mainLoad(urlScene:string, fileName:string){
+    var assetsManager = new AssetsManager(scene);
+	  var meshTask = assetsManager.addMeshTask("mainLoadTask", "", urlScene, fileName);
+    meshTask.onSuccess = function (task) {
+      //--task.loadedMeshes[0].position = Vector3.Zero();    
+    }	
+  }*/
   
   getArtistPositionsByID(id:number): Vector3{
 
@@ -334,11 +342,11 @@ const main = async () => {
   light03.intensity = 0.8;
 
   /** IMPORTACIÓN DE LA ESCENA DE BLENDER 
-   * 
-   * Las mallas que llegan importadas desde Blender deben ser 
-   * manipuladas dentro de la función que se ejecuta al terminar la importacion.
-   * 
+   * Un administrador de archivos se escargara de generar las tareas de carga
+   * y avisar cada vez que alguna de las escenas ha cargado
   */
+
+
   SceneLoader.ImportMesh(
     "",
     URL_SCENE_JS+"data/models/",
@@ -366,12 +374,10 @@ const main = async () => {
       },11000);
       //setMeshesMaterials(importedMeshes,sceneMaterials);
 
-      var myMaterial = new StandardMaterial("myMaterial", scene);
-
       importedMeshes.forEach(newMesh => {
+        console.log(newMesh);
         if(newMesh.material){
           let meshTexture = newMesh.material.getActiveTextures()[0] as Texture;
-          console.log(newMesh.material.getActiveTextures());
           if(meshTexture){
             var shaderMaterial = new SampleMaterial("material", scene);
             /*Los mejores:
@@ -410,7 +416,7 @@ const main = async () => {
       numArtists = artist.length;
       numCuadros = cuadroAbsoluteIndex;
       numMovies = movies.length;
-    
+      
       if(scene.getMeshByName("Limits.000")){
         limits = scene.getMeshByName("Limits.000") as Mesh;
         limits.metadata = "limits";
@@ -419,11 +425,17 @@ const main = async () => {
         limits.freezeWorldMatrix();
       }
 
+      //++ Porque un comportamiento especial para la sala uno?
       if(scene.getMeshByName("Room.000")){
         room = scene.getMeshByName("Room.000") as Mesh;
         room.metadata = "sala01";
         room.freezeWorldMatrix();
       }
+
+      /** Definicion de camara y target 
+       * Camara puede quedar en el centro y target a un ladito sin necesidad
+      */
+
       targetPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
       targetCameraPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
       oldTargetPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
@@ -442,7 +454,6 @@ const main = async () => {
       if(camera !== undefined && targetBox !== undefined && cameraSetted === false){
         camera.setTarget(targetBox);
         cameraSetted = true;
-  
       }
 
       /** FUNCION DE OBSERVACION DE EVENTOS DE CLICK
