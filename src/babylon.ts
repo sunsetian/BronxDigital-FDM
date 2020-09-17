@@ -1,4 +1,4 @@
-import { Engine, Scene, ArcRotateCamera, Vector3, CubeTexture, Color4, Mesh, StandardMaterial, Texture, Color3, GlowLayer } from '@babylonjs/core';
+import { Engine, Scene, ArcRotateCamera, Vector3, CubeTexture, Color4, Mesh, StandardMaterial, Texture, Color3, GlowLayer, AbstractMesh, Material } from '@babylonjs/core';
 //import '@babylonjs/inspector';
 
 export let canvas: HTMLCanvasElement
@@ -6,6 +6,8 @@ export let engine: Engine
 export let scene: Scene
 export let camera: ArcRotateCamera
 let handleResize: any
+
+
 
 export const createEngine = (hostCanvas: HTMLCanvasElement) => {
   canvas = hostCanvas
@@ -30,11 +32,14 @@ export const createScene = () => {
   scene.collisionsEnabled = true;
 
   scene.enablePhysics(new Vector3(0, -0.9, 0));
+  
+  var gl = new GlowLayer("glow",scene);
+
 
   var gl = new GlowLayer("glow",scene);
   
   // show the inspector when pressing shift + alt + I
-  /* scene.onKeyboardObservable.add(({ event }) => {
+  scene.onKeyboardObservable.add(({ event }) => {
     if (event.ctrlKey && event.shiftKey && event.code === 'KeyI') {
       if (scene.debugLayer.isVisible()) {
         scene.debugLayer.hide()
@@ -42,7 +47,7 @@ export const createScene = () => {
         scene.debugLayer.show()
       }
     }
-  }) */
+  }) 
 
   return scene
 }
@@ -101,4 +106,32 @@ export const createSkybox = (urlScene:string) => {
   skybox.material = skyboxMaterial;
   
   return skybox
+}
+
+/**Trabajo con el indice de materiales del archivo importado*/
+export const getMeshesMaterials = (meshes:AbstractMesh[]) => {
+  var materials:Material[] = new Array();
+  meshes.forEach(mesh => {
+    materials.push(mesh.material);
+  });
+  return materials;
+}
+export const setMeshesMaterials = ( meshes:AbstractMesh[],materials:Material | Material[]) => {
+  console.log(String(typeof(materials)));
+  /** Typeguard */ 
+  if(materials instanceof Material){
+    meshes.forEach(mesh => {
+      mesh.material=materials as Material;
+    });
+  }else if(materials instanceof Array){
+    if(materials.length === meshes.length){
+        let i=0;
+        meshes.forEach(mesh => {
+          mesh.material=materials[i];
+          i++;
+        });
+      }
+    }else{
+      console.log("La cantidad de materiales no es ingual a la cantidad de mallas");
+    }                 
 }
