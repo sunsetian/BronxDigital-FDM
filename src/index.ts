@@ -786,6 +786,7 @@ globalThis.virtualInButtonClick = function(buttonClickData){
     } 
   } 
   console.log("Button clicked: "+buttonId);
+  console.log(buttonClickData);
 }
 
 /** Keyboard events */
