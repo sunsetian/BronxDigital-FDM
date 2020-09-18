@@ -1,9 +1,14 @@
-import { Mesh, AbstractMesh, Vector3, Scene, PBRMetallicRoughnessMaterial, StandardMaterial, VideoTextureSettings, VideoTexture } from "@babylonjs/core";
+import { Mesh, AbstractMesh, Vector3, Scene, PBRMetallicRoughnessMaterial, StandardMaterial, VideoTextureSettings, VideoTexture, InterpolateValueAction, ActionManager, Color3 } from "@babylonjs/core";
 
 export class Artist {
 
+    /** Orientacion del cuadro: north, south, east, west */
     public wall: string = "";
+    /** Orden de aparicion establecido en Blender */
     public id: number = 0;
+    /** Orden de aparicion de los artistas */ 
+    public order: number = 0;
+    public firstCuadroAbsoluteOrder: number = -1;
     public slug: string = "";
     public name: string = "";
     public numCuadros: number = 0;
@@ -18,7 +23,8 @@ export class Artist {
 
         this.arrayIndex = arrayIndex;
 
-        this.id = parseInt(cuadrosGroup.name.split(".")[1]);
+        this.id = parseInt(cuadrosGroup.name.split(".")[1]); 
+        this.order = parseInt(cuadrosGroup.name.split(".")[1]); 
 
         if(cuadrosGroup.name.split(".")[2] !== null){
             this.slug = cuadrosGroup.name.split(".")[2].toLowerCase();
@@ -89,31 +95,32 @@ export class Artist {
 
 export class Cuadro {
 
-    public slug: string = "";
-    public id: string = "";
-    public order: number = -1;
-    public absoluteIndex: number = 0;
+    public orientation: string = "";
+    public slug: string = ""; // url de la info
+    public id: string = ""; // orden identificado en blender
+    public order: number = -1; // orden interno  de visualizacion de las obras del artista
+    public absoluteOrder: number = 0; // 
     //public material: StandardMaterial;
     public position: Vector3 = new Vector3();
     public viewerPosition:  Vector3 = new Vector3();
     public mesh: Mesh = new Mesh("");
+    public myArtist: number = -1;
 
     private closeDistance = 1.71;
 
-    public arrayIndex: number = -1;
+    public arrayIndex: number = -1; // posición en el array de cuadros del artista, diferente al orden de visualización
     public name: string = "";
     
     constructor(cuadro: Mesh, wall: string, idArtist: number, slugArtista:string, ubicacion: Vector3, arrayIndex: number, scene: Scene) {
+        this.orientation = wall;
         this.name = cuadro.name;
         this.arrayIndex = arrayIndex;
         this.order = parseInt(cuadro.name.split("@")[1])-1;
         this.slug = slugArtista + "_" + (this.order + 1);
         //console.log("cuadr slug.: " + this.slug);
         this.id = idArtist + "_" + cuadro.name.split("@")[1];
+        this.myArtist = idArtist;
 
-        //this.absoluteIndex = absoluteIndex + cuadro.name.split("@")[1];
-        //console.log("cuadro.id: " + this.id)
-        //this.order = parseInt(this.slug.split("_")[2])-1;
 
         this.mesh = cuadro;
 
@@ -126,7 +133,17 @@ export class Cuadro {
 
         meshMaterial.roughness = 0.9;
         meshMaterial.metallic = 0.1;
-        //meshMaterial.emissiveColor = 1;
+  
+        this.mesh.actionManager = new ActionManager(scene);
+        //this.mesh.actionManager.hoverCursor = "none";
+
+        let makeOverOut = function (mesh) {
+    
+            mesh.actionManager.registerAction(new InterpolateValueAction(ActionManager.OnPointerOutTrigger, mesh.material, "emissiveColor", mesh.material.emissiveColor, 200));
+            mesh.actionManager.registerAction(new InterpolateValueAction(ActionManager.OnPointerOverTrigger, mesh.material, "emissiveColor", new Color3(0, 0.1, 0), 200));
+        }
+        
+        makeOverOut(this.mesh);
 
         this.position.copyFromFloats(cuadro.position.x + ubicacion.x, cuadro.position.y + ubicacion.y, cuadro.position.z + ubicacion.z);
 
