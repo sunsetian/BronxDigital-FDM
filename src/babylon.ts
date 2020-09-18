@@ -32,14 +32,10 @@ export const createScene = () => {
   scene.collisionsEnabled = true;
 
   scene.enablePhysics(new Vector3(0, -0.9, 0));
-  
-  var gl = new GlowLayer("glow",scene);
-
 
   var gl = new GlowLayer("glow",scene);
-  
   // show the inspector when pressing shift + alt + I
-  scene.onKeyboardObservable.add(({ event }) => {
+  /* scene.onKeyboardObservable.add(({ event }) => {
     if (event.ctrlKey && event.shiftKey && event.code === 'KeyI') {
       if (scene.debugLayer.isVisible()) {
         scene.debugLayer.hide()
@@ -47,7 +43,7 @@ export const createScene = () => {
         scene.debugLayer.show()
       }
     }
-  }) 
+  }) */
 
   return scene
 }
@@ -58,7 +54,7 @@ export const createArcRotateCamera = () => {
     const startRadius = 3
     const startPosition = new Vector3(0, 1.9, 0)
     const camera = new ArcRotateCamera('camera', startAlpha, startBeta, startRadius, startPosition, scene, true)
-    //camera.attachControl(canvas, false)
+    camera.attachControl(canvas, false)
 
     // Set some basic camera settings
     camera.minZ = 0.1;
@@ -135,3 +131,4 @@ export const setMeshesMaterials = ( meshes:AbstractMesh[],materials:Material | M
       console.log("La cantidad de materiales no es ingual a la cantidad de mallas");
     }                 
 }
+
