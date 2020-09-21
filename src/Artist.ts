@@ -17,9 +17,9 @@ export class Artist {
     public viewerPosition: Vector3 = new Vector3();
     public firstBoundingBox: Vector3  = new Vector3();
     public arrayIndex: number = -1;
-    private closeDistance = 4;
+    public closeDistance = 4;   // PARA MASTER: cambiar a public porque se llamará desde index.ts
 
-    constructor(cuadrosGroup: AbstractMesh, arrayIndex: number, scene: Scene) {
+    constructor(cuadrosGroup: AbstractMesh, arrayIndex: number, sceneName: string, scene: Scene) {  // MASTER OK
 
         this.arrayIndex = arrayIndex;
 
@@ -28,7 +28,6 @@ export class Artist {
 
         if(cuadrosGroup.name.split(".")[2] !== null){
             this.slug = cuadrosGroup.name.split(".")[2].toLowerCase();
-            //console.log("artist slug. " + this.slug);
         }
 
         let cuadrosArray : AbstractMesh[] = cuadrosGroup.getChildMeshes(true);
@@ -37,10 +36,12 @@ export class Artist {
 
         this.numCuadros = cuadrosArray.length;
 
-        //console.log("·············· id: " + this.id);
-
         this.position = cuadrosGroup.position;
 
+        if(sceneName == "voltaje"){  /// MASTER OK
+            this.closeDistance = 18;
+        }
+        
         this.firstBoundingBox = cuadrosArray[0].getBoundingInfo().boundingBox.extendSize;
 
         const calculateViewerPosition = (): Vector3 => {
@@ -49,7 +50,7 @@ export class Artist {
             newViewerPosition.copyFromFloats(cuadrosGroup.position.x, cuadrosGroup.position.y, cuadrosGroup.position.z);
 
 
-            if(this.firstBoundingBox.x >= this.firstBoundingBox.z){
+            if(this.firstBoundingBox.x > this.firstBoundingBox.z){
 
                 if(cuadrosGroup.position.z > 0){
                     this.wall = "east"
@@ -75,8 +76,6 @@ export class Artist {
                 }
             }
 
-            //console.log("newViewerPosition: " + newViewerPosition);
-
             return newViewerPosition;
         }
 
@@ -87,7 +86,6 @@ export class Artist {
         cuadrosArray.forEach(newCuadro => {
             this.cuadro.push(new Cuadro(newCuadro as Mesh, this.wall, this.id, this.slug, this.position, cuadroIndex, scene));
             cuadroIndex++;
-       
         });
 
     }
@@ -106,6 +104,9 @@ export class Cuadro {
     public mesh: Mesh = new Mesh("");
     public myArtist: number = -1;
 
+    private cuadroWidth: number = 1; // AÑADIR AL MASTER PARA UBICACION AUTOMATICA DE LA CAMARA RESPECTO AL TAMAÑO DEL CUADRO
+    private cuadroHeight: number = 1; // AÑADIR AL MASTER PARA UBICACION AUTOMATICA DE LA CAMARA RESPECTO AL TAMAÑO DEL CUADRO
+
     private closeDistance = 1.71;
 
     public arrayIndex: number = -1; // posición en el array de cuadros del artista, diferente al orden de visualización
@@ -121,6 +122,16 @@ export class Cuadro {
         this.id = idArtist + "_" + cuadro.name.split("@")[1];
         this.myArtist = idArtist;
 
+        if(this.orientation == "east" || this.orientation == "west" ){
+            this.cuadroWidth = cuadro.getBoundingInfo().boundingBox.extendSize.x;
+        }
+        else if(this.orientation == "north" || this.orientation == "south" ){
+            this.cuadroWidth = cuadro.getBoundingInfo().boundingBox.extendSize.z;
+        }
+
+        this.cuadroHeight = cuadro.getBoundingInfo().boundingBox.extendSize.y;
+           
+        this.closeDistance = this.cuadroWidth*2.5;  // MASTER OK
 
         this.mesh = cuadro;
 
@@ -133,17 +144,43 @@ export class Cuadro {
 
         meshMaterial.roughness = 0.9;
         meshMaterial.metallic = 0.1;
-  
-        this.mesh.actionManager = new ActionManager(scene);
-        //this.mesh.actionManager.hoverCursor = "none";
 
-        let makeOverOut = function (mesh) {
+        // NO BORRAR: CODIGO ALTERNATIVO PARA RESALTAR LOS BORDES DEL CUADRO   
+     /* 
+       
+    var mouseOverUnit = function(unit_mesh) {
+    	console.log ("mouse over "+unit_mesh.meshUnderPointer.id);
+    	console.log (unit_mesh);
+    	if (unit_mesh.meshUnderPointer !== null) {
+        	unit_mesh.meshUnderPointer.renderOutline = true;	
+        	unit_mesh.meshUnderPointer.outlineWidth = 0.1;
+    	}
+    }
     
-            mesh.actionManager.registerAction(new InterpolateValueAction(ActionManager.OnPointerOutTrigger, mesh.material, "emissiveColor", mesh.material.emissiveColor, 200));
-            mesh.actionManager.registerAction(new InterpolateValueAction(ActionManager.OnPointerOverTrigger, mesh.material, "emissiveColor", new Color3(0, 0.1, 0), 200));
-        }
-        
-        makeOverOut(this.mesh);
+    var mouseOutUnit = function(unit_mesh) {
+        ("mouse out "+unit_mesh.meshUnderPointer.id);
+    	console.log (unit_mesh);
+    	if (unit_mesh.source !== null) {
+        	unit_mesh.source.renderOutline = false;	
+        	unit_mesh.source.outlineWidth = 0.1;
+    	}
+    }
+
+	let action = new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, mouseOverUnit);
+	let action2 = new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, mouseOutUnit);
+
+    this.mesh.actionManager = new BABYLON.ActionManager(scene);	
+	this.mesh.actionManager.registerAction(action);
+    this.mesh.actionManager.registerAction(action2); 
+    */
+
+        let overAction = new InterpolateValueAction(ActionManager.OnPointerOverTrigger, this.mesh.material, "emissiveColor", new Color3(0.05, 0.05, 0.05), 200);
+        let outAction = new InterpolateValueAction(ActionManager.OnPointerOutTrigger, this.mesh.material, "emissiveColor", new Color3(0, 0, 0), 200);
+
+        this.mesh.actionManager = new ActionManager(scene);
+        this.mesh.actionManager.hoverCursor = "";
+        this.mesh.actionManager.registerAction(overAction);
+        this.mesh.actionManager.registerAction(outAction);
 
         this.position.copyFromFloats(cuadro.position.x + ubicacion.x, cuadro.position.y + ubicacion.y, cuadro.position.z + ubicacion.z);
 
@@ -167,7 +204,6 @@ export class Cuadro {
             default:
                 break;
         }
-
 
     }
 }
@@ -203,8 +239,6 @@ export class Movie {
         this.mesh.metadata = "movie";
         this.mesh.id = this.id + "";
 
-        //console.log("·············· id: " + this.id);
-
         this.position = movieMesh.position;
 
         let videoMaterial: StandardMaterial = new StandardMaterial("videoMat" + this.id, scene);
@@ -214,7 +248,7 @@ export class Movie {
         this.videoTexture = new VideoTexture("video" + this.id, [scenePath + "data/movies/movie_" + this.id + ".mp4"], scene, true, false, VideoTexture.TRILINEAR_SAMPLINGMODE, myVideoSettings);
         //let preVideoTexture = new Texture(URL_SCENE_JS + "data/images/premovie01.png", scene, true, true);
     
-        videoMaterial.diffuseTexture = this.videoTexture;
+        videoMaterial.emissiveTexture = this.videoTexture;
         movieMesh.material = videoMaterial;
     
         this.videoTexturePlaying = false;
@@ -254,8 +288,6 @@ export class Movie {
                     
                 }
             }
-
-            //console.log("newViewerPosition: " + newViewerPosition);
 
             return newViewerPosition;
         }
