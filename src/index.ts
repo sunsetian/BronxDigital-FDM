@@ -34,14 +34,13 @@ let movies: Movie[] = []
 let numMovies: number = 0;
 let actualMovie: number = -1;
 
-
 const numVentanas: number = 0;
 
-let targetSpeed: number = 0.03;  // Cambiar de const a let el Type
-let cameraSpeed: number = 0.015;   //
+let targetSpeed: number = 0.03;
+let cameraSpeed: number = 0.015;
 
-const targetVoltajeSpeed: number = 0.04; // INCLUIR EN MARTES PARA VOLTAJE
-const cameraVoltajeSpeed: number = 0.03;  // INCLUIR EN MARTES PARA VOLTAJE
+const targetVoltajeSpeed: number = 0.04;
+const cameraVoltajeSpeed: number = 0.03;
 
 let sceneName: string = "auto";
 
@@ -52,238 +51,170 @@ let cameraLevel: number = 0;
 
 var URL_SCENE_JS:string;//Todo pasar a archivo de importacion API
 
-let camera: ArcRotateCamera = createArcRotateCamera() as ArcRotateCamera;;  /// ME LLEVO ESTA CAMARA MAS ADENTRO PARA CREARLA CUANDO SEPA QUE TIPO DE ESCENA ES
+let camera: ArcRotateCamera = createArcRotateCamera() as ArcRotateCamera;
 
 var oldTargetPosition: Vector3;
 var oldTargetCameraPosition: Vector3;
 
-/**GUI SCENE CLASS*/
 /* ******************************* GUI SCENE BABYLON CLASS ***************************** */
 
+/**GUI SCENE CLASS*/
 class GuiSceneBabylon{
   constructor(){}
   
   getArtistPositionsByID(id:number): Vector3{
-
     let newArtistPos: Vector3 = new Vector3();
-
     artist.forEach(artistElement => {
         if(artistElement.id === id) newArtistPos = artistElement.position;
     });
-
     return newArtistPos;
   }
 
   getArtistIndexByName(name: string):number{
-
     let newIndex: number = -1;
-
     artist.forEach(artistElement => {
       if(artistElement.name === name) newIndex = artistElement.arrayIndex;
     });
-
     return newIndex;
   }
 
   getArtistIndexByOrder(order: number):number{
-
     let newIndex: number = -1;
-
     artist.forEach(artistElement => {
       if(artistElement.order === order) newIndex = artistElement.arrayIndex;
     });
-
     return newIndex;
   }
 
   getArtistPositionsByName(name: string):Vector3{
-
     let newPos: Vector3 = new Vector3();
-
     artist.forEach(artistElement => {
       if(artistElement.name === name) newPos = artistElement.position;
     });
-
     return newPos;
   }
 
   getArtistViewPositionsByName(name: string):Vector3{
-
     let newPos: Vector3 = new Vector3();
-
     artist.forEach(artistElement => {
       if(artistElement.name === name) newPos = artistElement.viewerPosition;
     });
-
     return newPos;
   }
 
   getArtistViewerPositionsByID(id:number): Vector3{
-
     let newPos: Vector3 = new Vector3();
-
     artist.forEach(artistElement => {
         if(artistElement.id === id) newPos = artistElement.viewerPosition;
     });
-
     return newPos;
   }
 
   getMoviePositionsByName(name: string):Vector3{
-
     let newPos: Vector3 = new Vector3();
-
     movies.forEach(movieElement => {
       if(movieElement.name === name) newPos = movieElement.position;
     });
-
     return newPos;
   }
   
   getMovieViewPositionsByName(name: string):Vector3{
-
     let newPos: Vector3 = new Vector3();
-
     movies.forEach(movieElement => {
       if(movieElement.name === name) newPos = movieElement.viewerPosition;
     });
-
     return newPos;
   }
   
   getMovieIndexByName(name: string):number{
-
     let newIndex: number = -1;
-
     movies.forEach(movieElement => {
-
-      if(movieElement.name === name) newIndex = movieElement.arrayIndex;
-      
+      if(movieElement.name === name) newIndex = movieElement.arrayIndex;  
     });
-
     return newIndex;
   }
 
   getMovieViewerPositionsByID(id:number): Vector3{
-
     let newPos: Vector3 = new Vector3();
-
     movies.forEach(moviesElement => {
         if(moviesElement.id === id) newPos = moviesElement.viewerPosition;
     });
-
     return newPos;
   }
   
   getCuadroArtistByAbsOrder(absOrder: number): number{
-
     let newArtistIndex: number = -1;
-    //let cuadroID: number = id;
     artist.forEach(artistElement => {
       artistElement.cuadro.forEach(cuadroElement => {
         if(cuadroElement.absoluteOrder === absOrder) newArtistIndex = cuadroElement.myArtist;
       });
     });
-    
-
     return newArtistIndex;
   }
 
   getActualCuadroSlugByAbsOrder(absOrder: number): string{
-
     let newArtistSlug: string = "";
-    //let cuadroID: number = id;
     artist.forEach(artistElement => {
       artistElement.cuadro.forEach(cuadroElement => {
         if(cuadroElement.absoluteOrder === absOrder) newArtistSlug = cuadroElement.slug;
       });
     });
-    
-
     return newArtistSlug;
-
   }
 
   getCuadroOrientationByAbsOrder(absOrder: number): string{
-
     let newOrientation: string = "";
-    //let cuadroID: number = id;
     artist.forEach(artistElement => {
       artistElement.cuadro.forEach(cuadroElement => {
         if(cuadroElement.absoluteOrder === absOrder) newOrientation = cuadroElement.orientation;
       });
     });
-    
-
     return newOrientation;
-
   }
 
   getCuadroIndexByOrder(order: number, artist: Artist):number{
-
     let newIndex: number = -1;
-    //let cuadroID: number = id;
-
     artist.cuadro.forEach(cuadroElement => {
       if(cuadroElement.order === order) newIndex = cuadroElement.arrayIndex;
     });
-
     return newIndex;
   }
 
   getCuadroPositionsByID(id:number): Vector3{
-
     let newCuadroPos: Vector3 = new Vector3();
-
     artist.forEach(artistElement => {
       artistElement.cuadro.forEach(cuadroElement =>{
         if(cuadroElement.absoluteOrder === id) newCuadroPos = cuadroElement.position;
-      });
-        
+      });   
     });
-
     return newCuadroPos;
   }
 
   getCuadroViewerPositionsByID(id:number): Vector3{
-
     let newCuadroPos: Vector3 = new Vector3();
-
     artist.forEach(artistElement => {
       artistElement.cuadro.forEach(cuadroElement =>{
         if(cuadroElement.absoluteOrder === id) newCuadroPos = cuadroElement.viewerPosition;
       });
-        
     });
-
     return newCuadroPos;
   }
 
   selectArtist(artistOrderID: number): void{
-
     let pos = this.getArtistPositionsByID(artistOrderID);
     let viewPos = this.getArtistViewerPositionsByID(artistOrderID);
-
     actualArtist = artistOrderID;
-
     targetPosition = new Vector3(pos.x, pos.y, pos.z);
     targetCameraPosition = new Vector3(viewPos.x, viewPos.y, viewPos.z);
-    
     camera.useAutoRotationBehavior = false;
- 
     canvas.classList.remove('horizTranslate');
     canvas.classList.add('resetPosition');
-
     actualAbsoluteCuadro = artist[this.getArtistIndexByOrder(artistOrderID)].firstCuadroAbsoluteOrder;
-
     cameraAtCenter = false;
     cameraLevel = 1;
-
   }
 
   prev_artist(): void{
-
-    
     if(actualArtist > 0){
       actualArtist = (actualArtist + (numArtists-1))%numArtists;
     }
@@ -299,38 +230,17 @@ class GuiSceneBabylon{
   }
 
   selectCuadro(cuadroAbsoluteID: number): void{
-
     let pos = this.getCuadroPositionsByID(cuadroAbsoluteID);
     let viewPos = this.getCuadroViewerPositionsByID(cuadroAbsoluteID);
-
     actualAbsoluteCuadro = cuadroAbsoluteID;
-
-    actualArtist = this.getCuadroArtistByAbsOrder(cuadroAbsoluteID);
-    
-    
+    actualArtist = this.getCuadroArtistByAbsOrder(cuadroAbsoluteID); 
     targetPosition = new Vector3(pos.x, pos.y, pos.z);
     targetCameraPosition = new Vector3(viewPos.x, viewPos.y, viewPos.z);
-
     apuntador.position = new Vector3(pos.x, pos.y + 0.5, pos.z);
-
     let actualCuadroOrientation: string = this.getCuadroOrientationByAbsOrder(cuadroAbsoluteID);
-
-    /* if(actualCuadroOrientation == "north" || actualCuadroOrientation == "south"){
-      apuntador.rotation.z = Tools.ToRadians(90);
-      apuntador.rotation.x = Tools.ToRadians(0);
-    }
-    else if(actualCuadroOrientation == "east" || actualCuadroOrientation == "west")
-    {
-      apuntador.rotation.x = Tools.ToRadians(90);
-      apuntador.rotation.z = Tools.ToRadians(0);
-    }  */   
-    
     cameraAtCenter = false;
     cameraLevel = 2;
-
     camera.useAutoRotationBehavior = false;
-    //camera.detachControl(canvas);
-
     canvas.classList.remove('horizTranslate');
     canvas.classList.add('resetPosition');
   }
@@ -351,35 +261,27 @@ class GuiSceneBabylon{
   }
 
   next_navigation(): void{
-
-    this.setCameraAutoPlay(false); ///// DETENER EL AUTOPLAY OK
-
+    this.setCameraAutoPlay(false);
     if(cameraLevel == 1){
       this.next_artist();
     }
     else if(cameraLevel == 2 || cameraLevel == 3){
       this.next_cuadro();
     }
-
   }
 
   prev_navigation(): void{
-
-    this.setCameraAutoPlay(false); ///// DETENER EL AUTOPLAY OK
-
+    this.setCameraAutoPlay(false);
     if(cameraLevel == 1){
       this.prev_artist();
     }
     else if(cameraLevel == 2 || cameraLevel == 3){
       this.prev_cuadro();
     }
-
   }
 
-  next_view_level(): void{  /// AÑADIR A MASTER: Mejor control de Navegación
-
-    this.setCameraAutoPlay(false); ///// DETENER EL AUTOPLAY OK
-
+  next_view_level(): void{  /// Mejor control de Navegación
+    this.setCameraAutoPlay(false); 
     if(cameraLevel == 0){
       this.selectArtist(actualArtist);
     }
@@ -393,9 +295,7 @@ class GuiSceneBabylon{
   }
 
   prev_view_level(): void{
-
-    this.setCameraAutoPlay(false); ///// DETENER EL AUTOPLAY OK
-
+    this.setCameraAutoPlay(false);
     if(cameraLevel == 3){
       cameraLevel = 2;
     }
@@ -404,15 +304,12 @@ class GuiSceneBabylon{
     }
     else if(cameraLevel == 1){
       this.center_camera();
-      
     }
   }
 
   showCuadroInfo(thisCuadroSlug){
-    //canvas.width = canvas.width - 500;
     canvas.classList.remove('resetPosition');
     canvas.classList.add('horizTranslate');
-
     try {
       globalThis.bronxControl.showInfoByPostSlug(thisCuadroSlug,175);
       console.log("Show Info de: " + thisCuadroSlug);
@@ -423,44 +320,33 @@ class GuiSceneBabylon{
   }
 
   getMovieIndexByID(id: number, movies: Movie[]):number{
-
     let newIndex: number = -1;
-    //let cuadroID: number = id;
-
     movies.forEach(movieElement => {
       if(movieElement.id === id) newIndex = movieElement.arrayIndex;
     });
-
     return newIndex;
   }
 
   center_camera(): void{
-  
     if(this.intervalID != null){
       this.setCameraAutoPlay(false);
-      console.log("INTERVALO CLEARED")
     }
     
     targetPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
     targetCameraPosition = camera.position;
     oldTargetCameraPosition = targetCameraPosition;
-
     canvas.classList.remove('horizTranslate');
     canvas.classList.add('resetPosition');
-
     camera.attachControl(canvas);
-
     cameraAtCenter = true;
     cameraLevel = 0;
-
     camera.useAutoRotationBehavior = true;
     camera.angularSensibilityX = -5000;
 
-    let rotationSpeed = 0.05; // PARA MASTER: Diferente valor para voltaje
+    let rotationSpeed = 0.05;
     if(sceneName == "voltaje"){
       rotationSpeed = -0.1;
     }
-
     if(camera.autoRotationBehavior !== null){
       camera.autoRotationBehavior.idleRotationSpeed = rotationSpeed;
     } 
@@ -482,12 +368,10 @@ class GuiSceneBabylon{
         else{
           guiVI.next_cuadro();
         }
-
       }, 8000);
 
       this.autoPlaySetted = true; 
       document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "stop auto";
-
       if(cameraLevel < 2){
         this.next_artist();
       }
@@ -505,6 +389,7 @@ class GuiSceneBabylon{
     console.log("autoplay is after: " + this.autoPlaySetted)
   }
 
+  // PROXIMAMENTE DEPRECATED
   toggle_camera(): void{
     if(scene.activeCamera !== null){
       if( scene.activeCamera.name === "ArcCamera"){
@@ -518,10 +403,8 @@ class GuiSceneBabylon{
   }
 }
 
-/** SCENE GUI CLASS END */ 
-
 var guiVI = new GuiSceneBabylon()
-
+/** SCENE GUI CLASS END */ 
 
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
@@ -531,22 +414,19 @@ Main function that is async so we can call the scene manager with await
 
 const main = async () => {
   
-  /// INCLUIR ESTAFUNCIONS IF EN EL MASTER
-
   /** Carga de los elementos de la escena creados por codigo */
   function loadCodedSceneElements():void{
 
     if(sceneName == "voltaje"){
       createSkybox(URL_SCENE_JS);
     } 
-
-    // CAMBIAR LA CREACION DE LUCES EN EL MASTER PARA INCLUIR VOLTAJE
-    let light01: HemisphericLight; //= new HemisphericLight("light1", new Vector3(0, 3, -15), scene); // Utilizar este metodo general en el master
-    let light02: HemisphericLight; // = new HemisphericLight("light2", new Vector3(-25, 7, 0), scene);
-    let light03: HemisphericLight; // = new HemisphericLight("light3", new Vector3(0, 3, 15), scene);
+    
+    let light01: HemisphericLight;
+    let light02: HemisphericLight;
+    let light03: HemisphericLight;
 
     if(sceneName == "voltaje"){
-      light01 = new HemisphericLight("light1", new Vector3(0, 3, -15), scene); // Utilizar este metodo general en el master
+      light01 = new HemisphericLight("light1", new Vector3(0, 3, -15), scene);
       light02 = new HemisphericLight("light2", new Vector3(-25, 7, 0), scene);
       light03 = new HemisphericLight("light3", new Vector3(0, 3, 15), scene);
       
@@ -595,7 +475,6 @@ const main = async () => {
       let movieIndex = 0;
       let cuadroAbsoluteOrder = 0;
 
-      // ESTO LO MOVI FUERA DEL importedMeshes.forEach(
         if(scene.getMeshByName("Room.000")){  
           room = scene.getMeshByName("Room.000") as Mesh;
           room.metadata = "sala";
@@ -619,7 +498,7 @@ const main = async () => {
   
           camera = setupVoltajeArcRotateCamera(camera, roomCenter);
   
-          loadCodedSceneElements(); // CONTINUE LOADING DESPUES DE HABER DECLARADO EL NOMBRE DE LA ESCENA!!!
+          loadCodedSceneElements(); // CONTINÚE LOADING DESPUES DE HABER DECLARADO EL NOMBRE DE LA ESCENA!!!
   
         }
   
@@ -628,7 +507,7 @@ const main = async () => {
           limits.metadata = "limits";
           limits.name = "limits";
           limits.checkCollisions = true;
-          limits.visibility = 0;  // INCLUIR EN EL MASTER
+          limits.visibility = 0;
           limits.freezeWorldMatrix();
         }
 
@@ -638,9 +517,8 @@ const main = async () => {
         createSkybox(URL_SCENE_JS);
       },11000);
 
-
+      /** LOOP DE MESHES CARGADOS PARA ASIGNARLES COSAS */
       importedMeshes.forEach(newMesh => {
-        //console.log(newMesh);
         if(newMesh.material){
           let meshTexture = newMesh.material.getActiveTextures()[0] as Texture;
           if(meshTexture){
@@ -659,32 +537,23 @@ const main = async () => {
 
         let meshNames: string[] = newMesh.name.split(".");
         if( meshNames[0] === "Artist" ){
-          artist.push(new Artist(newMesh, index, sceneName, scene));  // PARA MASTER: Agregar parametro para saber si es voltaje u otro espacio
+          artist.push(new Artist(newMesh, index, sceneName, scene));
           index++;
-          
         }
-
         if( meshNames[0] === "Movie" ){
           movies.push(new Movie(newMesh as Mesh, movieIndex, URL_SCENE_JS, scene));
           movieIndex++;
-
         }
       });
       
       for(let i=0; i < artist.length; i++){
-
         let artistIndex = guiVI.getArtistIndexByOrder(i);
-
         for(let j=0; j < artist[artistIndex].cuadro.length; j++){
-
           let cuadroIndex = guiVI.getCuadroIndexByOrder(j, artist[artistIndex]);
-
           if(j === 0){
             artist[artistIndex].firstCuadroAbsoluteOrder = cuadroAbsoluteOrder;
           }
-
           artist[artistIndex].cuadro[cuadroIndex].absoluteOrder = cuadroAbsoluteOrder ;
-
           cuadroAbsoluteOrder++;
         }
       }
@@ -714,8 +583,6 @@ const main = async () => {
   
       }
 
-      
-
       /** FUNCION DE OBSERVACION DE EVENTOS DE CLICK
        * 
        * Aqui se determina que mesh fue clickeado
@@ -734,44 +601,35 @@ const main = async () => {
           return true;
         }
 
-
         let pickMesh: Ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);
         let hit: PickingInfo = scene.pickWithRay(pickMesh, predicate) as PickingInfo;
 
         let cuadrosName = "cuadro";
         let moviesName = "movie";
 
-
-
         if(hit.pickedMesh != null){
-
-          guiVI.setCameraAutoPlay(false); ///// DETENER EL AUTOPLAY OK
-          //console.log("INTERVALO CLEARED")
-
+          guiVI.setCameraAutoPlay(false); 
+         
           if(hit.pickedMesh.metadata != null){
 
             if (hit.pickedMesh && hit.pickedMesh.metadata === cuadrosName) {
-
               let currentMesh: AbstractMesh = new AbstractMesh("");
-
-              if(hit.pickedMesh!= null){  //// CORRECCIÓN DE REDUNDANCIA
+              if(hit.pickedMesh!= null){  
                 currentMesh = hit.pickedMesh;
               }
-              
+            
               oldTargetPosition = targetPosition;
               oldTargetCameraPosition = targetCameraPosition;
 
-              let iArtistOrdered = parseInt(currentMesh.id.split("_")[0]); /// PARA MASTER: ACLARACION DEL NOMBRE DE ESTA VARIABLE
-              let iCuadroOrdered = parseInt(currentMesh.id.split("_")[1])-1; /// PARA MASTER:  ACLARACION DEL NOMBRE DE ESTA VARIABLE
+              let iArtistOrdered = parseInt(currentMesh.id.split("_")[0]); 
+              let iCuadroOrdered = parseInt(currentMesh.id.split("_")[1])-1;
 
               camera.angularSensibilityX = 5000; /// Para cambiar la direccion de la rotacion de la camara al hacer GRAB 
 
               let currentArtistIndex: number = -1;
 
               if(hit.pickedMesh.parent != null){
-                 
                  currentArtistIndex = guiVI.getArtistIndexByName(hit.pickedMesh.parent.name);
-
               }
 
               if(actualArtist !== iArtistOrdered){
@@ -784,9 +642,7 @@ const main = async () => {
                 let currentCuadroAbsoluteIndex: number = artist[currentArtistIndex].cuadro[cuadroIndex].absoluteOrder
 
                 if(cameraLevel == 1){
-                
                   guiVI.selectCuadro(currentCuadroAbsoluteIndex);
-
                 }
                 else{
                   if(cameraLevel == 2){
@@ -799,36 +655,29 @@ const main = async () => {
               }
             }
             else if (hit.pickedMesh && hit.pickedMesh.metadata === moviesName) {
-
               let currentMoviePos: Vector3 = new Vector3();
               let currentMovieViewPos: Vector3 = new Vector3();
               let currentMovieIndex: number = -1;
 
               if(hit.pickedMesh != null){
-
                 currentMoviePos = guiVI.getMoviePositionsByName(hit.pickedMesh.name);
                 currentMovieViewPos = guiVI.getMovieViewPositionsByName(hit.pickedMesh.name);
                 currentMovieIndex = guiVI.getMovieIndexByName(hit.pickedMesh.name);
-
                 camera.useAutoRotationBehavior = false;
-
-             }
+              }
 
               let movieIndex:number = guiVI.getMovieIndexByID(parseInt(hit.pickedMesh.id), movies);
 
               if(actualMovie !== movieIndex){
                 actualMovie = movieIndex;
                 targetCameraPosition = new Vector3(currentMovieViewPos.x, currentMovieViewPos.y, currentMovieViewPos.z);
-              
                 targetPosition = new Vector3(currentMoviePos.x, currentMoviePos.y, currentMoviePos.z);
               }
 
-              // INCLUIR ESTE IF EN EL MASTER
               if(sceneName == "voltaje"){
                 movies.forEach(movie => {
                   movie.videoTexture.video.play();
                 });
-
               }
               else{
                 if(!movies[movieIndex].videoTexturePlaying){
@@ -839,7 +688,7 @@ const main = async () => {
                   movies[movieIndex].videoTexture.video.pause();
                   movies[movieIndex].videoTexturePlaying = false;
                 }
-              }    // INCLUIR CIERRE DEL NUEVO IF ELSE
+              }
 
             }
             else{
@@ -847,8 +696,6 @@ const main = async () => {
               canvas.classList.remove('horizTranslate');
               canvas.classList.add('resetPosition');
             }
-
-
           }
         }
       }
@@ -862,30 +709,21 @@ const main = async () => {
           var dlCount = evt.loaded / (1024 * 1024);
           loadedPercent = (Math.floor(dlCount * 100.0) / 100.0) + "";
       }
-      // assuming "loadingScreenPercent" is an existing html element
-      //document.getElementById("loadingScreenPercent").innerHTML = loadedPercent;
       console.log("loadedPercent: " + loadedPercent + "%");
       if(loadedPercent == "100"){
-        
         console.log("LOADED");
       }
-
     }
-
   );
-  
-
 
   /** Animation Loop */
  /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
   let time = 0;
-
   scene.registerBeforeRender(function() {
 
     if(cameraSetted){
       if(targetBox !== undefined){
-
           if (oldTargetPosition !== targetPosition){
               targetBox.position.x = targetBox.position.x*(1-targetSpeed) + targetPosition.x*targetSpeed;
               targetBox.position.y = targetBox.position.y*(1-targetSpeed) + targetPosition.y*targetSpeed;
@@ -896,16 +734,11 @@ const main = async () => {
           }
 
           if (oldTargetCameraPosition !== targetCameraPosition){
-
-              //PARA MASTER: USAR .position en el master para que sea compatible con UniversalCamera
               camera.position = new Vector3(camera.position.x*(1-cameraSpeed) + targetCameraPosition.x*cameraSpeed, camera.position.y*(1-cameraSpeed) + targetCameraPosition.y*cameraSpeed, camera.position.z*(1-cameraSpeed) + targetCameraPosition.z*cameraSpeed);
-
           }
           if(Math.abs(camera.position.x - targetCameraPosition.x) < 0.1 && Math.abs(camera.position.y - targetCameraPosition.y) < 0.1 && Math.abs(camera.position.z - targetCameraPosition.z) < 0.1){
               oldTargetCameraPosition = targetCameraPosition;
-
           }
- 
       }
 
       time += 0.05;
@@ -920,26 +753,21 @@ const main = async () => {
       apuntador.position = new Vector3(apuntador.position.x, apuntadorPosition, apuntador.position.z);
       apuntador.rotation.y = (apuntador.rotation.y + Tools.ToRadians(1))%Tools.ToRadians(360);
 
+      // NO BORRAR: POSIBLE USO
       /** Camera colides with wall and return */
        /* camera.onCollide = function(collider) {
             if(collider.name === 'limits') {
-                //console.log('onCollide', collider.name);
                 camera.autoRotationBehavior.idleRotationSpeed = camera.autoRotationBehavior.idleRotationSpeed*(-1)
-          
             } 
-        
-      } */
+      } ************* */
+
     }
-
-
   });
-
 
   /** RUN RENDER LOOP */
   engine.runRenderLoop(() => {
     scene.render()
   });
-
 
   /** RESIZE */
   window.addEventListener("resize", function () {
@@ -947,7 +775,6 @@ const main = async () => {
   });
 
 }
-
 
 /** Buttons events */
  /**************************** CONTROL NAVIGATION BUTTONS ************************************************/
@@ -1000,7 +827,6 @@ globalThis.virtualInButtonClick = function(buttonClickData){
 
   switch (kbInfo.type) {
       case KeyboardEventTypes.KEYDOWN:
-          //console.log("KEY DOWN: ", kbInfo.event.key);
           switch (kbInfo.event.key){
             case "c":
               guiVI.center_camera();
@@ -1025,12 +851,10 @@ globalThis.virtualInButtonClick = function(buttonClickData){
               break;
             default:
               break;
-
           }       
           break;
   }
 });
-
 
  /** INIT SCENE */
 
