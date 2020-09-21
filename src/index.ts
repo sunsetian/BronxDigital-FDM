@@ -4,8 +4,10 @@ import 'pepjs';
 import { Artist, Movie } from './Artist';
 //import * as cannon from 'cannon';
 
-import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, VideoTexture, Texture, ActionManager, ExecuteCodeAction, KeyboardEventTypes, VideoTextureSettings, Color3, InterpolateValueAction } from '@babylonjs/core'
-import { createEngine, createScene, createSkybox, createArcRotateCamera, setupVoltajeArcRotateCamera } from './babylon' // INCLIUR DIFERENCIAS
+import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, VideoTexture, Texture, ActionManager, ExecuteCodeAction, KeyboardEventTypes, VideoTextureSettings, AssetsManager, Color3, InterpolateValueAction } from '@babylonjs/core'
+import { createEngine, createScene, createSkybox, createArcRotateCamera, getMeshesMaterials, setMeshesMaterials, setupVoltajeArcRotateCamera} from './babylon'
+
+import { SampleMaterial } from "./Materials/SampleMaterial"
 
 //import * as viAPI from './virtualInsanityAPI'
 
@@ -61,23 +63,7 @@ var oldTargetCameraPosition: Vector3;
 class GuiSceneBabylon{
   constructor(){}
   
-  gotoCuadroBySlug(slug: string): void{
-
-    artist.forEach(artistElement => {
-      artistElement.cuadro.forEach(cuadroElement => {
-        if(cuadroElement.slug === slug) this.selectCuadro(cuadroElement.absoluteOrder);
-      });
-    });
-    
-  }
-
-  gotoArtistBySlug(slug: string): void{
-    artist.forEach(artistElement => {   
-        if(artistElement.slug === slug) this.selectCuadro(artistElement.order);
-    });
-  }
-
-    getArtistPositionsByID(id:number): Vector3{
+  getArtistPositionsByID(id:number): Vector3{
 
     let newArtistPos: Vector3 = new Vector3();
 
@@ -272,7 +258,7 @@ class GuiSceneBabylon{
 
     return newCuadroPos;
   }
- 
+
   selectArtist(artistOrderID: number): void{
 
     let pos = this.getArtistPositionsByID(artistOrderID);
@@ -297,7 +283,7 @@ class GuiSceneBabylon{
 
   prev_artist(): void{
 
-
+    
     if(actualArtist > 0){
       actualArtist = (actualArtist + (numArtists-1))%numArtists;
     }
@@ -447,9 +433,9 @@ class GuiSceneBabylon{
 
     return newIndex;
   }
-  
-  center_camera(): void{
 
+  center_camera(): void{
+  
     if(this.intervalID != null){
       this.setCameraAutoPlay(false);
       console.log("INTERVALO CLEARED")
@@ -544,7 +530,7 @@ Main function that is async so we can call the scene manager with await
 */
 
 const main = async () => {
-
+  
   /// INCLUIR ESTAFUNCIONS IF EN EL MASTER
 
   /** Carga de los elementos de la escena creados por codigo */
@@ -610,43 +596,66 @@ const main = async () => {
       let cuadroAbsoluteOrder = 0;
 
       // ESTO LO MOVI FUERA DEL importedMeshes.forEach(
-      if(scene.getMeshByName("Room.000")){  
-        room = scene.getMeshByName("Room.000") as Mesh;
-        room.metadata = "sala";
-        //room.checkCollisions = true;
-        room.freezeWorldMatrix();
+        if(scene.getMeshByName("Room.000")){  
+          room = scene.getMeshByName("Room.000") as Mesh;
+          room.metadata = "sala";
+          //room.checkCollisions = true;
+          room.freezeWorldMatrix();
+  
+          roomCenter = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
+        
+        }
+  
+        // INCLUIR EN EL MASTER
+        if(scene.getMeshByName("Voltaje.000")){
+          sceneName = "voltaje";
+  
+          sceneModel = scene.getMeshByName("Voltaje.000") as Mesh;
+          sceneModel.metadata = "scenario";
+          sceneModel.freezeWorldMatrix(); // ESTOS FreezWorldMatrix son para optimizar rendimiento en objetos inmoviles.
+  
+          targetSpeed = targetVoltajeSpeed;
+          cameraSpeed = cameraVoltajeSpeed;
+  
+          camera = setupVoltajeArcRotateCamera(camera, roomCenter);
+  
+          loadCodedSceneElements(); // CONTINUE LOADING DESPUES DE HABER DECLARADO EL NOMBRE DE LA ESCENA!!!
+  
+        }
+  
+        if(scene.getMeshByName("Limits.000")){
+          limits = scene.getMeshByName("Limits.000") as Mesh;
+          limits.metadata = "limits";
+          limits.name = "limits";
+          limits.checkCollisions = true;
+          limits.visibility = 0;  // INCLUIR EN EL MASTER
+          limits.freezeWorldMatrix();
+        }
 
-        roomCenter = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
-      
-      }
+      let sceneMaterials = getMeshesMaterials(importedMeshes);
+      setTimeout(function(){
+        setMeshesMaterials(importedMeshes,sceneMaterials);
+        createSkybox(URL_SCENE_JS);
+      },11000);
 
-      // INCLUIR EN EL MASTER
-      if(scene.getMeshByName("Voltaje.000")){
-        sceneName = "voltaje";
-
-        sceneModel = scene.getMeshByName("Voltaje.000") as Mesh;
-        sceneModel.metadata = "scenario";
-        sceneModel.freezeWorldMatrix(); // ESTOS FreezWorldMatrix son para optimizar rendimiento en objetos inmoviles.
-
-        targetSpeed = targetVoltajeSpeed;
-        cameraSpeed = cameraVoltajeSpeed;
-
-        camera = setupVoltajeArcRotateCamera(camera, roomCenter);
-
-        loadCodedSceneElements(); // CONTINUE LOADING DESPUES DE HABER DECLARADO EL NOMBRE DE LA ESCENA!!!
-
-      }
-
-      if(scene.getMeshByName("Limits.000")){
-        limits = scene.getMeshByName("Limits.000") as Mesh;
-        limits.metadata = "limits";
-        limits.name = "limits";
-        limits.checkCollisions = true;
-        limits.visibility = 0;  // INCLUIR EN EL MASTER
-        limits.freezeWorldMatrix();
-      }
 
       importedMeshes.forEach(newMesh => {
+        //console.log(newMesh);
+        if(newMesh.material){
+          let meshTexture = newMesh.material.getActiveTextures()[0] as Texture;
+          if(meshTexture){
+            var shaderMaterial = new SampleMaterial("material", scene);
+            /*Los mejores:
+             loadingShader1.jpg
+             loadingShader2.jpg */
+            var textureTest = new Texture(URL_SCENE_JS+"data/loadingMeshImage/loadingShader0.jpg", scene);
+            shaderMaterial.backFaceCulling = false;
+            shaderMaterial.setTexture("uHeightMap", textureTest);
+            shaderMaterial.setTexture("uDiffuseMap", meshTexture);
+            newMesh.material = shaderMaterial;
+          }
+        }
+        /***************/
 
         let meshNames: string[] = newMesh.name.split(".");
         if( meshNames[0] === "Artist" ){
@@ -683,7 +692,7 @@ const main = async () => {
       numArtists = artist.length;
       numCuadros = cuadroAbsoluteOrder;
       numMovies = movies.length;
-    
+
       targetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
       targetCameraPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
       oldTargetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
@@ -702,10 +711,10 @@ const main = async () => {
       if(camera !== undefined && targetBox !== undefined && cameraSetted === false){
         camera.setTarget(targetBox.position); /// USAR .position para mas compatibilidad
         cameraSetted = true;
-
+  
       }
 
-     
+      
 
       /** FUNCION DE OBSERVACION DE EVENTOS DE CLICK
        * 
@@ -732,7 +741,7 @@ const main = async () => {
         let cuadrosName = "cuadro";
         let moviesName = "movie";
 
-        
+
 
         if(hit.pickedMesh != null){
 
@@ -796,7 +805,7 @@ const main = async () => {
               let currentMovieIndex: number = -1;
 
               if(hit.pickedMesh != null){
- 
+
                 currentMoviePos = guiVI.getMoviePositionsByName(hit.pickedMesh.name);
                 currentMovieViewPos = guiVI.getMovieViewPositionsByName(hit.pickedMesh.name);
                 currentMovieIndex = guiVI.getMovieIndexByName(hit.pickedMesh.name);
@@ -830,7 +839,7 @@ const main = async () => {
                   movies[movieIndex].videoTexture.video.pause();
                   movies[movieIndex].videoTexturePlaying = false;
                 }
-              }    // INCLUIR CIERRE DEL NUEVO IF ELSE        
+              }    // INCLUIR CIERRE DEL NUEVO IF ELSE
 
             }
             else{
@@ -860,17 +869,17 @@ const main = async () => {
         
         console.log("LOADED");
       }
-        
+
     }
 
   );
+  
 
- 
 
   /** Animation Loop */
  /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
- let time = 0;
+  let time = 0;
 
   scene.registerBeforeRender(function() {
 
@@ -888,15 +897,15 @@ const main = async () => {
 
           if (oldTargetCameraPosition !== targetCameraPosition){
 
-            //PARA MASTER: USAR .position en el master para que sea compatible con UniversalCamera
+              //PARA MASTER: USAR .position en el master para que sea compatible con UniversalCamera
               camera.position = new Vector3(camera.position.x*(1-cameraSpeed) + targetCameraPosition.x*cameraSpeed, camera.position.y*(1-cameraSpeed) + targetCameraPosition.y*cameraSpeed, camera.position.z*(1-cameraSpeed) + targetCameraPosition.z*cameraSpeed);
-              
+
           }
           if(Math.abs(camera.position.x - targetCameraPosition.x) < 0.1 && Math.abs(camera.position.y - targetCameraPosition.y) < 0.1 && Math.abs(camera.position.z - targetCameraPosition.z) < 0.1){
               oldTargetCameraPosition = targetCameraPosition;
 
           }
-
+ 
       }
 
       time += 0.05;
@@ -912,16 +921,16 @@ const main = async () => {
       apuntador.rotation.y = (apuntador.rotation.y + Tools.ToRadians(1))%Tools.ToRadians(360);
 
       /** Camera colides with wall and return */
-      /* camera.onCollide = function(collider) {
-        if(collider.name === 'limits') {
-            //console.log('onCollide', collider.name);
-            camera.autoRotationBehavior.idleRotationSpeed = camera.autoRotationBehavior.idleRotationSpeed*(-1)
-      
-        }
+       /* camera.onCollide = function(collider) {
+            if(collider.name === 'limits') {
+                //console.log('onCollide', collider.name);
+                camera.autoRotationBehavior.idleRotationSpeed = camera.autoRotationBehavior.idleRotationSpeed*(-1)
+          
+            } 
         
       } */
     }
-    
+
 
   });
 
@@ -944,7 +953,7 @@ const main = async () => {
  /**************************** CONTROL NAVIGATION BUTTONS ************************************************/
 
 globalThis.virtualInButtonClick = function(buttonClickData){
-
+  
   let buttonId = buttonClickData.id;
   switch(buttonId) { 
     case 'VI_GUI_Left': { 
@@ -990,35 +999,35 @@ globalThis.virtualInButtonClick = function(buttonClickData){
   canvas.classList.add('resetPosition');
 
   switch (kbInfo.type) {
-    case KeyboardEventTypes.KEYDOWN:
-      //console.log("KEY DOWN: ", kbInfo.event.key);
-      switch (kbInfo.event.key){
-        case "c":
-          guiVI.center_camera();
-          break;
-        case "ArrowRight":
-          guiVI.next_navigation();
-          break;
-        case "ArrowLeft":
-          guiVI.prev_navigation();
-          break;
-        case "ArrowUp":
-          guiVI.next_view_level();
-          break;
-        case "ArrowDown":
-          guiVI.prev_view_level();
-          break;
-        case "p":
-          guiVI.setCameraAutoPlay(true);
-          break;
-        case "s":
-          guiVI.setCameraAutoPlay(false);
-          break;
-        default:
-          break;
+      case KeyboardEventTypes.KEYDOWN:
+          //console.log("KEY DOWN: ", kbInfo.event.key);
+          switch (kbInfo.event.key){
+            case "c":
+              guiVI.center_camera();
+              break;
+            case "ArrowRight":
+              guiVI.next_navigation();
+              break;
+            case "ArrowLeft":
+              guiVI.prev_navigation();
+              break;
+            case "ArrowUp":
+              guiVI.next_view_level();
+              break;
+            case "ArrowDown":
+              guiVI.prev_view_level();
+              break;
+            case "p":
+              guiVI.setCameraAutoPlay(true);
+              break;
+            case "s":
+              guiVI.setCameraAutoPlay(false);
+              break;
+            default:
+              break;
 
-      }       
-      break;
+          }       
+          break;
   }
 });
 

@@ -1,4 +1,4 @@
-import { Engine, Scene, ArcRotateCamera, Vector3, CubeTexture, Color4, Mesh, StandardMaterial, Texture, Color3 } from '@babylonjs/core';
+import { Engine, Scene, ArcRotateCamera, Vector3, CubeTexture, Color4, Mesh, StandardMaterial, Texture, Color3, GlowLayer, AbstractMesh, Material } from '@babylonjs/core';
 //import '@babylonjs/inspector';
 
 export let canvas: HTMLCanvasElement
@@ -31,6 +31,7 @@ export const createScene = () => {
 
   scene.enablePhysics(new Vector3(0, -0.9, 0));
 
+  var gl = new GlowLayer("glow",scene);
   // show the inspector when pressing shift + alt + I
   /* scene.onKeyboardObservable.add(({ event }) => {
     if (event.ctrlKey && event.shiftKey && event.code === 'KeyI') {
@@ -129,3 +130,32 @@ export const createSkybox = (urlScene:string) => {
   
   return skybox
 }
+
+/**Trabajo con el indice de materiales del archivo importado*/
+export const getMeshesMaterials = (meshes:AbstractMesh[]) => {
+  var materials:Material[] = new Array();
+  meshes.forEach(mesh => {
+    materials.push(mesh.material);
+  });
+  return materials;
+}
+export const setMeshesMaterials = ( meshes:AbstractMesh[],materials:Material | Material[]) => {
+  console.log(String(typeof(materials)));
+  /** Typeguard */ 
+  if(materials instanceof Material){
+    meshes.forEach(mesh => {
+      mesh.material=materials as Material;
+    });
+  }else if(materials instanceof Array){
+    if(materials.length === meshes.length){
+        let i=0;
+        meshes.forEach(mesh => {
+          mesh.material=materials[i];
+          i++;
+        });
+      }
+    }else{
+      console.log("La cantidad de materiales no es ingual a la cantidad de mallas");
+    }                 
+}
+

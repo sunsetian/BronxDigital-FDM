@@ -1,4 +1,4 @@
-import { Mesh, AbstractMesh, Vector3, Scene, PBRMetallicRoughnessMaterial, StandardMaterial, VideoTextureSettings, VideoTexture, InterpolateValueAction, ActionManager, Color3, ExecuteCodeAction } from "@babylonjs/core";
+import { Mesh, AbstractMesh, Vector3, Scene, PBRMetallicRoughnessMaterial, StandardMaterial, VideoTextureSettings, VideoTexture, InterpolateValueAction, ActionManager, Color3 } from "@babylonjs/core";
 
 export class Artist {
 
@@ -8,7 +8,7 @@ export class Artist {
     public id: number = 0;
     /** Orden de aparicion de los artistas */ 
     public order: number = 0;
-    public firstCuadroAbsoluteOrder: number = -1;   
+    public firstCuadroAbsoluteOrder: number = -1;
     public slug: string = "";
     public name: string = "";
     public numCuadros: number = 0;
@@ -23,8 +23,8 @@ export class Artist {
 
         this.arrayIndex = arrayIndex;
 
-        this.id = parseInt(cuadrosGroup.name.split(".")[1]);
-        this.order = parseInt(cuadrosGroup.name.split(".")[1]);
+        this.id = parseInt(cuadrosGroup.name.split(".")[1]); 
+        this.order = parseInt(cuadrosGroup.name.split(".")[1]); 
 
         if(cuadrosGroup.name.split(".")[2] !== null){
             this.slug = cuadrosGroup.name.split(".")[2].toLowerCase();
@@ -41,7 +41,7 @@ export class Artist {
         if(sceneName == "voltaje"){  /// MASTER OK
             this.closeDistance = 18;
         }
-
+        
         this.firstBoundingBox = cuadrosArray[0].getBoundingInfo().boundingBox.extendSize;
 
         const calculateViewerPosition = (): Vector3 => {
@@ -112,7 +112,7 @@ export class Cuadro {
     public arrayIndex: number = -1; // posición en el array de cuadros del artista, diferente al orden de visualización
     public name: string = "";
     
-    constructor(cuadro: Mesh, wall: string, idArtist: number, slugArtista:string, ubicacion: Vector3, arrayIndex: number, scene: Scene) { 
+    constructor(cuadro: Mesh, wall: string, idArtist: number, slugArtista:string, ubicacion: Vector3, arrayIndex: number, scene: Scene) {
         this.orientation = wall;
         this.name = cuadro.name;
         this.arrayIndex = arrayIndex;
@@ -145,7 +145,7 @@ export class Cuadro {
         meshMaterial.roughness = 0.9;
         meshMaterial.metallic = 0.1;
 
-     // NO BORRAR: CODIGO ALTERNATIVO PARA RESALTAR LOS BORDES DEL CUADRO   
+        // NO BORRAR: CODIGO ALTERNATIVO PARA RESALTAR LOS BORDES DEL CUADRO   
      /* 
        
     var mouseOverUnit = function(unit_mesh) {
@@ -172,7 +172,7 @@ export class Cuadro {
     this.mesh.actionManager = new BABYLON.ActionManager(scene);	
 	this.mesh.actionManager.registerAction(action);
     this.mesh.actionManager.registerAction(action2); 
-    */  
+    */
 
         let overAction = new InterpolateValueAction(ActionManager.OnPointerOverTrigger, this.mesh.material, "emissiveColor", new Color3(0.05, 0.05, 0.05), 200);
         let outAction = new InterpolateValueAction(ActionManager.OnPointerOutTrigger, this.mesh.material, "emissiveColor", new Color3(0, 0, 0), 200);
@@ -199,8 +199,7 @@ export class Cuadro {
             
             case "west":
                 this.viewerPosition.copyFromFloats(this.position.x, this.position.y, this.position.z+this.closeDistance);
-                break;  /// FALTABA ESTE BREAK
-
+                break;
         
             default:
                 break;
