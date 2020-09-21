@@ -4,7 +4,7 @@ import 'pepjs';
 import { Artist, Movie } from './Artist';
 //import * as cannon from 'cannon';
 
-import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, VideoTexture, Texture, ActionManager, ExecuteCodeAction, KeyboardEventTypes, VideoTextureSettings, AssetsManager, Color3, InterpolateValueAction } from '@babylonjs/core'
+import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, Texture, KeyboardEventTypes, Color3} from '@babylonjs/core'
 import { createEngine, createScene, createSkybox, createArcRotateCamera, getMeshesMaterials, setMeshesMaterials, setupVoltajeArcRotateCamera} from './babylon'
 
 import { SampleMaterial } from "./Materials/SampleMaterial"
@@ -511,28 +511,29 @@ const main = async () => {
           limits.freezeWorldMatrix();
         }
 
-      let sceneMaterials = getMeshesMaterials(importedMeshes);
+      /* let sceneMaterials = getMeshesMaterials(importedMeshes);
       setTimeout(function(){
         setMeshesMaterials(importedMeshes,sceneMaterials);
         createSkybox(URL_SCENE_JS);
-      },11000);
+      },11000); */
 
       /** LOOP DE MESHES CARGADOS PARA ASIGNARLES COSAS */
       importedMeshes.forEach(newMesh => {
-        if(newMesh.material){
+
+         
+        /* if(newMesh.material){
           let meshTexture = newMesh.material.getActiveTextures()[0] as Texture;
           if(meshTexture){
             var shaderMaterial = new SampleMaterial("material", scene);
-            /*Los mejores:
-             loadingShader1.jpg
-             loadingShader2.jpg */
+            
             var textureTest = new Texture(URL_SCENE_JS+"data/loadingMeshImage/loadingShader0.jpg", scene);
             shaderMaterial.backFaceCulling = false;
             shaderMaterial.setTexture("uHeightMap", textureTest);
             shaderMaterial.setTexture("uDiffuseMap", meshTexture);
             newMesh.material = shaderMaterial;
           }
-        }
+        } */
+
         /***************/
 
         let meshNames: string[] = newMesh.name.split(".");

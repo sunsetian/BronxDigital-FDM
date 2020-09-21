@@ -156,13 +156,24 @@ export class Cuadro {
     this.mesh.actionManager.registerAction(action2); 
     */
 
-        let overAction = new InterpolateValueAction(ActionManager.OnPointerOverTrigger, this.mesh.material, "emissiveColor", new Color3(0.05, 0.05, 0.05), 200);
+       /*  let overAction = new InterpolateValueAction(ActionManager.OnPointerOverTrigger, this.mesh.material, "emissiveColor", new Color3(0.05, 0.05, 0.05), 200);
         let outAction = new InterpolateValueAction(ActionManager.OnPointerOutTrigger, this.mesh.material, "emissiveColor", new Color3(0, 0, 0), 200);
 
         this.mesh.actionManager = new ActionManager(scene);
-        this.mesh.actionManager.hoverCursor = "";
+        //this.mesh.actionManager.hoverCursor = "";
         this.mesh.actionManager.registerAction(overAction);
         this.mesh.actionManager.registerAction(outAction);
+ */
+
+        this.mesh.actionManager = new ActionManager(scene);
+
+        let makeOverOut = function (mesh) {
+    
+            mesh.actionManager.registerAction(new InterpolateValueAction(ActionManager.OnPointerOutTrigger, mesh.material, "emissiveColor", mesh.material.emissiveColor, 200));
+            mesh.actionManager.registerAction(new InterpolateValueAction(ActionManager.OnPointerOverTrigger, mesh.material, "emissiveColor", new Color3(0, 0.1, 0), 200));
+        }
+        
+        makeOverOut(this.mesh);
 
         this.position.copyFromFloats(cuadro.position.x + ubicacion.x, cuadro.position.y + ubicacion.y, cuadro.position.z + ubicacion.z);
 
