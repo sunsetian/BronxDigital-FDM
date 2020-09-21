@@ -458,7 +458,7 @@ const main = async () => {
 
 
       importedMeshes.forEach(newMesh => {
-        console.log(newMesh);
+        //console.log(newMesh);
         if(newMesh.material){
           let meshTexture = newMesh.material.getActiveTextures()[0] as Texture;
           if(meshTexture){
