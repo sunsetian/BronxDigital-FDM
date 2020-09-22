@@ -55,7 +55,54 @@ var oldTargetCameraPosition: Vector3;
 
 class GuiSceneBabylon{
   constructor(){}
-  
+  isIndexButton(button):boolean{
+    let result = false;
+    let classNames = button.classNames;
+    for(let i=0; i< classNames.length;i++){
+      if(classNames[i]==='VI_index_posts'){
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  isArtistInThisRoom(slug: string):boolean{
+    let result = false;
+    console.log("slug: "+slug);
+    for(let i=0; i< artist.length; i++){
+      if(artist[i].slug === slug){
+        result=true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  gotoCuadroBySlug(slug: string): void{
+    artist.forEach(artistElement => {
+      for(let i=0; i<artistElement.cuadro.length; i++)
+      {
+        let cuadroElement = artistElement.cuadro[i];
+        if(cuadroElement.slug === slug){
+          this.selectCuadro(cuadroElement.absoluteOrder);
+          break;
+        }
+      }
+    });
+  }
+  gotoArtistBySlug(slug: string): void{
+    console.log("gotoArtistBySlug 1 Slug: " + slug)
+    for(let i=0; i<artist.length; i++){
+      let artistElement = artist[i];
+      console.log("artistElement.slug: "+ artistElement.slug);
+      if(artistElement.slug === slug){
+        console.log("ENTRA: "+ slug);
+        this.selectArtist(artistElement.order);
+        break;
+      }
+    }
+  }
   getArtistPositionsByID(id:number): Vector3{
 
     let newArtistPos: Vector3 = new Vector3();
@@ -456,9 +503,8 @@ const main = async () => {
         createSkybox(URL_SCENE_JS);
       },11000);
 
-
       importedMeshes.forEach(newMesh => {
-        console.log(newMesh);
+        //console.log(newMesh);
         if(newMesh.material){
           let meshTexture = newMesh.material.getActiveTextures()[0] as Texture;
           if(meshTexture){
@@ -582,7 +628,8 @@ const main = async () => {
               let currentMesh: AbstractMesh = new AbstractMesh("");
 
               if(scene.getMeshByName(hit.pickedMesh.name) != null){
-                currentMesh = scene.getMeshByName(hit.pickedMesh.name) as AbstractMesh;
+                //currentMesh = scene.getMeshByName(hit.pickedMesh.name) as AbstractMesh;
+                currentMesh = hit.pickedMesh;
               }
               
               oldTargetPosition = targetPosition;
@@ -590,6 +637,8 @@ const main = async () => {
 
               let iArtist = parseInt(currentMesh.id.split("_")[0]);
               let iCuadro = parseInt(currentMesh.id.split("_")[1])-1;
+              console.log("MENSAJE_PICK: ");
+              console.log(hit.pickedMesh);
 
               camera.angularSensibilityX = 5000;
 
@@ -783,10 +832,21 @@ globalThis.virtualInButtonClick = function(buttonClickData){
     case 'VI_GUI_Play': { 
       guiVI.setCameraAutoPlay(true);
        break; 
+    }
+    default: { 
+      if(guiVI.isIndexButton(buttonClickData)){
+        console.log(buttonClickData);
+        if(guiVI.isArtistInThisRoom(buttonClickData.slug)){
+          guiVI.gotoArtistBySlug(buttonClickData.slug);
+        }else {
+
+        }
+      }
+      break; 
     } 
   } 
   console.log("Button clicked: "+buttonId);
-  console.log(buttonClickData);
+  
 }
 
 /** Keyboard events */
@@ -842,5 +902,3 @@ function initBabylonScene(srcScene:string){
   URL_SCENE_JS = srcScene;
   main();
 }
-
-
