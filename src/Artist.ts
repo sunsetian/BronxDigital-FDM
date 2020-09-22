@@ -19,7 +19,7 @@ export class Artist {
     public arrayIndex: number = -1;
     public closeDistance = 4;
 
-    constructor(cuadrosGroup: AbstractMesh, arrayIndex: number, sceneName: string, scene: Scene) {
+    constructor(cuadrosGroup: AbstractMesh, arrayIndex: number, sceneName: string, scenePath: string, scene: Scene) {
 
         this.arrayIndex = arrayIndex;
         this.id = parseInt(cuadrosGroup.name.split(".")[1]); 
@@ -72,7 +72,7 @@ export class Artist {
         let cuadroIndex = 0;
 
         cuadrosArray.forEach(newCuadro => {
-            this.cuadro.push(new Cuadro(newCuadro as Mesh, this.wall, this.id, this.slug, this.position, cuadroIndex, scene));
+            this.cuadro.push(new Cuadro(newCuadro as Mesh, this.wall, this.id, this.slug, this.position, cuadroIndex, scenePath, scene));
             cuadroIndex++;
         });
     }
@@ -94,8 +94,11 @@ export class Cuadro {
     private closeDistance = 1.71;
     public arrayIndex: number = -1; // posición en el array de cuadros del artista, diferente al orden de visualización
     public name: string = "";
+
+    public videoTexturePlaying: boolean = false;
+    public videoTexture: VideoTexture;
     
-    constructor(cuadro: Mesh, wall: string, idArtist: number, slugArtista:string, ubicacion: Vector3, arrayIndex: number, scene: Scene) {
+    constructor(cuadro: Mesh, wall: string, idArtist: number, slugArtista:string, ubicacion: Vector3, arrayIndex: number, scenePath: string, scene: Scene) {
         this.orientation = wall;
         this.name = cuadro.name;
         this.arrayIndex = arrayIndex;
@@ -117,7 +120,7 @@ export class Cuadro {
 
         this.mesh = cuadro;
 
-        this.mesh.name = this.slug;
+        //this.mesh.name = this.slug;
         this.mesh.metadata = "cuadro";
         this.mesh.id = this.id;
 
@@ -126,6 +129,21 @@ export class Cuadro {
 
         meshMaterial.roughness = 0.9;
         meshMaterial.metallic = 0.1;
+
+        // Creación DE MOVIE CUADROS
+
+        if(cuadro.name.split("@")[0].split(".")[0] === "movie"){
+            let videoMaterial: StandardMaterial = new StandardMaterial("videoMat" + this.id, scene);
+            let myVideoSettings: VideoTextureSettings = new Object({autoPlay: false, loop: true, clickToPlay: true, poster: scenePath + "data/models/premovie_" + this.id + ".jpg", autoUpdateTexture: true}) as VideoTextureSettings;
+            this.videoTexture = new VideoTexture("video" + this.id, [scenePath + "data/movies/movie_" + this.id + ".mp4"], scene, true, false, VideoTexture.TRILINEAR_SAMPLINGMODE, myVideoSettings);
+            videoMaterial.emissiveTexture = this.videoTexture;
+            videoMaterial.roughness = 1;
+            videoMaterial.specularColor = new Color3(0, 0, 0);
+            this.mesh.material = videoMaterial;
+            this.videoTexturePlaying = false;
+            this.mesh.metadata = "cuadromovie";
+
+        }
 
     // NO BORRAR: CODIGO ALTERNATIVO PARA RESALTAR LOS BORDES DEL CUADRO   
      /* 
