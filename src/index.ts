@@ -9,6 +9,7 @@ import { createEngine, createScene, createSkybox, createArcRotateCamera, getMesh
 
 import { SampleMaterial } from "./Materials/SampleMaterial"
 
+
 //import * as viAPI from './virtualInsanityAPI'
 
 const canvas: HTMLCanvasElement = document.getElementById('virtualInsanityCanvas') as HTMLCanvasElement
@@ -28,6 +29,7 @@ let artist: Artist[]  = [];
 let numArtists: number =  0;
 let numCuadros: number =  0;
 let actualArtist: number = -1;
+let initArtistSlug: string;
 let actualAbsoluteCuadro: number = -1;
 let movies: Movie[] = []
 let numMovies: number = 0;
@@ -55,6 +57,26 @@ var oldTargetCameraPosition: Vector3;
 
 class GuiSceneBabylon{
   constructor(){}
+  initPosArtist(){
+    this.getVarsFromUrl();
+    if(initArtistSlug){
+      this.gotoArtistBySlug(initArtistSlug);
+    }
+  }
+  getVarsFromUrl(){
+    let varsArray = location.search.substring(1,location.search.length).split("&");
+    varsArray.forEach(varUrl => {
+      if(varUrl){
+        let newVar = varUrl.split("=");
+        console.log("varUrl captured: "+newVar[0]+"="+newVar[1]);
+        if (isNaN(parseFloat(newVar[1])))
+          eval(newVar[0]+"='"+unescape(newVar[1])+"';");
+        else
+          eval(newVar[0]+"="+newVar[1]+";");
+      }
+    });
+  }
+
   isIndexButton(button):boolean{
     let result = false;
     let classNames = button.classNames;
@@ -79,6 +101,12 @@ class GuiSceneBabylon{
     return result;
   }
 
+  gotoPageByArtistSlugs(artistSlug: string, roomSlug: string):void{
+    
+    let urlRoom = location.origin+'/'+ roomSlug;
+    let varsUsr = "?initArtistSlug="+artistSlug;
+    window.open(urlRoom,"_self");
+  }
   gotoCuadroBySlug(slug: string): void{
     artist.forEach(artistElement => {
       for(let i=0; i<artistElement.cuadro.length; i++)
@@ -97,7 +125,6 @@ class GuiSceneBabylon{
       let artistElement = artist[i];
       console.log("artistElement.slug: "+ artistElement.slug);
       if(artistElement.slug === slug){
-        console.log("ENTRA: "+ slug);
         this.selectArtist(artistElement.order);
         break;
       }
@@ -322,8 +349,6 @@ class GuiSceneBabylon{
   next_artist(): void{
     actualArtist = (actualArtist + 1)%numArtists;
     this.selectArtist(actualArtist);
-    
-    
   }
 
   selectCuadro(cuadroAbsoluteID: number): void{
@@ -460,7 +485,6 @@ Main function that is async so we can call the scene manager with await
 */
 
 const main = async () => {
-  //createSkybox(URL_SCENE_JS);
 
   const light01 = new HemisphericLight("light1", new Vector3(3, 1, 1), scene);
   const light02 = new HemisphericLight("light2", new Vector3(-3, 1, -1), scene);
@@ -498,6 +522,7 @@ const main = async () => {
       let cuadroAbsoluteOrder = 0;
 
       let sceneMaterials = getMeshesMaterials(importedMeshes);
+      setTimeout(function(){guiVI.initPosArtist();},2000);
       setTimeout(function(){
         setMeshesMaterials(importedMeshes,sceneMaterials);
         createSkybox(URL_SCENE_JS);
@@ -801,7 +826,7 @@ const main = async () => {
 /** Buttons events */
  /**************************** CONTROL NAVIGATION BUTTONS ************************************************/
 
-globalThis.virtualInButtonClick = function(buttonClickData){
+globalThis.virtualInButtonClick = function(buttonClickData):void{
   let buttonId = buttonClickData.id;
   switch(buttonId) { 
     case 'VI_GUI_Left': { 
@@ -835,11 +860,26 @@ globalThis.virtualInButtonClick = function(buttonClickData){
     }
     default: { 
       if(guiVI.isIndexButton(buttonClickData)){
-        console.log(buttonClickData);
+        
+        /**Si el artista no esta aqui se busca en las etiquetas */
         if(guiVI.isArtistInThisRoom(buttonClickData.slug)){
           guiVI.gotoArtistBySlug(buttonClickData.slug);
         }else {
-
+          /**Get roomSlug */
+          console.log(buttonClickData);
+          let tagsVector = buttonClickData.tags;
+          let roomSlug;
+          for(let i=0; i<tagsVector.length; i++){
+            let tagSplite = tagsVector[i].split(":");
+            if(tagSplite){
+              if(tagSplite[0]==="roomSlug"){
+                roomSlug=tagSplite[1];
+              }
+            }
+          }
+          if(roomSlug){
+            guiVI.gotoPageByArtistSlugs(buttonClickData.slug, roomSlug);
+          }
         }
       }
       break; 
