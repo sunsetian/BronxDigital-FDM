@@ -535,45 +535,8 @@ const main = async () => {
   /** Carga de los elementos de la escena creados por codigo */
   function loadCodedSceneElements():void{
 
-    if(sceneName == "voltaje"){
-      createSkybox(URL_SCENE_JS);
-    } 
     
-    let light01: HemisphericLight;
-    let light02: HemisphericLight;
-    let light03: HemisphericLight;
-
-    if(sceneName == "voltaje"){
-      light01 = new HemisphericLight("light1", new Vector3(0, 3, -15), scene);
-      light02 = new HemisphericLight("light2", new Vector3(-25, 7, 0), scene);
-      light03 = new HemisphericLight("light3", new Vector3(0, 3, 15), scene);
-      
-      light01.intensity = 0.1;
-      light02.intensity = 0.3;
-      light03.intensity = 0.1;
-
-      light01.diffuse = new Color3(0.0, 1, 0);
-      light02.diffuse = new Color3(0.5, 0.7, 0.7);
-      light03.diffuse = new Color3(1, 0, 0);
-    }
-    else{
-      light01 = new HemisphericLight("light1", new Vector3(3, 1, 1), scene);
-      light02 = new HemisphericLight("light2", new Vector3(-3, 1, -1), scene);
-      light03 = new HemisphericLight("light3", new Vector3(0, 1, 0), scene);
-
-      light01.intensity = 0.8;
-      light02.intensity = 0.8;
-      light03.intensity = 0.8;
-    }
-
-  apuntador= Mesh.CreateTorus("apuntador", 0.08, 0.02, 3, scene);
-  apuntador.rotation.x = Tools.ToRadians(90);
-  apuntador.position = new Vector3(0, 10, 0);
-  let apuntadorMat = new StandardMaterial("greenMat", scene);
-  apuntadorMat.diffuseColor = new Color3(0, 1, 0);
-
-  apuntador.material = apuntadorMat;
-}
+  }
   
   /** IMPORTACIÓN DE LA ESCENA DE BLENDER 
    * 
@@ -585,7 +548,8 @@ const main = async () => {
   SceneLoader.ImportMesh(
     "",
     URL_SCENE_JS+"data/models/",
-    "thisBabylonScene.babylon", // MEJOR UTILIZAR ESTE FORMATO DE NOMBRE PARA LOS MODELOS thisBabylonScene.babylon
+    "thisBronxScene.babylon", // MEJOR UTILIZAR ESTE FORMATO DE NOMBRE PARA LOS MODELOS thisBabylonScene.babylon
+    //"thisBronxScene.babylon", 
     scene,
     function (importedMeshes) {
 
@@ -617,11 +581,45 @@ const main = async () => {
         cameraSpeed = cameraVoltajeSpeed;
 
         camera = setupVoltajeArcRotateCamera(camera, roomCenter);
+      }
+      //loadCodedSceneElements(); // CONTINÚE LOADING DESPUES DE HABER DECLARADO EL NOMBRE DE LA ESCENA!!!
+      let light01: HemisphericLight;
+      let light02: HemisphericLight;
+      let light03: HemisphericLight;
 
-        loadCodedSceneElements(); // CONTINÚE LOADING DESPUES DE HABER DECLARADO EL NOMBRE DE LA ESCENA!!!
+      if(sceneName == "voltaje"){
+        createSkybox(URL_SCENE_JS);
 
+        light01 = new HemisphericLight("light1", new Vector3(0, 3, -15), scene);
+        light02 = new HemisphericLight("light2", new Vector3(-25, 7, 0), scene);
+        light03 = new HemisphericLight("light3", new Vector3(0, 3, 15), scene);
+        
+        light01.intensity = 0.1;
+        light02.intensity = 0.3;
+        light03.intensity = 0.1;
+
+        light01.diffuse = new Color3(0.0, 1, 0);
+        light02.diffuse = new Color3(0.5, 0.7, 0.7);
+        light03.diffuse = new Color3(1, 0, 0);
+      }
+      else{
+        light01 = new HemisphericLight("light1", new Vector3(3, 1, 1), scene);
+        light02 = new HemisphericLight("light2", new Vector3(-3, 1, -1), scene);
+        light03 = new HemisphericLight("light3", new Vector3(0, 1, 0), scene);
+
+        light01.intensity = 0.8;
+        light02.intensity = 0.8;
+        light03.intensity = 0.8;
       }
 
+      apuntador= Mesh.CreateTorus("apuntador", 0.08, 0.02, 3, scene);
+      apuntador.rotation.x = Tools.ToRadians(90);
+      apuntador.position = new Vector3(0, 10, 0);
+      let apuntadorMat = new StandardMaterial("greenMat", scene);
+      apuntadorMat.diffuseColor = new Color3(0, 1, 0);
+
+      apuntador.material = apuntadorMat;
+      
       if(scene.getMeshByName("Limits.000")){
         limits = scene.getMeshByName("Limits.000") as Mesh;
         limits.metadata = "limits";
