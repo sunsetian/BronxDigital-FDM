@@ -39,37 +39,6 @@ export const createScene = () => {
 
   return scene
 }
-// INCLUIR EN MASTER PARA VOLTAJE
-export const setupVoltajeArcRotateCamera = (camera: ArcRotateCamera, roomCenter: Vector3) => {
-  
-  camera.alpha = Math.PI;
-  camera.beta = Math.PI / 2;
-  //camera.radius = 2
-  camera.position = new Vector3(roomCenter.x - 2, roomCenter.y + 1, roomCenter.z + 2)
-  //const camera = new ArcRotateCamera('camera', startAlpha, startBeta, startRadius, startPosition, scene, true)
-
-  camera.attachControl(canvas, false);
-  camera.minZ = 0.1;
-  camera.lowerBetaLimit = Math.PI * 1.8/ 4;
-  camera.upperBetaLimit = Math.PI * 2/ 4;
-  camera.lowerRadiusLimit = 2;  // Voltaje
-  camera.upperRadiusLimit = 18.1; // Voltaje 
-  camera.allowUpsideDown = false;
-  camera.wheelPrecision = 250;
-  camera.angularSensibilityX = -4000;
-  camera.angularSensibilityY = 6000;
-
-  camera.useAutoRotationBehavior = true;
-  if(camera.autoRotationBehavior != null){
-    camera.autoRotationBehavior.idleRotationSpeed = -0.1;
-  }
-
-  camera.pinchPrecision = 1000;
-  camera.checkCollisions = true // make the camera collide with meshes
-  camera.collisionRadius = new Vector3(1.7, 0.5, 1.7) // how close can the camera go to other meshes
-
-  return camera
-}
 
 // INCLUIR EN MASTER PARA VOLTAJE
 export const setupVoltajeArcRotateCamera = (camera: ArcRotateCamera, roomCenter: Vector3) => {
