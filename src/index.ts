@@ -59,7 +59,6 @@ let camera: ArcRotateCamera = createArcRotateCamera() as ArcRotateCamera;
 var oldTargetPosition: Vector3;
 var oldTargetCameraPosition: Vector3;
 
-/**GUI SCENE CLASS*/
 /* ******************************* GUI SCENE BABYLON CLASS ***************************** */
 
 /**GUI SCENE CLASS*/
@@ -379,7 +378,7 @@ class GuiSceneBabylon{
     this.selectCuadro(actualAbsoluteCuadro);
   }
 
-next_navigation(): void{
+  next_navigation(): void{
     this.setCameraAutoPlay(false);
     if(cameraLevel == 1){
       this.next_artist();
@@ -500,9 +499,9 @@ next_navigation(): void{
     }
     else{
       if(this.autoPlaySetted){
-      clearInterval(this.intervalID);
-      this.autoPlaySetted = false;
-      document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "auto play";      
+        clearInterval(this.intervalID);
+        this.autoPlaySetted = false;
+        document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "auto play";      
     }
   }
 }
@@ -531,12 +530,6 @@ Main function that is async so we can call the scene manager with await
 */
 
 const main = async () => {
-
-  /** Carga de los elementos de la escena creados por codigo */
-  function loadCodedSceneElements():void{
-
-    
-  }
   
   /** IMPORTACIÓN DE LA ESCENA DE BLENDER 
    * 
@@ -642,18 +635,16 @@ const main = async () => {
           let meshTexture = newMesh.material.getActiveTextures()[0] as Texture;
           if(meshTexture){
             var shaderMaterial = new SampleMaterial("material", scene);
-            /*Los mejores:
-             loadingShader1.jpg
-             loadingShader2.jpg */
+            
             var textureTest = new Texture(URL_SCENE_JS+"data/loadingMeshImage/loadingShader0.jpg", scene);
             shaderMaterial.backFaceCulling = false;
             shaderMaterial.setTexture("uHeightMap", textureTest);
             shaderMaterial.setTexture("uDiffuseMap", meshTexture);
             newMesh.material = shaderMaterial;
           }
-        }
-        /***************/
+        } 
 
+        /***************/
 
         let meshNames: string[] = newMesh.name.split(".");
         if( meshNames[0] === "Artist" ){
@@ -702,13 +693,12 @@ const main = async () => {
         room.freezeWorldMatrix();
       }
 
-      targetPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
-      targetCameraPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
-      oldTargetPosition = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
+      targetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
+      targetCameraPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
+      oldTargetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
       oldTargetCameraPosition = targetCameraPosition;
-      roomCenter = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
 
-            // TODO Sacar esto fuera del SceneImport
+      // TODO Sacar esto fuera del SceneImport
 
       targetBox = Mesh.CreateBox("TargetBox.000", 0.5, scene);
       let baseMat = new StandardMaterial("BaseMaterial", scene);
@@ -869,7 +859,7 @@ const main = async () => {
       }
     }
   );
-  
+
   /** Animation Loop */
  /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 

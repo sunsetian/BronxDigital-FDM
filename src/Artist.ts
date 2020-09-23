@@ -22,29 +22,21 @@ export class Artist {
     constructor(cuadrosGroup: AbstractMesh, arrayIndex: number, sceneName: string, scenePath: string, scene: Scene) {
 
         this.arrayIndex = arrayIndex;
-
         this.id = parseInt(cuadrosGroup.name.split(".")[1]); 
         this.order = parseInt(cuadrosGroup.name.split(".")[1]); 
 
         if(cuadrosGroup.name.split(".")[2] !== null){
             this.slug = cuadrosGroup.name.split(".")[2].toLowerCase();
-            //console.log("artist slug. " + this.slug);
         }
 
         let cuadrosArray : AbstractMesh[] = cuadrosGroup.getChildMeshes(true);
-
         this.name = cuadrosGroup.name;
-
         this.numCuadros = cuadrosArray.length;
-
-        //console.log("·············· id: " + this.id);
-
         this.position = cuadrosGroup.position;
 
         if(sceneName == "voltaje"){  
             this.closeDistance = 18;
         }
-
         this.firstBoundingBox = cuadrosArray[0].getBoundingInfo().boundingBox.extendSize;
         const calculateViewerPosition = (): Vector3 => {
 
@@ -71,22 +63,17 @@ export class Artist {
                     newViewerPosition.x = newViewerPosition.x + this.closeDistance;                   
                 }
             }
-
-            //console.log("newViewerPosition: " + newViewerPosition);
-
             return newViewerPosition;
         }
 
         this.viewerPosition = calculateViewerPosition();
 
-       let cuadroIndex = 0;
+        let cuadroIndex = 0;
 
         cuadrosArray.forEach(newCuadro => {
             this.cuadro.push(new Cuadro(newCuadro as Mesh, this.wall, this.id, this.slug, this.position, cuadroIndex, scenePath, scene));
             cuadroIndex++;
-       
         });
-
     }
 }
 
@@ -97,7 +84,6 @@ export class Cuadro {
     public id: string = ""; // orden identificado en blender
     public order: number = -1; // orden interno  de visualizacion de las obras del artista
     public absoluteOrder: number = 0; // 
-    //public material: StandardMaterial;
     public position: Vector3 = new Vector3();
     public viewerPosition:  Vector3 = new Vector3();
     public mesh: Mesh = new Mesh("");
@@ -107,17 +93,16 @@ export class Cuadro {
     private closeDistance = 1.71;
     public arrayIndex: number = -1; // posición en el array de cuadros del artista, diferente al orden de visualización
     public name: string = "";
-    
+
     public videoTexturePlaying: boolean = false;
     public videoTexture: VideoTexture;
-
+    
     constructor(cuadro: Mesh, wall: string, idArtist: number, slugArtista:string, ubicacion: Vector3, arrayIndex: number, scenePath: string, scene: Scene) {
         this.orientation = wall;
         this.name = cuadro.name;
         this.arrayIndex = arrayIndex;
         this.order = parseInt(cuadro.name.split("@")[1])-1;
         this.slug = slugArtista + "_" + (this.order + 1);
-        //console.log("cuadr slug.: " + this.slug);
         this.id = idArtist + "_" + cuadro.name.split("@")[1];
         this.myArtist = idArtist;
 
