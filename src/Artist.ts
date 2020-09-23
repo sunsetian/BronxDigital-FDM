@@ -37,7 +37,6 @@ export class Artist {
         if(sceneName == "voltaje"){  
             this.closeDistance = 18;
         }
-        
         this.firstBoundingBox = cuadrosArray[0].getBoundingInfo().boundingBox.extendSize;
         const calculateViewerPosition = (): Vector3 => {
 
@@ -47,21 +46,21 @@ export class Artist {
             if(this.firstBoundingBox.x > this.firstBoundingBox.z){
                 if(cuadrosGroup.position.z > 0){
                     this.wall = "east"
-                    newViewerPosition.z = newViewerPosition.z - this.closeDistance;          
+                    newViewerPosition.z = newViewerPosition.z - this.closeDistance;             
                 }
                 else{
                     this.wall = "west";
-                    newViewerPosition.z = newViewerPosition.z + this.closeDistance;          
+                    newViewerPosition.z = newViewerPosition.z + this.closeDistance;                   
                 } 
             }
             else{
                 if(cuadrosGroup.position.x > 0){
                     this.wall = "north";
-                    newViewerPosition.x = newViewerPosition.x - this.closeDistance;          
+                    newViewerPosition.x = newViewerPosition.x - this.closeDistance;                 
                 }
                 else{
                     this.wall = "south";
-                    newViewerPosition.x = newViewerPosition.x + this.closeDistance;          
+                    newViewerPosition.x = newViewerPosition.x + this.closeDistance;                   
                 }
             }
             return newViewerPosition;
@@ -129,7 +128,7 @@ export class Cuadro {
 
         meshMaterial.roughness = 0.9;
         meshMaterial.metallic = 0.1;
-
+  
         // Creación DE MOVIE CUADROS
 
         if(cuadro.name.split("@")[0].split(".")[0] === "movie"){

@@ -4,7 +4,7 @@ import 'pepjs';
 import { Artist, Cuadro, Movie } from './Artist';
 //import * as cannon from 'cannon';
 
-import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, Texture, KeyboardEventTypes, Color3} from '@babylonjs/core'
+import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, VideoTexture, Texture, ActionManager, ExecuteCodeAction, KeyboardEventTypes, VideoTextureSettings, AssetsManager, Color3, InterpolateValueAction } from '@babylonjs/core'
 import { createEngine, createScene, createSkybox, createArcRotateCamera, getMeshesMaterials, setMeshesMaterials, setupVoltajeArcRotateCamera} from './babylon'
 
 import { SampleMaterial } from "./Materials/SampleMaterial"
@@ -31,6 +31,7 @@ let artist: Artist[]  = [];
 let numArtists: number =  0;
 let numCuadros: number =  0;
 let actualArtist: number = -1;
+let initArtistSlug: string;
 let actualAbsoluteCuadro: number = 0;
 let movies: Movie[] = []
 let numMovies: number = 0;
@@ -63,7 +64,79 @@ var oldTargetCameraPosition: Vector3;
 /**GUI SCENE CLASS*/
 class GuiSceneBabylon{
   constructor(){}
-  
+  initPosArtist(){
+    this.getVarsFromUrl();
+    if(initArtistSlug){
+      this.gotoArtistBySlug(initArtistSlug);
+    }
+  }
+  getVarsFromUrl(){
+    let varsArray = location.search.substring(1,location.search.length).split("&");
+    varsArray.forEach(varUrl => {
+      if(varUrl){
+        let newVar = varUrl.split("=");
+        console.log("varUrl captured: "+newVar[0]+"="+newVar[1]);
+        if (isNaN(parseFloat(newVar[1])))
+          eval(newVar[0]+"='"+unescape(newVar[1])+"';");
+        else
+          eval(newVar[0]+"="+newVar[1]+";");
+      }
+    });
+  }
+
+  isIndexButton(button):boolean{
+    let result = false;
+    let classNames = button.classNames;
+    for(let i=0; i< classNames.length;i++){
+      if(classNames[i]==='VI_index_posts'){
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  isArtistInThisRoom(slug: string):boolean{
+    let result = false;
+    console.log("slug: "+slug);
+    for(let i=0; i< artist.length; i++){
+      if(artist[i].slug === slug){
+        result=true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  gotoPageByArtistSlugs(artistSlug: string, roomSlug: string):void{
+    
+    let urlRoom = location.origin+'/'+ roomSlug;
+    let varsUsr = "?initArtistSlug="+artistSlug;
+    window.open(urlRoom+varsUsr,"_self");
+  }
+  gotoCuadroBySlug(slug: string): void{
+    artist.forEach(artistElement => {
+      for(let i=0; i<artistElement.cuadro.length; i++)
+      {
+        let cuadroElement = artistElement.cuadro[i];
+        if(cuadroElement.slug === slug){
+          this.selectCuadro(cuadroElement.absoluteOrder);
+          break;
+        }
+      }
+    });
+  }
+  gotoArtistBySlug(slug: string): void{
+    console.log("gotoArtistBySlug 1 Slug: " + slug)
+    for(let i=0; i<artist.length; i++){
+      let artistElement = artist[i];
+      console.log("artistElement.slug: "+ artistElement.slug);
+      if(artistElement.slug === slug){
+        this.selectArtist(artistElement.order);
+        break;
+      }
+    }
+  }
   getArtistPositionsByID(id:number): Vector3{
     let newArtistPos: Vector3 = new Vector3();
     artist.forEach(artistElement => {
@@ -131,7 +204,7 @@ class GuiSceneBabylon{
   getMovieIndexByName(name: string):number{
     let newIndex: number = -1;
     movies.forEach(movieElement => {
-      if(movieElement.name === name) newIndex = movieElement.arrayIndex;  
+      if(movieElement.name === name) newIndex = movieElement.arrayIndex; 
     });
     return newIndex;
   }
@@ -152,30 +225,30 @@ class GuiSceneBabylon{
       });
     });
     return newArtistIndex;
-  }
+    }
 
-  getCuadroByAbsOrder(absOrder: number): Cuadro{
-    let newCuadro: Cuadro;
-    artist.forEach(artistElement => {
-      artistElement.cuadro.forEach(cuadroElement => {
-        if(cuadroElement.absoluteOrder === absOrder) newCuadro = cuadroElement;
+    getCuadroByAbsOrder(absOrder: number): Cuadro{
+      let newCuadro: Cuadro;
+      artist.forEach(artistElement => {
+        artistElement.cuadro.forEach(cuadroElement => {
+          if(cuadroElement.absoluteOrder === absOrder) newCuadro = cuadroElement;
+        });
       });
-    });
-    return newCuadro;
-  }
-
-  getActualCuadroSlugByAbsOrder(absOrder: number): string{
-    let newArtistSlug: string = "";
-    artist.forEach(artistElement => {
-      artistElement.cuadro.forEach(cuadroElement => {
-        if(cuadroElement.absoluteOrder === absOrder) newArtistSlug = cuadroElement.slug;
+      return newCuadro;
+    }
+  
+    getActualCuadroSlugByAbsOrder(absOrder: number): string{
+      let newArtistSlug: string = "";
+      artist.forEach(artistElement => {
+        artistElement.cuadro.forEach(cuadroElement => {
+          if(cuadroElement.absoluteOrder === absOrder) newArtistSlug = cuadroElement.slug;
+        });
       });
-    });
-    return newArtistSlug;
-  }
-
-  getCuadroOrientationByAbsOrder(absOrder: number): string{
-    let newOrientation: string = "";
+      return newArtistSlug;
+    }
+  
+    getCuadroOrientationByAbsOrder(absOrder: number): string{
+       let newOrientation: string = "";
     artist.forEach(artistElement => {
       artistElement.cuadro.forEach(cuadroElement => {
         if(cuadroElement.absoluteOrder === absOrder) newOrientation = cuadroElement.orientation;
@@ -207,7 +280,7 @@ class GuiSceneBabylon{
     artist.forEach(artistElement => {
       artistElement.cuadro.forEach(cuadroElement =>{
         if(cuadroElement.absoluteOrder === id) newCuadroPos = cuadroElement.viewerPosition;
-      });
+      }); 
     });
     return newCuadroPos;
   }
@@ -217,7 +290,7 @@ class GuiSceneBabylon{
     let viewPos = this.getArtistViewerPositionsByID(artistOrderID);
     actualArtist = artistOrderID;
     targetPosition = new Vector3(pos.x, pos.y, pos.z);
-    targetCameraPosition = new Vector3(viewPos.x, viewPos.y, viewPos.z);
+    targetCameraPosition = new Vector3(viewPos.x, viewPos.y, viewPos.z);   
     camera.useAutoRotationBehavior = false;
     camera.attachControl(canvas, false);
     canvas.classList.remove('horizTranslate');
@@ -245,11 +318,11 @@ class GuiSceneBabylon{
 
   selectCuadro(cuadroAbsoluteID: number): void{
 
-    
+
     let pos = this.getCuadroPositionsByID(cuadroAbsoluteID);
     let viewPos = this.getCuadroViewerPositionsByID(cuadroAbsoluteID);
     actualAbsoluteCuadro = cuadroAbsoluteID;
-    actualArtist = this.getCuadroArtistByAbsOrder(cuadroAbsoluteID); 
+    actualArtist = this.getCuadroArtistByAbsOrder(cuadroAbsoluteID);
     targetPosition = new Vector3(pos.x, pos.y, pos.z);
     targetCameraPosition = new Vector3(viewPos.x, viewPos.y, viewPos.z);
     apuntador.position = new Vector3(pos.x, pos.y + 0.5, pos.z);
@@ -376,7 +449,7 @@ class GuiSceneBabylon{
     if(this.intervalID != null){
       this.setCameraAutoPlay(false);
     }
-    
+  
     targetPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
     targetCameraPosition = camera.position;
     oldTargetCameraPosition = targetCameraPosition;
@@ -414,7 +487,7 @@ class GuiSceneBabylon{
           guiVI.next_cuadro();
         }
       }, 8000);
-
+      
       this.autoPlaySetted = true; 
       document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "stop auto";
       if(cameraLevel < 2){
@@ -428,10 +501,10 @@ class GuiSceneBabylon{
       if(this.autoPlaySetted){
         clearInterval(this.intervalID);
         this.autoPlaySetted = false;
-        document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "auto play";
-      }
+        document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "auto play";      
     }
   }
+}
 
   // PROXIMAMENTE DEPRECATED
   toggle_camera(): void{
@@ -458,49 +531,6 @@ Main function that is async so we can call the scene manager with await
 
 const main = async () => {
   
-  /** Carga de los elementos de la escena creados por codigo */
-  function loadCodedSceneElements():void{
-
-    if(sceneName == "voltaje"){
-      createSkybox(URL_SCENE_JS);
-    } 
-    
-    let light01: HemisphericLight;
-    let light02: HemisphericLight;
-    let light03: HemisphericLight;
-
-    if(sceneName == "voltaje"){
-      light01 = new HemisphericLight("light1", new Vector3(0, 3, -15), scene);
-      light02 = new HemisphericLight("light2", new Vector3(-25, 7, 0), scene);
-      light03 = new HemisphericLight("light3", new Vector3(0, 3, 15), scene);
-      
-      light01.intensity = 0.1;
-      light02.intensity = 0.3;
-      light03.intensity = 0.1;
-
-      light01.diffuse = new Color3(0.0, 1, 0);
-      light02.diffuse = new Color3(0.5, 0.7, 0.7);
-      light03.diffuse = new Color3(1, 0, 0);
-    }
-    else{
-      light01 = new HemisphericLight("light1", new Vector3(3, 1, 1), scene);
-      light02 = new HemisphericLight("light2", new Vector3(-3, 1, -1), scene);
-      light03 = new HemisphericLight("light3", new Vector3(0, 1, 0), scene);
-
-      light01.intensity = 0.8;
-      light02.intensity = 0.8;
-      light03.intensity = 0.8;
-    }
-
-    apuntador= Mesh.CreateTorus("apuntador", 0.08, 0.02, 3, scene);
-    apuntador.rotation.x = Tools.ToRadians(90);
-    apuntador.position = new Vector3(0, 10, 0);
-    let apuntadorMat = new StandardMaterial("greenMat", scene);
-    apuntadorMat.diffuseColor = new Color3(0, 1, 0);
-
-    apuntador.material = apuntadorMat;
-  }
-
   /** IMPORTACIÓN DE LA ESCENA DE BLENDER 
    * 
    * Las mallas que llegan importadas desde Blender deben ser 
@@ -511,7 +541,8 @@ const main = async () => {
   SceneLoader.ImportMesh(
     "",
     URL_SCENE_JS+"data/models/",
-    "thisBabylonScene.babylon", // MEJOR UTILIZAR ESTE FORMATO DE NOMBRE PARA LOS MODELOS thisBabylonScene.babylon
+    "thisBronxScene.babylon", // MEJOR UTILIZAR ESTE FORMATO DE NOMBRE PARA LOS MODELOS thisBabylonScene.babylon
+    //"thisBronxScene.babylon", 
     scene,
     function (importedMeshes) {
 
@@ -519,53 +550,88 @@ const main = async () => {
       let movieIndex = 0;
       let cuadroAbsoluteOrder = 0;
 
-        if(scene.getMeshByName("Room.000")){  
-          room = scene.getMeshByName("Room.000") as Mesh;
-          room.metadata = "sala";
-          //room.checkCollisions = true;
-          room.freezeWorldMatrix();
-  
-          roomCenter = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
-        
-        }
-  
-        // INCLUIR EN EL MASTER
-        if(scene.getMeshByName("Voltaje.000")){
-          sceneName = "voltaje";
-  
-          sceneModel = scene.getMeshByName("Voltaje.000") as Mesh;
-          sceneModel.metadata = "scenario";
-          sceneModel.freezeWorldMatrix(); // ESTOS FreezWorldMatrix son para optimizar rendimiento en objetos inmoviles.
-  
-          targetSpeed = targetVoltajeSpeed;
-          cameraSpeed = cameraVoltajeSpeed;
-  
-          camera = setupVoltajeArcRotateCamera(camera, roomCenter);
-  
-          loadCodedSceneElements(); // CONTINÚE LOADING DESPUES DE HABER DECLARADO EL NOMBRE DE LA ESCENA!!!
-  
-        }
-  
-        if(scene.getMeshByName("Limits.000")){
-          limits = scene.getMeshByName("Limits.000") as Mesh;
-          limits.metadata = "limits";
-          limits.name = "limits";
-          limits.checkCollisions = true;
-          limits.visibility = 0;
-          limits.freezeWorldMatrix();
-        }
+      let sceneMaterials = getMeshesMaterials(importedMeshes);
+      setTimeout(function(){guiVI.initPosArtist();},2000);
+      if(scene.getMeshByName("Room.000")){  
+        room = scene.getMeshByName("Room.000") as Mesh;
+        room.metadata = "sala";
+        //room.checkCollisions = true;
+        room.freezeWorldMatrix();
 
-      /* let sceneMaterials = getMeshesMaterials(importedMeshes);
+        roomCenter = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
+      
+      }
+
+      // INCLUIR EN EL MASTER
+      if(scene.getMeshByName("Voltaje.000")){
+        sceneName = "voltaje";
+
+        sceneModel = scene.getMeshByName("Voltaje.000") as Mesh;
+        sceneModel.metadata = "scenario";
+        sceneModel.freezeWorldMatrix(); // ESTOS FreezWorldMatrix son para optimizar rendimiento en objetos inmoviles.
+
+        targetSpeed = targetVoltajeSpeed;
+        cameraSpeed = cameraVoltajeSpeed;
+
+        camera = setupVoltajeArcRotateCamera(camera, roomCenter);
+      }
+      //loadCodedSceneElements(); // CONTINÚE LOADING DESPUES DE HABER DECLARADO EL NOMBRE DE LA ESCENA!!!
+      let light01: HemisphericLight;
+      let light02: HemisphericLight;
+      let light03: HemisphericLight;
+
+      if(sceneName == "voltaje"){
+        createSkybox(URL_SCENE_JS);
+
+        light01 = new HemisphericLight("light1", new Vector3(0, 3, -15), scene);
+        light02 = new HemisphericLight("light2", new Vector3(-25, 7, 0), scene);
+        light03 = new HemisphericLight("light3", new Vector3(0, 3, 15), scene);
+        
+        light01.intensity = 0.1;
+        light02.intensity = 0.3;
+        light03.intensity = 0.1;
+
+        light01.diffuse = new Color3(0.0, 1, 0);
+        light02.diffuse = new Color3(0.5, 0.7, 0.7);
+        light03.diffuse = new Color3(1, 0, 0);
+      }
+      else{
+        light01 = new HemisphericLight("light1", new Vector3(3, 1, 1), scene);
+        light02 = new HemisphericLight("light2", new Vector3(-3, 1, -1), scene);
+        light03 = new HemisphericLight("light3", new Vector3(0, 1, 0), scene);
+
+        light01.intensity = 0.8;
+        light02.intensity = 0.8;
+        light03.intensity = 0.8;
+      }
+
+      apuntador= Mesh.CreateTorus("apuntador", 0.08, 0.02, 3, scene);
+      apuntador.rotation.x = Tools.ToRadians(90);
+      apuntador.position = new Vector3(0, 10, 0);
+      let apuntadorMat = new StandardMaterial("greenMat", scene);
+      apuntadorMat.diffuseColor = new Color3(0, 1, 0);
+
+      apuntador.material = apuntadorMat;
+      
+      if(scene.getMeshByName("Limits.000")){
+        limits = scene.getMeshByName("Limits.000") as Mesh;
+        limits.metadata = "limits";
+        limits.name = "limits";
+        limits.checkCollisions = true;
+        limits.visibility = 0;
+        limits.freezeWorldMatrix();
+      }
+
+
       setTimeout(function(){
         setMeshesMaterials(importedMeshes,sceneMaterials);
         createSkybox(URL_SCENE_JS);
-      },11000); */
+      },11000);
 
       /** LOOP DE MESHES CARGADOS PARA ASIGNARLES COSAS */
       importedMeshes.forEach(newMesh => {
-
-         
-        /* if(newMesh.material){
+        //console.log(newMesh);
+        if(newMesh.material){
           let meshTexture = newMesh.material.getActiveTextures()[0] as Texture;
           if(meshTexture){
             var shaderMaterial = new SampleMaterial("material", scene);
@@ -576,7 +642,7 @@ const main = async () => {
             shaderMaterial.setTexture("uDiffuseMap", meshTexture);
             newMesh.material = shaderMaterial;
           }
-        } */
+        } 
 
         /***************/
 
@@ -610,9 +676,30 @@ const main = async () => {
       targetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
       targetCameraPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
       oldTargetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
+
+    
+      if(scene.getMeshByName("Limits.000")){
+        limits = scene.getMeshByName("Limits.000") as Mesh;
+        limits.metadata = "limits";
+        limits.name = "limits";
+        limits.checkCollisions = true;
+        limits.freezeWorldMatrix();
+      }
+
+      if(scene.getMeshByName("Room.000")){
+        room = scene.getMeshByName("Room.000") as Mesh;
+        room.metadata = "sala";
+        //room.checkCollisions = true;
+        room.freezeWorldMatrix();
+      }
+
+      targetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
+      targetCameraPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
+      oldTargetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
       oldTargetCameraPosition = targetCameraPosition;
 
       // TODO Sacar esto fuera del SceneImport
+
       targetBox = Mesh.CreateBox("TargetBox.000", 0.5, scene);
       let baseMat = new StandardMaterial("BaseMaterial", scene);
 
@@ -721,7 +808,7 @@ const main = async () => {
                 currentMovieViewPos = guiVI.getMovieViewPositionsByName(hit.pickedMesh.name);
                 currentMovieIndex = guiVI.getMovieIndexByName(hit.pickedMesh.name);
                 camera.useAutoRotationBehavior = false;
-              }
+             }
 
               let movieIndex:number = guiVI.getMovieIndexByID(parseInt(hit.pickedMesh.id), movies);
 
@@ -735,8 +822,8 @@ const main = async () => {
                 movies.forEach(movie => {
                   movie.videoTexture.video.play();
                 });
-              }
-              else{
+                }
+                else{
                 if(!movies[movieIndex].videoTexturePlaying){
                   movies[movieIndex].videoTexture.video.play();
                   movies[movieIndex].videoTexturePlaying = true;
@@ -776,7 +863,7 @@ const main = async () => {
   /** Animation Loop */
  /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-  let time = 0;
+ let time = 0;
   scene.registerBeforeRender(function() {
 
     if(cameraSetted){
@@ -815,7 +902,7 @@ const main = async () => {
       apuntador.position = new Vector3(apuntador.position.x, apuntadorPosition, apuntador.position.z);
       apuntador.rotation.y = (apuntador.rotation.y + Tools.ToRadians(1))%Tools.ToRadians(360);
 
-      // NO BORRAR: POSIBLE USO
+            // NO BORRAR: POSIBLE USO
       /** Camera colides with wall and return */
        /* camera.onCollide = function(collider) {
             if(collider.name === 'limits') {
@@ -841,7 +928,7 @@ const main = async () => {
 /** Buttons events */
  /**************************** CONTROL NAVIGATION BUTTONS ************************************************/
 
-globalThis.virtualInButtonClick = function(buttonClickData){
+ globalThis.virtualInButtonClick = function(buttonClickData){
   
   let buttonId = buttonClickData.id;
   switch(buttonId) { 
@@ -874,6 +961,32 @@ globalThis.virtualInButtonClick = function(buttonClickData){
       guiVI.setCameraAutoPlay(true);
       console.log("VI_GUI_Play at Babylon");
        break; 
+    }
+    default: { 
+      if(guiVI.isIndexButton(buttonClickData)){
+        
+        /**Si el artista no esta aqui se busca en las etiquetas */
+        if(guiVI.isArtistInThisRoom(buttonClickData.slug)){
+          guiVI.gotoArtistBySlug(buttonClickData.slug);
+        }else {
+          /**Get roomSlug */
+          console.log(buttonClickData);
+          let tagsVector = buttonClickData.tags;
+          let roomSlug;
+          for(let i=0; i<tagsVector.length; i++){
+            let tagSplite = tagsVector[i].split(":");
+            if(tagSplite){
+              if(tagSplite[0]==="roomSlug"){
+                roomSlug=tagSplite[1];
+              }
+            }
+          }
+          if(roomSlug){
+            guiVI.gotoPageByArtistSlugs(buttonClickData.slug, roomSlug);
+          }
+        }
+      }
+      break; 
     } 
   } 
   console.log("Button clicked: "+buttonId);
@@ -888,34 +1001,34 @@ globalThis.virtualInButtonClick = function(buttonClickData){
   canvas.classList.add('resetPosition');
 
   switch (kbInfo.type) {
-      case KeyboardEventTypes.KEYDOWN:
-          switch (kbInfo.event.key){
-            case "c":
-              guiVI.center_camera();
-              break;
-            case "ArrowRight":
-              guiVI.next_navigation();
-              break;
-            case "ArrowLeft":
-              guiVI.prev_navigation();
-              break;
-            case "ArrowUp":
-              guiVI.next_view_level();
-              break;
-            case "ArrowDown":
-              guiVI.prev_view_level();
-              break;
-            case "p":
-              guiVI.setCameraAutoPlay(true);
-              break;
-            case "s":
-              guiVI.setCameraAutoPlay(false);
-              break;
-            default:
-              break;
-          }       
-          break;
-  }
+    case KeyboardEventTypes.KEYDOWN:
+        switch (kbInfo.event.key){
+          case "c":
+            guiVI.center_camera();
+            break;
+          case "ArrowRight":
+            guiVI.next_navigation();
+            break;
+          case "ArrowLeft":
+            guiVI.prev_navigation();
+            break;
+          case "ArrowUp":
+            guiVI.next_view_level();
+            break;
+          case "ArrowDown":
+            guiVI.prev_view_level();
+            break;
+          case "p":
+            guiVI.setCameraAutoPlay(true);
+            break;
+          case "s":
+            guiVI.setCameraAutoPlay(false);
+            break;
+          default:
+            break;
+        }       
+        break;
+}
 });
 
  /** INIT SCENE */
