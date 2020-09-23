@@ -105,7 +105,7 @@ class GuiSceneBabylon{
     
     let urlRoom = location.origin+'/'+ roomSlug;
     let varsUsr = "?initArtistSlug="+artistSlug;
-    window.open(urlRoom,"_self");
+    window.open(urlRoom+varsUsr,"_self");
   }
   gotoCuadroBySlug(slug: string): void{
     artist.forEach(artistElement => {
