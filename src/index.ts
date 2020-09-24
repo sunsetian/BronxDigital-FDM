@@ -542,7 +542,7 @@ const main = async () => {
     "",
     URL_SCENE_JS+"data/models/",
     "thisBronxScene.babylon", // MEJOR UTILIZAR ESTE FORMATO DE NOMBRE PARA LOS MODELOS thisBabylonScene.babylon
-    //"thisBronxScene.babylon", 
+    //"thisBabylonScene.babylon", 
     scene,
     function (importedMeshes) {
 
