@@ -58,7 +58,9 @@ let camera: ArcRotateCamera = createArcRotateCamera() as ArcRotateCamera;
 
 var oldTargetPosition: Vector3;
 var oldTargetCameraPosition: Vector3;
-
+const removeAccents = (str) => {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+} 
 /* ******************************* GUI SCENE BABYLON CLASS ***************************** */
 
 /**GUI SCENE CLASS*/
@@ -67,9 +69,10 @@ class GuiSceneBabylon{
   initPosArtist(){
     this.getVarsFromUrl();
     if(initArtistSlug){
-      this.gotoArtistBySlug(initArtistSlug);
+      this.gotoArtistBySlug(removeAccents(initArtistSlug));
     }
   }
+  
   getVarsFromUrl(){
     let varsArray = location.search.substring(1,location.search.length).split("&");
     varsArray.forEach(varUrl => {
@@ -97,29 +100,32 @@ class GuiSceneBabylon{
   }
 
   isArtistInThisRoom(slug: string):boolean{
+    let slugFlat = removeAccents(slug);
     let result = false;
-    console.log("slug: "+slug);
+    console.log("slug: "+slugFlat);
     for(let i=0; i< artist.length; i++){
-      if(artist[i].slug === slug){
+      if(artist[i].slug === slugFlat){
         result=true;
         break;
       }
     }
     return result;
   }
-
   gotoPageByArtistSlugs(artistSlug: string, roomSlug: string):void{
-    
-    let urlRoom = location.origin+'/'+ roomSlug;
-    let varsUsr = "?initArtistSlug="+artistSlug;
+    let artistSlugFlat=removeAccents(artistSlug);
+    let roomSlugFlat=removeAccents(roomSlug);
+    //alert(roomSlugFlat);
+    let urlRoom = location.origin+'/'+ roomSlugFlat;
+    let varsUsr = "?initArtistSlug="+artistSlugFlat;
     window.open(urlRoom+varsUsr,"_self");
   }
   gotoCuadroBySlug(slug: string): void{
+    let slugFlat = removeAccents(slug);
     artist.forEach(artistElement => {
       for(let i=0; i<artistElement.cuadro.length; i++)
       {
         let cuadroElement = artistElement.cuadro[i];
-        if(cuadroElement.slug === slug){
+        if(cuadroElement.slug === slugFlat){
           this.selectCuadro(cuadroElement.absoluteOrder);
           break;
         }
@@ -127,11 +133,12 @@ class GuiSceneBabylon{
     });
   }
   gotoArtistBySlug(slug: string): void{
-    console.log("gotoArtistBySlug 1 Slug: " + slug)
+    let slugFlat = removeAccents(slug);
+    console.log("gotoArtistBySlug 1 Slug: " + slugFlat)
     for(let i=0; i<artist.length; i++){
       let artistElement = artist[i];
       console.log("artistElement.slug: "+ artistElement.slug);
-      if(artistElement.slug === slug){
+      if(artistElement.slug === slugFlat){
         this.selectArtist(artistElement.order);
         break;
       }

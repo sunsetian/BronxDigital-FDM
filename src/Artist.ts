@@ -1,5 +1,7 @@
 import { Mesh, AbstractMesh, Vector3, Scene, PBRMetallicRoughnessMaterial, StandardMaterial, VideoTextureSettings, VideoTexture, InterpolateValueAction, ActionManager, Color3 } from "@babylonjs/core";
-
+const removeAccents = (str) => {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  } 
 export class Artist {
 
     /** Orientacion del cuadro: north, south, east, west */
@@ -26,7 +28,7 @@ export class Artist {
         this.order = parseInt(cuadrosGroup.name.split(".")[1]); 
 
         if(cuadrosGroup.name.split(".")[2] !== null){
-            this.slug = cuadrosGroup.name.split(".")[2].toLowerCase();
+            this.slug = removeAccents(cuadrosGroup.name.split(".")[2].toLowerCase());
         }
 
         let cuadrosArray : AbstractMesh[] = cuadrosGroup.getChildMeshes(true);
@@ -102,7 +104,7 @@ export class Cuadro {
         this.name = cuadro.name;
         this.arrayIndex = arrayIndex;
         this.order = parseInt(cuadro.name.split("@")[1])-1;
-        this.slug = slugArtista + "_" + (this.order + 1);
+        this.slug = removeAccents(slugArtista + "_" + (this.order + 1));
         this.id = idArtist + "_" + cuadro.name.split("@")[1];
         this.myArtist = idArtist;
 
