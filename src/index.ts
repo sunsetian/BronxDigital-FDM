@@ -1,3 +1,5 @@
+/** Version: 0.9.3.2.Seb */
+
 //imports
 import 'pepjs';
 //import '@babylonjs/loaders';
@@ -465,17 +467,21 @@ class GuiSceneBabylon{
     camera.attachControl(canvas);
     //cameraAtCenter = true;
     cameraLevel = 0;
-    camera.useAutoRotationBehavior = true;
-    camera.angularSensibilityX = -5000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
 
-    let rotationSpeed = 0.05;
-    if(sceneName == "voltaje"){
-      rotationSpeed = -0.1;
-      camera.angularSensibilityX = -4000;
+    if(this.autoPlaySetted){
+      camera.useAutoRotationBehavior = true;
+      camera.angularSensibilityX = -5000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
+
+      let rotationSpeed = 0.05;
+      if(sceneName == "voltaje"){
+        rotationSpeed = -0.1;
+        camera.angularSensibilityX = -4000;
+      }
+      if(camera.autoRotationBehavior !== null){
+        camera.autoRotationBehavior.idleRotationSpeed = rotationSpeed;
+      } 
     }
-    if(camera.autoRotationBehavior !== null){
-      camera.autoRotationBehavior.idleRotationSpeed = rotationSpeed;
-    } 
+    
     cameraLevel = 0;
   }
 
@@ -486,18 +492,33 @@ class GuiSceneBabylon{
 
   setCameraAutoPlay(set: boolean): void{
     if(set && !this.autoPlaySetted){
-      this.intervalID = setInterval( function() {
-        if(cameraLevel < 2){
-          guiVI.next_artist();
-        }
-        else{
-          guiVI.next_cuadro();
-        }
-      }, 8000);
+      if(cameraLevel != 0){
+        this.intervalID = setInterval( function() {
+          if(cameraLevel < 2){
+            guiVI.next_artist();
+          }
+          else{
+            guiVI.next_cuadro();
+          }
+        }, 8000);
+      }
       
       this.autoPlaySetted = true; 
       document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "stop auto";
-      if(cameraLevel < 2){
+      if(cameraLevel == 0){
+        camera.useAutoRotationBehavior = true;
+        camera.angularSensibilityX = -5000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
+
+        let rotationSpeed = 0.05;
+        if(sceneName == "voltaje"){
+          rotationSpeed = -0.1;
+          camera.angularSensibilityX = -4000;
+        }
+        if(camera.autoRotationBehavior !== null){
+          camera.autoRotationBehavior.idleRotationSpeed = rotationSpeed;
+        }
+      }
+      else if(cameraLevel < 2){
         this.next_artist();
       }
       else{
@@ -559,6 +580,7 @@ const main = async () => {
 
       let sceneMaterials = getMeshesMaterials(importedMeshes);
       setTimeout(function(){guiVI.initPosArtist();},2000);
+
       if(scene.getMeshByName("Room.000")){  
         room = scene.getMeshByName("Room.000") as Mesh;
         room.metadata = "sala";
@@ -630,17 +652,26 @@ const main = async () => {
       }
 
 
-      setTimeout(function(){
-        setMeshesMaterials(importedMeshes,sceneMaterials);
-        createSkybox(URL_SCENE_JS);
-      },11000);
+     
 
       /** LOOP DE MESHES CARGADOS PARA ASIGNARLES COSAS */
       importedMeshes.forEach(newMesh => {
-        //console.log(newMesh);
+        
+
+        let meshNames: string[] = newMesh.name.split(".");
+        if( meshNames[0] === "Artist" ){
+          artist.push(new Artist(newMesh, index, sceneName, URL_SCENE_JS, scene));
+          index++;
+        }
+        if( meshNames[0] === "Movie" ){
+          movies.push(new Movie(newMesh as Mesh, movieIndex, URL_SCENE_JS, scene));
+          movieIndex++;
+        }
+
+        /** CARGA SHADERS COMO LOADING */
         if(newMesh.material){
           let meshTexture = newMesh.material.getActiveTextures()[0] as Texture;
-          if(meshTexture){
+          if(meshTexture ){
             var shaderMaterial = new SampleMaterial("material", scene);
             
             var textureTest = new Texture(URL_SCENE_JS+"data/loadingMeshImage/loadingShader0.jpg", scene);
@@ -653,16 +684,12 @@ const main = async () => {
 
         /***************/
 
-        let meshNames: string[] = newMesh.name.split(".");
-        if( meshNames[0] === "Artist" ){
-          artist.push(new Artist(newMesh, index, sceneName, URL_SCENE_JS, scene));
-          index++;
-        }
-        if( meshNames[0] === "Movie" ){
-          movies.push(new Movie(newMesh as Mesh, movieIndex, URL_SCENE_JS, scene));
-          movieIndex++;
-        }
       });
+
+      setTimeout(function(){
+        setMeshesMaterials(importedMeshes,sceneMaterials);
+        createSkybox(URL_SCENE_JS);
+      },11000);
       
       for(let i=0; i < artist.length; i++){
         let artistIndex = guiVI.getArtistIndexByOrder(i);
@@ -721,6 +748,7 @@ const main = async () => {
         cameraSetted = true;
   
       }
+
 
       /** FUNCION DE OBSERVACION DE EVENTOS DE CLICK
        * 
