@@ -99,29 +99,31 @@ export class Cuadro {
     public videoTexturePlaying: boolean = false;
     public videoTexture: VideoTexture;
 
-    private resetOutLine(unit_mesh): void{
+    /* private resetActiveColor(unit_mesh): void{
         if (unit_mesh.source !== null) {
-            unit_mesh.source.renderOutline = false;
+            //unit_mesh.source.renderOutline = false;
+            unit_mesh.material.emissiveColor = new Color3(0,0,0);
         }
-    }
+    } */
 
     private mouseOverUnit = function(unit_mesh) {
-    	console.log ("mouse over "+unit_mesh.meshUnderPointer.id);
+    	//console.log ("mouse over "+unit_mesh.meshUnderPointer.id);
     	//console.log (unit_mesh);
     	if (unit_mesh.meshUnderPointer !== null) {
         	unit_mesh.meshUnderPointer.renderOutline = true;	
             unit_mesh.meshUnderPointer.outlineWidth = 0.1;
             unit_mesh.meshUnderPointer.outlineColor = new Color3(0,1,0);
-            setTimeout(function(){unit_mesh.source.renderOutline = false;},2000);
+            //unit_mesh.material.emissiveColor = new Color3(0,1,0);
+            setTimeout(function(){unit_mesh.source.renderOutline = false;},1000);
     	}
     }
     
     private mouseOutUnit = function(unit_mesh) {
-        console.log("mouse out "+unit_mesh.meshUnderPointer.id);
+        //console.log("mouse out "+unit_mesh.meshUnderPointer.id);
     	//console.log (unit_mesh);
     	if (unit_mesh.source !== null) {
         	unit_mesh.source.renderOutline = false;	
-            
+            //unit_mesh.material.emissiveColor = new Color3(0,1,0);
     	}
     }
     
@@ -143,7 +145,7 @@ export class Cuadro {
 
         this.cuadroHeight = cuadro.getBoundingInfo().boundingBox.extendSize.y;
            
-        this.closeDistance = this.cuadroWidth*3.2;
+        this.closeDistance = this.cuadroWidth*3.5;
 
         this.mesh = cuadro;
 

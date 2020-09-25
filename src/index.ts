@@ -1,4 +1,4 @@
-/** Version: 0.9.3.2.Seb */
+/** Version: 0.9.3.3.Seb */
 
 //imports
 import 'pepjs';
@@ -42,7 +42,7 @@ let actualMovie: number = -1;
 const numVentanas: number = 0;
 
 let targetSpeed: number = 0.03;
-let cameraSpeed: number = 0.015;
+let cameraSpeed: number = 0.027;
 
 const targetVoltajeSpeed: number = 0.04;
 const cameraVoltajeSpeed: number = 0.03;
@@ -455,6 +455,7 @@ class GuiSceneBabylon{
   }
 
   center_camera(): void{
+
     if(this.intervalID != null){
       this.setCameraAutoPlay(false);
     }
@@ -470,7 +471,7 @@ class GuiSceneBabylon{
 
     if(this.autoPlaySetted){
       camera.useAutoRotationBehavior = true;
-      camera.angularSensibilityX = -5000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
+      camera.angularSensibilityX = -3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
 
       let rotationSpeed = 0.05;
       if(sceneName == "voltaje"){
@@ -505,9 +506,10 @@ class GuiSceneBabylon{
       
       this.autoPlaySetted = true; 
       document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "stop auto";
+      document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#00ff00";
       if(cameraLevel == 0){
         camera.useAutoRotationBehavior = true;
-        camera.angularSensibilityX = -5000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
+        camera.angularSensibilityX = -3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
 
         let rotationSpeed = 0.05;
         if(sceneName == "voltaje"){
@@ -529,7 +531,8 @@ class GuiSceneBabylon{
       if(this.autoPlaySetted){
         clearInterval(this.intervalID);
         this.autoPlaySetted = false;
-        document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "auto play";      
+        document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "auto play";
+        document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#d6d6d6";      
     }
   }
 }
@@ -587,7 +590,7 @@ const main = async () => {
         //room.checkCollisions = true;
         room.freezeWorldMatrix();
 
-        roomCenter = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
+        roomCenter = new Vector3(room.position.x, room.position.y + 1.9, room.position.z);
       
       }
 
@@ -652,8 +655,6 @@ const main = async () => {
       }
 
 
-     
-
       /** LOOP DE MESHES CARGADOS PARA ASIGNARLES COSAS */
       importedMeshes.forEach(newMesh => {
         
@@ -706,11 +707,6 @@ const main = async () => {
       numArtists = artist.length;
       numCuadros = cuadroAbsoluteOrder;
       numMovies = movies.length;
-
-      targetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
-      targetCameraPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
-      oldTargetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
-
     
       if(scene.getMeshByName("Limits.000")){
         limits = scene.getMeshByName("Limits.000") as Mesh;
@@ -727,9 +723,9 @@ const main = async () => {
         room.freezeWorldMatrix();
       }
 
-      targetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
-      targetCameraPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
-      oldTargetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
+      targetPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
+      targetCameraPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
+      oldTargetPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
       oldTargetCameraPosition = targetCameraPosition;
 
       // TODO Sacar esto fuera del SceneImport
@@ -792,7 +788,13 @@ const main = async () => {
               let iArtistOrdered = parseInt(currentMesh.id.split("_")[0]); 
               let iCuadroOrdered = parseInt(currentMesh.id.split("_")[1])-1;
 
-              camera.angularSensibilityX = 5000; /// Para cambiar la direccion de la rotacion de la camara al hacer GRAB 
+              camera.angularSensibilityX = 3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
+
+              let rotationSpeed = 0.05;
+              if(sceneName == "voltaje"){
+                rotationSpeed = -0.1;
+                camera.angularSensibilityX = 4000;
+              }
 
               let currentArtistIndex: number = -1;
 
@@ -918,7 +920,7 @@ const main = async () => {
               camera.position = new Vector3(camera.position.x*(1-cameraSpeed) + targetCameraPosition.x*cameraSpeed, camera.position.y*(1-cameraSpeed) + targetCameraPosition.y*cameraSpeed, camera.position.z*(1-cameraSpeed) + targetCameraPosition.z*cameraSpeed);
               
               //console.log("targetCameraPosition.x: " + targetCameraPosition.x);
-              if(Math.abs(camera.position.x - targetCameraPosition.x) < 0.1 && Math.abs(camera.position.y - targetCameraPosition.y) < 0.1 && Math.abs(camera.position.z - targetCameraPosition.z) < 0.1){
+              if(Math.abs(camera.position.x - targetCameraPosition.x) < 0.05 && Math.abs(camera.position.y - targetCameraPosition.y) < 0.05 && Math.abs(camera.position.z - targetCameraPosition.z) < 0.05){
                 oldTargetCameraPosition = targetCameraPosition;
               }
           }
@@ -937,7 +939,7 @@ const main = async () => {
       apuntador.position = new Vector3(apuntador.position.x, apuntadorPosition, apuntador.position.z);
       apuntador.rotation.y = (apuntador.rotation.y + Tools.ToRadians(1))%Tools.ToRadians(360);
 
-            // NO BORRAR: POSIBLE USO
+      // NO BORRAR: POSIBLE USO
       /** Camera colides with wall and return */
        /* camera.onCollide = function(collider) {
             if(collider.name === 'limits') {
