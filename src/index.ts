@@ -1,4 +1,4 @@
-/** Version: 0.9.3.3.Seb */
+/** Versión: 0.9.3.4.Adr */
 
 //imports
 import 'pepjs';
@@ -67,11 +67,16 @@ const removeAccents = (str) => {
 
 /**GUI SCENE CLASS*/
 class GuiSceneBabylon{
-  constructor(){}
+  constructor(){
+    
+  }
   initPosArtist(){
     this.getVarsFromUrl();
     if(initArtistSlug){
       this.gotoArtistBySlug(removeAccents(initArtistSlug));
+      
+      setTimeout(function(){globalThis.bronxControl.loadInfoByPostSlug(initArtistSlug,175);},3000);
+      setTimeout(function(){globalThis.bronxControl.showInfo(175) ;},4000);
     }
   }
   
@@ -104,7 +109,6 @@ class GuiSceneBabylon{
   isArtistInThisRoom(slug: string):boolean{
     let slugFlat = removeAccents(slug);
     let result = false;
-    console.log("slug: "+slugFlat);
     for(let i=0; i< artist.length; i++){
       if(artist[i].slug === slugFlat){
         result=true;
@@ -113,6 +117,25 @@ class GuiSceneBabylon{
     }
     return result;
   }
+
+  cleanRoomIndex(){
+    console.log("Clean index");
+    let indexContainer = document.getElementsByClassName("indexRoom")[0];
+    console.log(indexContainer);
+    if(indexContainer){
+      let indexRoom = indexContainer.children;
+      for (let i = 0; i < indexRoom.length; i++){
+        let a = indexRoom[i].getElementsByTagName("a")[0];
+        let slugFlat = removeAccents(a.getAttribute("slug"));
+        if(!this.isArtistInThisRoom(slugFlat)){
+          indexContainer.removeChild(indexRoom[i]);
+          i--;
+        }
+      }
+    }
+
+  }
+  
   gotoPageByArtistSlugs(artistSlug: string, roomSlug: string):void{
     let artistSlugFlat=removeAccents(artistSlug);
     let roomSlugFlat=removeAccents(roomSlug);
@@ -561,7 +584,7 @@ Main function that is async so we can call the scene manager with await
 */
 
 const main = async () => {
-  
+ 
   /** IMPORTACIÓN DE LA ESCENA DE BLENDER 
    * 
    * Las mallas que llegan importadas desde Blender deben ser 
@@ -582,6 +605,7 @@ const main = async () => {
       let cuadroAbsoluteOrder = 0;
 
       let sceneMaterials = getMeshesMaterials(importedMeshes);
+      setTimeout(function(){guiVI.cleanRoomIndex();},1000);
       setTimeout(function(){guiVI.initPosArtist();},2000);
 
       if(scene.getMeshByName("Room.000")){  
@@ -1005,6 +1029,9 @@ const main = async () => {
         /**Si el artista no esta aqui se busca en las etiquetas */
         if(guiVI.isArtistInThisRoom(buttonClickData.slug)){
           guiVI.gotoArtistBySlug(buttonClickData.slug);
+          globalThis.bronxControl.closeInfo(1521);
+          globalThis.bronxControl.loadInfoByPostSlug(buttonClickData.slug,175);
+          setTimeout(function(){globalThis.bronxControl.showInfo(175) ;},1000);
         }else {
           /**Get roomSlug */
           console.log(buttonClickData);
