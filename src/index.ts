@@ -42,7 +42,7 @@ let actualMovie: number = -1;
 const numVentanas: number = 0;
 
 let targetSpeed: number = 0.03;
-let cameraSpeed: number = 0.015;
+let cameraSpeed: number = 0.027;
 
 const targetVoltajeSpeed: number = 0.04;
 const cameraVoltajeSpeed: number = 0.03;
@@ -478,6 +478,7 @@ class GuiSceneBabylon{
   }
 
   center_camera(): void{
+
     if(this.intervalID != null){
       this.setCameraAutoPlay(false);
     }
@@ -490,17 +491,21 @@ class GuiSceneBabylon{
     camera.attachControl(canvas);
     //cameraAtCenter = true;
     cameraLevel = 0;
-    camera.useAutoRotationBehavior = true;
-    camera.angularSensibilityX = -5000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
 
-    let rotationSpeed = 0.05;
-    if(sceneName == "voltaje"){
-      rotationSpeed = -0.1;
-      camera.angularSensibilityX = -4000;
+    if(this.autoPlaySetted){
+      camera.useAutoRotationBehavior = true;
+      camera.angularSensibilityX = -3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
+
+      let rotationSpeed = 0.05;
+      if(sceneName == "voltaje"){
+        rotationSpeed = -0.1;
+        camera.angularSensibilityX = -4000;
+      }
+      if(camera.autoRotationBehavior !== null){
+        camera.autoRotationBehavior.idleRotationSpeed = rotationSpeed;
+      } 
     }
-    if(camera.autoRotationBehavior !== null){
-      camera.autoRotationBehavior.idleRotationSpeed = rotationSpeed;
-    } 
+    
     cameraLevel = 0;
   }
 
@@ -511,18 +516,34 @@ class GuiSceneBabylon{
 
   setCameraAutoPlay(set: boolean): void{
     if(set && !this.autoPlaySetted){
-      this.intervalID = setInterval( function() {
-        if(cameraLevel < 2){
-          guiVI.next_artist();
-        }
-        else{
-          guiVI.next_cuadro();
-        }
-      }, 8000);
+      if(cameraLevel != 0){
+        this.intervalID = setInterval( function() {
+          if(cameraLevel < 2){
+            guiVI.next_artist();
+          }
+          else{
+            guiVI.next_cuadro();
+          }
+        }, 8000);
+      }
       
       this.autoPlaySetted = true; 
       document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "stop auto";
-      if(cameraLevel < 2){
+      document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#00ff00";
+      if(cameraLevel == 0){
+        camera.useAutoRotationBehavior = true;
+        camera.angularSensibilityX = -3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
+
+        let rotationSpeed = 0.05;
+        if(sceneName == "voltaje"){
+          rotationSpeed = -0.1;
+          camera.angularSensibilityX = -4000;
+        }
+        if(camera.autoRotationBehavior !== null){
+          camera.autoRotationBehavior.idleRotationSpeed = rotationSpeed;
+        }
+      }
+      else if(cameraLevel < 2){
         this.next_artist();
       }
       else{
@@ -533,7 +554,8 @@ class GuiSceneBabylon{
       if(this.autoPlaySetted){
         clearInterval(this.intervalID);
         this.autoPlaySetted = false;
-        document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "auto play";      
+        document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "auto play";
+        document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#d6d6d6";      
     }
   }
 }
@@ -585,13 +607,14 @@ const main = async () => {
       let sceneMaterials = getMeshesMaterials(importedMeshes);
       setTimeout(function(){guiVI.cleanRoomIndex();},1000);
       setTimeout(function(){guiVI.initPosArtist();},2000);
+
       if(scene.getMeshByName("Room.000")){  
         room = scene.getMeshByName("Room.000") as Mesh;
         room.metadata = "sala";
         //room.checkCollisions = true;
         room.freezeWorldMatrix();
 
-        roomCenter = new Vector3(room.position.x, room.position.y + 1.7, room.position.z);
+        roomCenter = new Vector3(room.position.x, room.position.y + 1.9, room.position.z);
       
       }
 
@@ -656,17 +679,24 @@ const main = async () => {
       }
 
 
-      setTimeout(function(){
-        setMeshesMaterials(importedMeshes,sceneMaterials);
-        createSkybox(URL_SCENE_JS);
-      },11000);
-
       /** LOOP DE MESHES CARGADOS PARA ASIGNARLES COSAS */
       importedMeshes.forEach(newMesh => {
-        //console.log(newMesh);
+        
+
+        let meshNames: string[] = newMesh.name.split(".");
+        if( meshNames[0] === "Artist" ){
+          artist.push(new Artist(newMesh, index, sceneName, URL_SCENE_JS, scene));
+          index++;
+        }
+        if( meshNames[0] === "Movie" ){
+          movies.push(new Movie(newMesh as Mesh, movieIndex, URL_SCENE_JS, scene));
+          movieIndex++;
+        }
+
+        /** CARGA SHADERS COMO LOADING */
         if(newMesh.material){
           let meshTexture = newMesh.material.getActiveTextures()[0] as Texture;
-          if(meshTexture){
+          if(meshTexture ){
             var shaderMaterial = new SampleMaterial("material", scene);
             
             var textureTest = new Texture(URL_SCENE_JS+"data/loadingMeshImage/loadingShader0.jpg", scene);
@@ -679,16 +709,12 @@ const main = async () => {
 
         /***************/
 
-        let meshNames: string[] = newMesh.name.split(".");
-        if( meshNames[0] === "Artist" ){
-          artist.push(new Artist(newMesh, index, sceneName, URL_SCENE_JS, scene));
-          index++;
-        }
-        if( meshNames[0] === "Movie" ){
-          movies.push(new Movie(newMesh as Mesh, movieIndex, URL_SCENE_JS, scene));
-          movieIndex++;
-        }
       });
+
+      setTimeout(function(){
+        setMeshesMaterials(importedMeshes,sceneMaterials);
+        createSkybox(URL_SCENE_JS);
+      },11000);
       
       for(let i=0; i < artist.length; i++){
         let artistIndex = guiVI.getArtistIndexByOrder(i);
@@ -705,11 +731,6 @@ const main = async () => {
       numArtists = artist.length;
       numCuadros = cuadroAbsoluteOrder;
       numMovies = movies.length;
-
-      targetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
-      targetCameraPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
-      oldTargetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
-
     
       if(scene.getMeshByName("Limits.000")){
         limits = scene.getMeshByName("Limits.000") as Mesh;
@@ -726,9 +747,9 @@ const main = async () => {
         room.freezeWorldMatrix();
       }
 
-      targetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
-      targetCameraPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
-      oldTargetPosition = new Vector3(roomCenter.x, roomCenter.y + 1.7, roomCenter.z);
+      targetPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
+      targetCameraPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
+      oldTargetPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
       oldTargetCameraPosition = targetCameraPosition;
 
       // TODO Sacar esto fuera del SceneImport
@@ -747,6 +768,7 @@ const main = async () => {
         cameraSetted = true;
   
       }
+
 
       /** FUNCION DE OBSERVACION DE EVENTOS DE CLICK
        * 
@@ -790,7 +812,13 @@ const main = async () => {
               let iArtistOrdered = parseInt(currentMesh.id.split("_")[0]); 
               let iCuadroOrdered = parseInt(currentMesh.id.split("_")[1])-1;
 
-              camera.angularSensibilityX = 5000; /// Para cambiar la direccion de la rotacion de la camara al hacer GRAB 
+              camera.angularSensibilityX = 3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
+
+              let rotationSpeed = 0.05;
+              if(sceneName == "voltaje"){
+                rotationSpeed = -0.1;
+                camera.angularSensibilityX = 4000;
+              }
 
               let currentArtistIndex: number = -1;
 
@@ -916,7 +944,7 @@ const main = async () => {
               camera.position = new Vector3(camera.position.x*(1-cameraSpeed) + targetCameraPosition.x*cameraSpeed, camera.position.y*(1-cameraSpeed) + targetCameraPosition.y*cameraSpeed, camera.position.z*(1-cameraSpeed) + targetCameraPosition.z*cameraSpeed);
               
               //console.log("targetCameraPosition.x: " + targetCameraPosition.x);
-              if(Math.abs(camera.position.x - targetCameraPosition.x) < 0.1 && Math.abs(camera.position.y - targetCameraPosition.y) < 0.1 && Math.abs(camera.position.z - targetCameraPosition.z) < 0.1){
+              if(Math.abs(camera.position.x - targetCameraPosition.x) < 0.05 && Math.abs(camera.position.y - targetCameraPosition.y) < 0.05 && Math.abs(camera.position.z - targetCameraPosition.z) < 0.05){
                 oldTargetCameraPosition = targetCameraPosition;
               }
           }
@@ -935,7 +963,7 @@ const main = async () => {
       apuntador.position = new Vector3(apuntador.position.x, apuntadorPosition, apuntador.position.z);
       apuntador.rotation.y = (apuntador.rotation.y + Tools.ToRadians(1))%Tools.ToRadians(360);
 
-            // NO BORRAR: POSIBLE USO
+      // NO BORRAR: POSIBLE USO
       /** Camera colides with wall and return */
        /* camera.onCollide = function(collider) {
             if(collider.name === 'limits') {

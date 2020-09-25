@@ -75,19 +75,20 @@ export const setupVoltajeArcRotateCamera = (camera: ArcRotateCamera, roomCenter:
 export const createArcRotateCamera = () => {
     const startAlpha = Math.PI / 2;
     const startBeta = Math.PI / 2;
-    const startRadius = 3
-    const startPosition = new Vector3(0, 1.9, 0)
+    const startRadius = 0
+    const startPosition = new Vector3(0, 0, 0)
     const camera = new ArcRotateCamera('camera', startAlpha, startBeta, startRadius, startPosition, scene, true)
     camera.attachControl(canvas, false)
 
+    // Set some basic camera settings
     camera.minZ = 0.1;
     camera.lowerBetaLimit = Math.PI * 1.8/ 4;
     camera.upperBetaLimit = Math.PI * 2.2 / 4;
-    camera.lowerRadiusLimit = 1.71;
+    camera.lowerRadiusLimit = 0.7;
     camera.upperRadiusLimit = 6;
     camera.allowUpsideDown = false;
     camera.wheelPrecision = 250;
-    camera.angularSensibilityX = -5000;
+    camera.angularSensibilityX = -3000;
     camera.angularSensibilityY = 5000;
 
     camera.useAutoRotationBehavior = true;
@@ -97,7 +98,7 @@ export const createArcRotateCamera = () => {
 
     camera.pinchPrecision = 1000;
     camera.checkCollisions = true;
-    camera.collisionRadius = new Vector3(1.7, 0.2, 1.7);
+    camera.collisionRadius = new Vector3(1, 0.2, 1);
 
     return camera
 }
@@ -121,27 +122,35 @@ export const createSkybox = (urlScene:string) => {
 export const getMeshesMaterials = (meshes:AbstractMesh[]) => {
   var materials:Material[] = new Array();
   meshes.forEach(mesh => {
-    materials.push(mesh.material);
+    if(mesh.metadata !== "cuadromovie"){
+      materials.push(mesh.material);
+    }
   });
   return materials;
 }
 export const setMeshesMaterials = ( meshes:AbstractMesh[],materials:Material | Material[]) => {
   console.log(String(typeof(materials)));
-  /** Typeguard */ 
-  if(materials instanceof Material){
-    meshes.forEach(mesh => {
-      mesh.material=materials as Material;
-    });
-  }else if(materials instanceof Array){
-    if(materials.length === meshes.length){
-        let i=0;
-        meshes.forEach(mesh => {
-          mesh.material=materials[i];
+  /** Typeguard */
+  
+    if(materials instanceof Material){
+      meshes.forEach(mesh => {
+        if(mesh.metadata !== "cuadromovie"){
+          mesh.material=materials as Material;
+        }
+      });
+    }else if(materials instanceof Array){
+      if(materials.length === meshes.length){
+          let i=0;
+          meshes.forEach(mesh => {
+            if(mesh.metadata !== "cuadromovie"){
+            mesh.material=materials[i];
+          }
           i++;
         });
       }
     }else{
       console.log("La cantidad de materiales no es ingual a la cantidad de mallas");
-    }                 
+    }       
+            
 }
 
