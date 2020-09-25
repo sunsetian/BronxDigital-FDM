@@ -121,27 +121,35 @@ export const createSkybox = (urlScene:string) => {
 export const getMeshesMaterials = (meshes:AbstractMesh[]) => {
   var materials:Material[] = new Array();
   meshes.forEach(mesh => {
-    materials.push(mesh.material);
+    if(mesh.metadata !== "cuadromovie"){
+      materials.push(mesh.material);
+    }
   });
   return materials;
 }
 export const setMeshesMaterials = ( meshes:AbstractMesh[],materials:Material | Material[]) => {
   console.log(String(typeof(materials)));
-  /** Typeguard */ 
-  if(materials instanceof Material){
-    meshes.forEach(mesh => {
-      mesh.material=materials as Material;
-    });
-  }else if(materials instanceof Array){
-    if(materials.length === meshes.length){
-        let i=0;
-        meshes.forEach(mesh => {
-          mesh.material=materials[i];
+  /** Typeguard */
+  
+    if(materials instanceof Material){
+      meshes.forEach(mesh => {
+        if(mesh.metadata !== "cuadromovie"){
+          mesh.material=materials as Material;
+        }
+      });
+    }else if(materials instanceof Array){
+      if(materials.length === meshes.length){
+          let i=0;
+          meshes.forEach(mesh => {
+            if(mesh.metadata !== "cuadromovie"){
+            mesh.material=materials[i];
+          }
           i++;
         });
       }
     }else{
       console.log("La cantidad de materiales no es ingual a la cantidad de mallas");
-    }                 
+    }       
+            
 }
 
