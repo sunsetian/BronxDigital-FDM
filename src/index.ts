@@ -1,4 +1,4 @@
-/** Versión: 0.9.3.4.Seb */
+/** Versión: 0.9.3.4.Seb.2 */
 
 //imports
 import 'pepjs';
@@ -498,16 +498,21 @@ class GuiSceneBabylon{
     camera.attachControl(canvas);
     //cameraAtCenter = true;
     cameraLevel = 0;
+    camera.angularSensibilityX = -3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
+    if(sceneName == "voltaje"){
+      camera.angularSensibilityX = -3000;
+    }
 
     if(this.autoPlaySetted){
       camera.useAutoRotationBehavior = true;
-      camera.angularSensibilityX = -3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
-
+     
       let rotationSpeed = 0.05;
+
       if(sceneName == "voltaje"){
         rotationSpeed = -0.1;
-        camera.angularSensibilityX = -4000;
+        camera.angularSensibilityX = -3000;
       }
+      
       if(camera.autoRotationBehavior !== null){
         camera.autoRotationBehavior.idleRotationSpeed = rotationSpeed;
       } 

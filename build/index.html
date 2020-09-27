@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="theme-color" content="#000000" />
+    
+    <title>TypeBaby Starter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babylonjs/4.1.0/babylon.js" integrity="sha256-IRmCyNooC7H6r9t99bFifu2ZizjqB0bO7owJTipmSZA=" crossorigin="anonymous"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+    <style>
+    html, body {
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+
+     }
+    #virtualInsanityCanvas {
+        width: 100%;
+        height: 100%;
+        touch-action: none;
+    }
+    </style>
+    
+</head>
+<body>
+    <canvas id="virtualInsanityCanvas" width="900" height="600"></canvas>
+    <script src="bundle.js"></script>
+    <script>
+        window.onload = function () {
+            var urlScene = "http://localhost:9000/";
+            console.log(window.virualInsanity);
+            window.virualInsanity.initBabylonScene(urlScene);
+        };
+      </script>
+      <button id="VI_GUI_Play"><a>auto play</a></button>
+</body>
+</html>
