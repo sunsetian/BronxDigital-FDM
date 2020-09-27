@@ -1,4 +1,512 @@
+@font-face {
+  font-family: "GT-America-Mono";
+  src: url("https://storage.googleapis.com/wp-bronx-storage/1/2020/09/GT-America-Mono-Regular.woff");
+}
 
-canvas {
-    outline: none;
+body.home #responsive-menu-button {
+  display: none;
+}
+
+body {
+  font-family: 'GT-America-Mono', monospace;
+  background-color: #000;
+  color: #fff;
+  font-size: 0.8em;
+  cursor: url('https://storage.googleapis.com/wp-bronx-storage/1/2020/09/cursor-32x32.png') 5 0, auto !important;
+}
+
+a {
+  background-color: transparent;
+  text-decoration: none;
+  color: #0f0;
+  cursor: url('https://storage.googleapis.com/wp-bronx-storage/1/2020/09/cursor-manito-32x32.png') 10 0, auto !important;
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Old versions of Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently */
+}
+
+button {
+  background-color: transparent;
+  text-decoration: none;
+  color: #0f0;
+  cursor: url('https://storage.googleapis.com/wp-bronx-storage/1/2020/09/cursor-manito-32x32.png') 10 0, auto !important;
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Old versions of Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently */
+}
+
+
+/*** Wordpress ***/
+
+.info-container {
+  display: block;
+  top: 100px;
+  position: relative;
+  font-size: 0.8rem;
+}
+
+.site-header {
+  padding: 0;
+}
+
+.entry-title {
+  font-size: 1.2rem;
+  color: #0f0;
+  /*margin-top: -200px;*/
+}
+
+.page-template-default .entry-title,
+.post-tags {
+  display: none;
+}
+
+.post-template-default .responsive-menu-button {
+  display: none !important;
+}
+
+.page-id-1197 .responsive-menu-button {
+  display: none !important;
+}
+
+.page-id-1568 .responsive-menu-button {
+  display: none !important;
+}
+
+.site-branding {
+  display: none;
+}
+
+
+/* Setian */
+
+.full-screen-centered {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.full-screen-centered img {
+  object-fit: cover;
+}
+
+#mapa-iframe-container {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.popup-setian-container {
+  width: 100%;
+  height: -webkit-fill-available;
+}
+
+.map-image-container {
+  z-index: -1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: flex;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+}
+
+.map-image-container img {
+  object-fit: cover;
+  height: 100%;
+}
+
+@media (orientation: landscape) {
+  .mapa-image-container img {
+    height: 100%;
+  }
+}
+
+@media (orientation: portrait) {
+  .mapa-image-container img {
+    width: 100%;
+  }
+}
+
+#popmake-1572 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fluid-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.green-border {
+  border: 10px solid #00ff00;
+}
+
+.center-middle {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+}
+
+.active-button {
+  pointer-events: all;
+  font-size: 0.7rem;
+}
+
+.button-fdm {
+  margin: 0px;
+  padding: 0px;
+  width: 2em;
+  height: 2em;
+  color: #00ff00;
+  pointer-events: all;
+  font-size: 0.4rem;
+  text-align: left;
+}
+
+.button-left {
+  position: absolute;
+  bottom: 50px;
+  left: calc(50% - 55px);
+}
+
+.button-right {
+  position: absolute;
+  bottom: 50px;
+  left: calc(50% + 15px);
+}
+
+.button-up {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: rotate(90deg);
+}
+
+.button-down {
+  position: absolute;
+  bottom: 35px;
+  left: 50%;
+  transform: rotate(90deg);
+}
+
+.button-up .wp-block-button__link,
+.button-down .wp-block-button__link {
+  box-shadow: 6px -6px #000;
+}
+
+.button-top {
+  position: absolute;
+  top: 15px;
+}
+
+.button-bottom {
+  position: absolute;
+  left: 80px;
+  bottom: 40px;
+}
+
+.button-bottom-left {
+  position: absolute;
+  bottom: 60px;
+  left: 10px;
+}
+
+.button-bottom-left-2 {
+  position: absolute;
+  bottom: 60px;
+  right: 80px;
+}
+
+.btn-map a {
+  background-color: #0f0;
+}
+
+.btn-map a:hover {
+  background-color: #fff;
+}
+
+.btn-map-rigth-up {
+  position: absolute;
+  top: 20%;
+  right: 40%;
+}
+
+.btn-map-rigth-down {
+  position: absolute;
+  bottom: 40%;
+  right: 30%;
+}
+
+.btn-map-left-up {
+  position: absolute;
+  top: 30%;
+  left: 30%;
+}
+
+.btn-map-left-down {
+  position: absolute;
+  bottom: 35%;
+  left: 15%;
+}
+
+.btn-map-center-up {
+  position: absolute;
+  top: 15%;
+  left: 45%;
+}
+
+.btn-map-center-down {
+  position: absolute;
+  bottom: 25%;
+  left: 45%;
+}
+
+.centered {
+  margin-left: 45%;
+}
+
+
+/* Virtual Insanity */
+
+#virtualInsanityCanvas {
+  border: 0;
+  background-color: #000000;
+  background-image: url("https://storage.googleapis.com/wp-bronx-storage/1/2020/09/fondo-loading-08.png");
+}
+
+#virtualInsanityCanvas.horizTranslate {
+  -webkit-transition: 3s;
+  -moz-transition: 3s;
+  -ms-transition: 3s;
+  -o-transition: 3s;
+  transition: 3s;
+  left: -250px;
+  top: 0%;
+}
+
+#virtualInsanityCanvas.resetPosition {
+  -webkit-transition: 3s;
+  -moz-transition: 3s;
+  -ms-transition: 3s;
+  -o-transition: 3s;
+  transition: 3s;
+  left: 0px;
+  top: 0%;
+}
+
+
+/* Gutenberg Modifications */
+
+.wp-block-button__link {
+  background-color: #d6d6d6;
+  color: #000 !important;
+  font-weight: 700;
+  font-size: 0.8rem;
+  box-shadow: 6px 6px #000;
+  border: solid 2px #000;
+  padding: 0.2rem 0.7rem 0.3rem 0.7rem;
+}
+
+.wp-block-button .button-fdm-green {
+  background-color: #0f0 !important;
+  color: #000;
+}
+
+.button-fdm-gray.wp-block-button__link {
+  background-color: #d6d6d6;
+  color: #000;
+}
+
+
+/******ARTIST INDEX*********/
+
+.indexItem:hover {
+  color: #0f0 !important;
+  background-color: #000;
+}
+
+#popmake-1521 {
+  overflow-y: scroll;
+  padding-right: 20px;
+}
+
+#popmake-1521,
+#popmake-1521 li {
+  font-size: 0.8rem;
+  color: #000;
+}
+
+#popmake-1521 a:hover {
+  color: #0f0;
+}
+
+p.VirtualIn_index_posts_letter.indexLetter {
+  margin-bottom: 0px;
+}
+
+#popmake-1521 h1 {
+  font-size: 1.5rem;
+  /*color: #0f0 !important;*/
+}
+
+#pum-1521 .pum-close {
+  position: absolute;
+  left: 18%;
+  top: 15%;
+  pointer-events: all;
+  z-index: 9999999990;
+  height: 36px;
+  width: 36px;
+  padding: 0px;
+  color: #0a0101;
+  font-family: "Arial";
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20px;
+  border: 2px solid #000;
+  border-radius: 0px;
+  box-shadow: 6px 6px 0px 0px rgba( 0, 0, 0);
+  background-color: #d6d6d6;
+}
+
+
+/* Menu responsive Plugin */
+
+@media screen and (max-width: 8000px) {
+  button#responsive-menu-button {
+    box-shadow: 6px 6px #fff;
+    border-radius: 0px;
+  }
+}
+
+#responsive-menu-container {
+  padding: 12% 0;
+}
+
+
+/*  Popup Maker Plugin  */
+
+.pum-close {
+  pointer-events: none;
+}
+
+.pum-content,
+.popmake-content {
+  height: -webkit-fill-available;
+}
+
+@media screen and (max-width: 600px) {
+  .pum-theme-171 .pum-container,
+  .pum-theme-cutting-edge .pum-container {
+    width: 100% !important;
+    padding: 0px;
+    left: 0;
+    right: 0;
+    top: 35% !important;
+    height: 65% !important;
+  }
+  #pum-175 .pum-close {
+    left: 10px !important;
+    top: -40px !important;
+  }
+  #virtualInsanityCanvas.horizTranslate {
+    -webkit-transition: 3s;
+    -moz-transition: 3s;
+    -ms-transition: 3s;
+    -o-transition: 3s;
+    transition: 3s;
+    top: -30%;
+    left: 0;
+  }
+  #popmake-1572 {
+    width: 95% !important;
+    height: 70% !important;
+    top: 25% !important;
+    left: 2.5% !important;
+  }
+  #responsive-menu-container {
+    padding-top: 70px;
+  }
+  /* Menu Artistas */
+  #popmake-1521 {
+    width: 95% !important;
+    height: 70% !important;
+    top: 25% !important;
+    left: 2% !important;
+    padding: 15px;
+  }
+  #pum-1521 .pum-close {
+    position: absolute;
+    left: 15px;
+    top: 20%;
+  }
+  /* BOTONES MENÚ MAPA */
+  .btn-map-rigth-up {
+    position: absolute;
+    top: 25%;
+    right: 35%;
+  }
+  .btn-map-rigth-down {
+    position: absolute;
+    bottom: 40%;
+    right: 30%;
+  }
+  .btn-map-left-up {
+    position: absolute;
+    top: 30%;
+    left: 30%;
+  }
+  .btn-map-left-down {
+    position: absolute;
+    bottom: 35%;
+    left: 15%;
+  }
+  .btn-map-center-up {
+    position: absolute;
+    top: 15%;
+    left: 45%;
+  }
+  .btn-map-center-down {
+    position: absolute;
+    bottom: 25%;
+    left: 45%;
+  }
 }

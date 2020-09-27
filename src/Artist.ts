@@ -144,8 +144,13 @@ export class Cuadro {
         }
 
         this.cuadroHeight = cuadro.getBoundingInfo().boundingBox.extendSize.y;
-           
-        this.closeDistance = this.cuadroWidth*3.5;
+
+        if(this.cuadroHeight >= this.cuadroWidth){
+            this.closeDistance = this.cuadroHeight*3.5;
+        }
+        else{
+            this.closeDistance = this.cuadroWidth*3.5;
+        }
 
         this.mesh = cuadro;
 

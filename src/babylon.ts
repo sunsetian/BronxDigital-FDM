@@ -80,6 +80,8 @@ export const createArcRotateCamera = () => {
     const camera = new ArcRotateCamera('camera', startAlpha, startBeta, startRadius, startPosition, scene, true)
     camera.attachControl(canvas, false)
 
+    //camera.inputs.removeByType("ArcRotateCameraKeyboardMoveInput");
+
     // Set some basic camera settings
     camera.minZ = 0.1;
     camera.lowerBetaLimit = Math.PI * 1.8/ 4;
