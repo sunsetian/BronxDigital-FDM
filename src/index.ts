@@ -1,4 +1,4 @@
-/** Versión: 0.9.3.4.Adr */
+/** Versión: 0.9.3.4.Seb */
 
 //imports
 import 'pepjs';
@@ -32,7 +32,7 @@ let currentCuadro: Cuadro;
 let artist: Artist[]  = [];
 let numArtists: number =  0;
 let numCuadros: number =  0;
-let actualArtist: number = -1;
+let actualArtist: number = 0;
 let initArtistSlug: string;
 let actualAbsoluteCuadro: number = 0;
 let movies: Movie[] = []
@@ -412,7 +412,11 @@ class GuiSceneBabylon{
 
   next_navigation(): void{
     this.setCameraAutoPlay(false);
-    if(cameraLevel == 1){
+    if(cameraLevel == 0){
+      this.next_artist();
+      
+    }
+    else if(cameraLevel == 1){
       this.next_artist();
     }
     else if(cameraLevel == 2 || cameraLevel == 3){
@@ -422,7 +426,10 @@ class GuiSceneBabylon{
 
   prev_navigation(): void{
     this.setCameraAutoPlay(false);
-    if(cameraLevel == 1){
+    if(cameraLevel == 0){
+      this.prev_artist();  
+    }
+    else if(cameraLevel == 1){
       this.prev_artist();
     }
     else if(cameraLevel == 2 || cameraLevel == 3){
