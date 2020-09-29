@@ -1,4 +1,4 @@
-import { Mesh, AbstractMesh, Vector3, Scene, PBRMetallicRoughnessMaterial, StandardMaterial, VideoTextureSettings, VideoTexture, InterpolateValueAction, ActionManager, Color3, ExecuteCodeAction } from "@babylonjs/core";
+import { Mesh, AbstractMesh, Vector3, Scene, PBRMetallicRoughnessMaterial, StandardMaterial, VideoTextureSettings, VideoTexture, InterpolateValueAction, ActionManager, Color3, ExecuteCodeAction, PBRMaterial } from "@babylonjs/core";
 const removeAccents = (str) => {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   } 
@@ -38,6 +38,7 @@ export class Artist {
 
         if(sceneName == "voltaje"){  
             this.closeDistance = 18;
+
         }
         this.firstBoundingBox = cuadrosArray[0].getBoundingInfo().boundingBox.extendSize;
         const calculateViewerPosition = (): Vector3 => {
@@ -73,7 +74,7 @@ export class Artist {
         let cuadroIndex = 0;
 
         cuadrosArray.forEach(newCuadro => {
-            this.cuadro.push(new Cuadro(newCuadro as Mesh, this.wall, this.id, this.slug, this.position, cuadroIndex, scenePath, scene));
+            this.cuadro.push(new Cuadro(newCuadro as Mesh, this.wall, this.id, this.slug, this.position, cuadroIndex, sceneName, scenePath, scene));
             cuadroIndex++;
         });
     }
@@ -127,7 +128,7 @@ export class Cuadro {
     	}
     }
     
-    constructor(cuadro: Mesh, wall: string, idArtist: number, slugArtista:string, ubicacion: Vector3, arrayIndex: number, scenePath: string, scene: Scene) {
+    constructor(cuadro: Mesh, wall: string, idArtist: number, slugArtista:string, ubicacion: Vector3, arrayIndex: number, sceneName: string, scenePath: string, scene: Scene) {
         this.orientation = wall;
         this.name = cuadro.name;
         this.arrayIndex = arrayIndex;
@@ -158,8 +159,8 @@ export class Cuadro {
         this.mesh.metadata = "cuadro";
         this.mesh.id = this.id;
 
-        let meshMaterial = new PBRMetallicRoughnessMaterial("cuadrosMat", scene);
-        meshMaterial = this.mesh.material as PBRMetallicRoughnessMaterial;
+        let meshMaterial = new PBRMaterial("cuadrosMat", scene);
+        meshMaterial = this.mesh.material as PBRMaterial;
 
         meshMaterial.roughness = 0.9;
         meshMaterial.metallic = 0.1;
@@ -178,6 +179,36 @@ export class Cuadro {
             this.mesh.metadata = "cuadromovie";
 
         }
+
+         if(sceneName == "voltaje"){  
+  
+            if(cuadro.name.split("@")[0].split(".")[0] === "arbol"){  
+                //arbol = scene.getMeshByName("Artist.007.arbol_ariel") as Mesh;
+                //arbol.metadata = "arbol";
+                //arbol.freezeWorldMatrix();
+                console.log("arbol in")
+
+                this.mesh.getChildMeshes().forEach(arbolPart => {
+                let meshMaterial = new PBRMaterial("arbolMat", scene);
+                    meshMaterial = arbolPart.material as PBRMaterial;
+                    console.log("arbolPart.name " + arbolPart.name)
+                    //let partColor: Color3 = meshMaterial.baseColor;
+                    if(arbolPart.name === "branches" || arbolPart.name === "leaves"){
+                        meshMaterial.emissiveColor = new Color3(0.061, 0.195, 0.15);
+                    }
+                    else if(arbolPart.name === "flowers"){
+                        meshMaterial.emissiveColor = new Color3(0.799, 0.056, 0.084);
+                    }
+                    //console.log("ARBOL Before asigne material")
+                    arbolPart.material = meshMaterial;
+                    console.log("ARBOL PART SETTED")
+                });
+
+                this.mesh.metadata = "arbol";
+                
+              }
+        } 
+
 
     // NO BORRAR: CODIGO ALTERNATIVO PARA RESALTAR LOS BORDES DEL CUADRO   
       

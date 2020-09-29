@@ -1,4 +1,4 @@
-/** Versión: 0.9.3.4.Seb.2 */
+/** Versión: 0.9.3.4.Seb.3 */
 
 //imports
 import 'pepjs';
@@ -6,7 +6,7 @@ import 'pepjs';
 import { Artist, Cuadro, Movie } from './Artist';
 //import * as cannon from 'cannon';
 
-import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, VideoTexture, Texture, ActionManager, ExecuteCodeAction, KeyboardEventTypes, VideoTextureSettings, AssetsManager, Color3, InterpolateValueAction } from '@babylonjs/core'
+import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, KeyboardEventTypes, Color3 } from '@babylonjs/core'
 import { createEngine, createScene, createSkybox, createArcRotateCamera, getMeshesMaterials, setMeshesMaterials, setupVoltajeArcRotateCamera} from './babylon'
 
 import { SampleMaterial } from "./Materials/SampleMaterial"
@@ -20,6 +20,7 @@ const scene = createScene()
 let room:Mesh;
 let limits:Mesh;
 let sceneModel: Mesh;
+let arbol: Mesh;
 
 let targetBox: Mesh;
 let targetPosition: Vector3;
@@ -53,6 +54,7 @@ let cameraSetted: boolean = false;
 let cameraAtCenter: boolean = true;
 
 let cameraLevel: number = 0;
+let firstClick:boolean = true;
 
 var URL_SCENE_JS:string;//Todo pasar a archivo de importacion API
 
@@ -75,8 +77,8 @@ class GuiSceneBabylon{
     if(initArtistSlug){
       this.gotoArtistBySlug(removeAccents(initArtistSlug));
       
-      setTimeout(function(){globalThis.bronxControl.loadInfoByPostSlug(initArtistSlug,175);},3000);
-      setTimeout(function(){globalThis.bronxControl.showInfo(175) ;},4000);
+      //setTimeout(function(){globalThis.bronxControl.loadInfoByPostSlug(initArtistSlug,175);},3000);
+      //setTimeout(function(){globalThis.bronxControl.showInfo(175) ;},4000);
     }
   }
   
@@ -119,13 +121,14 @@ class GuiSceneBabylon{
   }
 
   cleanRoomIndex(){
-    console.log("Clean index");
+    console.log("CleanRoomIndex");
     let indexContainer = document.getElementsByClassName("indexRoom")[0];
     console.log(indexContainer);
     if(indexContainer){
       let indexRoom = indexContainer.children;
       for (let i = 0; i < indexRoom.length; i++){
         let a = indexRoom[i].getElementsByTagName("a")[0];
+        console.log("artistas en la sala" + a.textContent);
         let slugFlat = removeAccents(a.getAttribute("slug"));
         if(!this.isArtistInThisRoom(slugFlat)){
           indexContainer.removeChild(indexRoom[i]);
@@ -499,9 +502,10 @@ class GuiSceneBabylon{
     //cameraAtCenter = true;
     cameraLevel = 0;
     camera.angularSensibilityX = -3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
-    if(sceneName == "voltaje"){
+    camera.angularSensibilityY = 3000;
+    /* if(sceneName == "voltaje"){
       camera.angularSensibilityX = -3000;
-    }
+    } */
 
     if(this.autoPlaySetted){
       camera.useAutoRotationBehavior = true;
@@ -510,7 +514,6 @@ class GuiSceneBabylon{
 
       if(sceneName == "voltaje"){
         rotationSpeed = -0.1;
-        camera.angularSensibilityX = -3000;
       }
       
       if(camera.autoRotationBehavior !== null){
@@ -545,11 +548,12 @@ class GuiSceneBabylon{
       if(cameraLevel == 0){
         camera.useAutoRotationBehavior = true;
         camera.angularSensibilityX = -3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
+        camera.angularSensibilityY = 3000;
 
         let rotationSpeed = 0.05;
         if(sceneName == "voltaje"){
           rotationSpeed = -0.1;
-          camera.angularSensibilityX = -4000;
+          //camera.angularSensibilityX = -3000;
         }
         if(camera.autoRotationBehavior !== null){
           camera.autoRotationBehavior.idleRotationSpeed = rotationSpeed;
@@ -604,6 +608,8 @@ const main = async () => {
    * 
   */
 
+  createSkybox(URL_SCENE_JS);
+
   SceneLoader.ImportMesh(
     "",
     URL_SCENE_JS+"data/models/",
@@ -643,13 +649,14 @@ const main = async () => {
 
         camera = setupVoltajeArcRotateCamera(camera, roomCenter);
       }
+
       //loadCodedSceneElements(); // CONTINÚE LOADING DESPUES DE HABER DECLARADO EL NOMBRE DE LA ESCENA!!!
       let light01: HemisphericLight;
       let light02: HemisphericLight;
       let light03: HemisphericLight;
 
       if(sceneName == "voltaje"){
-        createSkybox(URL_SCENE_JS);
+        
 
         light01 = new HemisphericLight("light1", new Vector3(0, 3, -15), scene);
         light02 = new HemisphericLight("light2", new Vector3(-25, 7, 0), scene);
@@ -693,8 +700,7 @@ const main = async () => {
 
       /** LOOP DE MESHES CARGADOS PARA ASIGNARLES COSAS */
       importedMeshes.forEach(newMesh => {
-        
-
+       
         let meshNames: string[] = newMesh.name.split(".");
         if( meshNames[0] === "Artist" ){
           artist.push(new Artist(newMesh, index, sceneName, URL_SCENE_JS, scene));
@@ -706,7 +712,7 @@ const main = async () => {
         }
 
         /** CARGA SHADERS COMO LOADING */
-        if(newMesh.material){
+       /*  if(newMesh.material){
           let meshTexture = newMesh.material.getActiveTextures()[0] as Texture;
           if(meshTexture ){
             var shaderMaterial = new SampleMaterial("material", scene);
@@ -717,16 +723,23 @@ const main = async () => {
             shaderMaterial.setTexture("uDiffuseMap", meshTexture);
             newMesh.material = shaderMaterial;
           }
-        } 
+        }  */
 
         /***************/
 
       });
 
       setTimeout(function(){
-        setMeshesMaterials(importedMeshes,sceneMaterials);
-        createSkybox(URL_SCENE_JS);
-      },11000);
+       // setMeshesMaterials(importedMeshes,sceneMaterials);
+       document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "stop auto";
+       document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#00ff00";
+        try {
+          globalThis.bronxControl.showInfo(1946);
+        } catch (error) {
+          console.log("Información no disponible")
+        }
+        
+      },10000);
       
       for(let i=0; i < artist.length; i++){
         let artistIndex = guiVI.getArtistIndexByOrder(i);
@@ -825,11 +838,12 @@ const main = async () => {
               let iCuadroOrdered = parseInt(currentMesh.id.split("_")[1])-1;
 
               camera.angularSensibilityX = 3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
+              camera.angularSensibilityY = -3000;
 
               let rotationSpeed = 0.05;
               if(sceneName == "voltaje"){
                 rotationSpeed = -0.1;
-                camera.angularSensibilityX = 4000;
+                //camera.angularSensibilityX = -3000;
               }
 
               let currentArtistIndex: number = -1;
@@ -837,11 +851,18 @@ const main = async () => {
               if(hit.pickedMesh.parent != null){
                  currentArtistIndex = guiVI.getArtistIndexByName(hit.pickedMesh.parent.name);
               }
+              console.log("iArtistOrdered " + iArtistOrdered);
+              console.log("actualArtist " + actualArtist);
 
-              if(actualArtist !== iArtistOrdered){
+              if(actualArtist !== iArtistOrdered || firstClick){
                 actualArtist = iArtistOrdered;
                 guiVI.selectArtist(actualArtist);
-
+                firstClick = false;
+                try {
+                  globalThis.bronxControl.showInfo(1955);
+                } catch (error) {
+                  console.log("Información no disponible")
+                }
               }
               else{
                 let cuadroIndex:number = guiVI.getCuadroIndexByOrder(iCuadroOrdered, artist[currentArtistIndex]);
@@ -851,6 +872,11 @@ const main = async () => {
                 if(cameraLevel == 1){
 
                   guiVI.selectCuadro(currentCuadroAbsoluteIndex);
+                  try {
+                    globalThis.bronxControl.showInfo(1959);
+                  } catch (error) {
+                    console.log("Información no disponible")
+                  }
 
                   if(hit.pickedMesh.metadata === cuadrosMovieName){
                     console.log("play video cuadro");
@@ -932,6 +958,8 @@ const main = async () => {
       }
     }
   );
+
+  //
 
   /** Animation Loop */
  /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
