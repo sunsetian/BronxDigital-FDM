@@ -30,8 +30,8 @@ void main(void)
         discard;
     }
     
-    if (height > (time-0.04)) {
-        color = vec4(0, 1, 0, 1.0);
+    if (height > (time-0.01)) {
+        color = vec4(0.4, 0.6, 0.4, 1.0);
     }
     gl_FragColor = color;
 }

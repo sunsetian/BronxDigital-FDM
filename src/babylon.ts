@@ -52,7 +52,7 @@ export const setupVoltajeArcRotateCamera = (camera: ArcRotateCamera, roomCenter:
   camera.attachControl(canvas, false);
   camera.minZ = 0.1;
   camera.lowerBetaLimit = Math.PI * 1.8/ 4;
-  camera.upperBetaLimit = Math.PI * 2/ 4;
+  camera.upperBetaLimit = Math.PI * 2.2/ 4;
   camera.lowerRadiusLimit = 2;  // Voltaje
   camera.upperRadiusLimit = 18.1; // Voltaje 
   camera.allowUpsideDown = false;
@@ -91,7 +91,7 @@ export const createArcRotateCamera = () => {
     camera.allowUpsideDown = false;
     camera.wheelPrecision = 250;
     camera.angularSensibilityX = -3000;
-    camera.angularSensibilityY = 5000;
+    camera.angularSensibilityY = 3000;
 
     camera.useAutoRotationBehavior = true;
     if(camera.autoRotationBehavior != null){
