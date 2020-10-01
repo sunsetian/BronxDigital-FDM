@@ -86,7 +86,7 @@ export const createArcRotateCamera = () => {
     camera.minZ = 0.1;
     camera.lowerBetaLimit = Math.PI * 1.8/ 4;
     camera.upperBetaLimit = Math.PI * 2.2 / 4;
-    camera.lowerRadiusLimit = 0.7;
+    camera.lowerRadiusLimit = 0.21;
     camera.upperRadiusLimit = 6;
     camera.allowUpsideDown = false;
     camera.wheelPrecision = 250;
@@ -100,7 +100,7 @@ export const createArcRotateCamera = () => {
 
     camera.pinchPrecision = 1000;
     camera.checkCollisions = true;
-    camera.collisionRadius = new Vector3(1, 0.2, 1);
+    camera.collisionRadius = new Vector3(0.2, 0.2, 0.2);
 
     return camera
 }

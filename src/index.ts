@@ -1,4 +1,4 @@
-/** Versión: 0.9.3.4.Seb.3 */
+/** Versión: 0.9.3.5.Seb.4 */
 
 //imports
 import 'pepjs';
@@ -6,7 +6,7 @@ import 'pepjs';
 import { Artist, Cuadro, Movie } from './Artist';
 //import * as cannon from 'cannon';
 
-import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, KeyboardEventTypes, Color3 } from '@babylonjs/core'
+import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, KeyboardEventTypes, Color3, PBRMaterial } from '@babylonjs/core'
 import { createEngine, createScene, createSkybox, createArcRotateCamera, getMeshesMaterials, setMeshesMaterials, setupVoltajeArcRotateCamera} from './babylon'
 
 import { SampleMaterial } from "./Materials/SampleMaterial"
@@ -657,7 +657,6 @@ const main = async () => {
 
       if(sceneName == "voltaje"){
         
-
         light01 = new HemisphericLight("light1", new Vector3(0, 3, -15), scene);
         light02 = new HemisphericLight("light2", new Vector3(-25, 7, 0), scene);
         light03 = new HemisphericLight("light3", new Vector3(0, 3, 15), scene);
@@ -675,9 +674,9 @@ const main = async () => {
         light02 = new HemisphericLight("light2", new Vector3(-3, 1, -1), scene);
         light03 = new HemisphericLight("light3", new Vector3(0, 1, 0), scene);
 
-        light01.intensity = 0.8;
-        light02.intensity = 0.8;
-        light03.intensity = 0.8;
+        light01.intensity = 0.5;
+        light02.intensity = 0.5;
+        light03.intensity = 0.5;
       }
 
       apuntador= Mesh.CreateTorus("apuntador", 0.08, 0.02, 3, scene);
@@ -700,6 +699,17 @@ const main = async () => {
 
       /** LOOP DE MESHES CARGADOS PARA ASIGNARLES COSAS */
       importedMeshes.forEach(newMesh => {
+
+        console.log("MESH NAME " + newMesh.name);
+
+        if(newMesh.material != null){
+          let meshMaterial = new PBRMaterial("Mat", scene);
+          meshMaterial = newMesh.material as PBRMaterial;
+          meshMaterial.backFaceCulling = false;
+          meshMaterial.metallic = 0.2;
+          meshMaterial.roughness = 0.8;
+          newMesh.material =  meshMaterial;
+        }
        
         let meshNames: string[] = newMesh.name.split(".");
         if( meshNames[0] === "Artist" ){
@@ -830,6 +840,8 @@ const main = async () => {
               if(hit.pickedMesh!= null){  
                 currentMesh = hit.pickedMesh;
               }
+
+              console.log("CUADRO NAME " + currentMesh.name)
             
               oldTargetPosition = targetPosition;
               oldTargetCameraPosition = targetCameraPosition;
@@ -851,8 +863,8 @@ const main = async () => {
               if(hit.pickedMesh.parent != null){
                  currentArtistIndex = guiVI.getArtistIndexByName(hit.pickedMesh.parent.name);
               }
-              console.log("iArtistOrdered " + iArtistOrdered);
-              console.log("actualArtist " + actualArtist);
+              //console.log("iArtistOrdered " + iArtistOrdered);
+              //console.log("actualArtist " + actualArtist);
 
               if(actualArtist !== iArtistOrdered || firstClick){
                 actualArtist = iArtistOrdered;
@@ -1093,7 +1105,7 @@ const main = async () => {
       break; 
     } 
   } 
-  console.log("Button clicked: "+buttonId);
+  //console.log("Button clicked: "+buttonId);
 }
 
 /** Keyboard events */
