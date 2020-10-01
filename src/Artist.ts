@@ -189,9 +189,9 @@ export class Cuadro {
                 console.log("arbol in")
 
                 this.mesh.getChildMeshes().forEach(arbolPart => {
-                let meshMaterial = new PBRMaterial("arbolMat", scene);
+                    let meshMaterial = new PBRMaterial("arbolMat", scene);
                     meshMaterial = arbolPart.material as PBRMaterial;
-                    console.log("arbolPart.name " + arbolPart.name)
+                    //console.log("arbolPart.name " + arbolPart.name)
                     //let partColor: Color3 = meshMaterial.baseColor;
                     if(arbolPart.name === "branches" || arbolPart.name === "leaves"){
                         meshMaterial.emissiveColor = new Color3(0.061, 0.195, 0.15);
