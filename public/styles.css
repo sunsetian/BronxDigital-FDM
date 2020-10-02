@@ -12,7 +12,7 @@ body {
   background-color: #000;
   color: #fff;
   font-size: 0.8em;
-  cursor: url('https://storage.googleapis.com/wp-bronx-storage/1/2020/09/cursor-32x32.png') 5 0, auto !important;
+  cursor: url('https://storage.googleapis.com/wp-bronx-storage/1/2020/09/cursor-32x32.png') 10 0, auto !important;
 }
 
 a {
@@ -213,6 +213,12 @@ button {
   left: calc(50% + 15px);
 }
 
+.button-right-top {
+  position: absolute;
+  top: 80px;
+  right: 40px;
+}
+
 .button-up {
   position: absolute;
   bottom: 80px;
@@ -310,6 +316,11 @@ button {
   border: 0;
   background-color: #000000;
   background-image: url("https://storage.googleapis.com/wp-bronx-storage/1/2020/09/fondo-loading-08.png");
+  cursor: url('https://storage.googleapis.com/wp-bronx-storage/1/2020/09/cursor-grab-32x32.png') 10 0, auto !important;
+}
+
+#virtualInsanityCanvas:active:hover {
+  cursor: url('https://storage.googleapis.com/wp-bronx-storage/1/2020/09/cursor-grabbing-32x32.png') 10 0, auto !important;
 }
 
 #virtualInsanityCanvas.horizTranslate {
@@ -431,6 +442,16 @@ p.VirtualIn_index_posts_letter.indexLetter {
 .pum-content,
 .popmake-content {
   height: -webkit-fill-available;
+}
+
+.pum-container.pum-scrollable .pum-content {
+  border-right: dotted 2px #000;
+  padding-right: 5px;
+}
+
+.pum-theme-1951 .pum-content,
+.pum-theme-tooltips .pum-content {
+  font-size: 0.7rem;
 }
 
 @media screen and (max-width: 600px) {
