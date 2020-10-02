@@ -74,10 +74,12 @@ export const setupVoltajeArcRotateCamera = (camera: ArcRotateCamera, roomCenter:
 
 export const createArcRotateCamera = () => {
     const startAlpha = Math.PI / 2;
-    const startBeta = Math.PI / 2;
+    const startBeta = Math.random()*2*Math.PI;
     const startRadius = 0
     const startPosition = new Vector3(0, 0, 0)
-    const camera = new ArcRotateCamera('camera', startAlpha, startBeta, startRadius, startPosition, scene, true)
+    const camera = new ArcRotateCamera('camera', startAlpha, startBeta, startRadius, startPosition, scene, true);
+
+    camera.position = new Vector3(Math.random()-0.5, 1.7, Math.random()-0.5)
     camera.attachControl(canvas, false)
 
     //camera.inputs.removeByType("ArcRotateCameraKeyboardMoveInput");

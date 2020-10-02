@@ -1,4 +1,4 @@
-/** Versión: 0.9.3.5.Seb.5 */
+/** Versión: 0.9.3.5.Seb.6 */
 
 //imports
 import 'pepjs';
@@ -6,7 +6,7 @@ import 'pepjs';
 import { Artist, Cuadro, Movie } from './Artist';
 //import * as cannon from 'cannon';
 
-import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, KeyboardEventTypes, Color3, PBRMaterial } from '@babylonjs/core'
+import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, KeyboardEventTypes, Color3, PBRMaterial, Sound} from '@babylonjs/core'
 import { createEngine, createScene, createSkybox, createArcRotateCamera, getMeshesMaterials, setMeshesMaterials, setupVoltajeArcRotateCamera} from './babylon'
 
 import { SampleMaterial } from "./Materials/SampleMaterial"
@@ -41,7 +41,8 @@ let actualMovie: number = -1;
 let currentCuadroAbsoluteIndex: number = 0;
 let currentCuadroPrevAbsoluteIndex: number = 0;
 
-const numVentanas: number = 0;
+let playTimeLine: number = 0.0;
+let autoPlayDuration: number = 8000.0;
 
 let targetSpeed: number = 0.03;
 let cameraSpeed: number = 0.027;
@@ -52,7 +53,6 @@ const cameraVoltajeSpeed: number = 0.03;
 let sceneName: string = "auto";
 
 let cameraSetted: boolean = false;
-let cameraAtCenter: boolean = true;
 
 let cameraLevel: number = 0;
 let firstClick:boolean = true;
@@ -63,6 +63,9 @@ let camera: ArcRotateCamera = createArcRotateCamera() as ArcRotateCamera;
 
 var oldTargetPosition: Vector3;
 var oldTargetCameraPosition: Vector3;
+
+let sound: Sound;
+
 const removeAccents = (str) => {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 } 
@@ -548,7 +551,9 @@ class GuiSceneBabylon{
           else{
             guiVI.next_cuadro();
           }
-        }, 8000);
+          playTimeLine = Date.now();
+        }, autoPlayDuration);
+        playTimeLine = Date.now();
       }
 
       if(cameraLevel == 0){
@@ -578,12 +583,11 @@ class GuiSceneBabylon{
 
     }
     else{
-      if(this.autoPlaySetted){
-        clearInterval(this.intervalID);
-        this.autoPlaySetted = false;
-        document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "auto play";
-        document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#d6d6d6";      
-      }
+    
+      clearInterval(this.intervalID);
+      this.autoPlaySetted = false;
+      document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "auto play";
+      document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#d6d6d6";      
       camera.useAutoRotationBehavior = false;
     }
   }
@@ -609,6 +613,17 @@ const main = async () => {
   */
 
   createSkybox(URL_SCENE_JS);
+
+   sound = new Sound("sound",  URL_SCENE_JS + "data/sound/texturas-feria_01.mp3", scene, null, {
+    loop: true,
+    autoplay: true,
+    //spatialSound: true,
+    //distanceModel: "lineal",
+    //rolloffFactor: 0.1
+  });
+
+
+  //sound.setPosition(new Vector3(0, 1.7, 1.5));
 
   SceneLoader.ImportMesh(
     "",
@@ -700,7 +715,7 @@ const main = async () => {
       /** LOOP DE MESHES CARGADOS PARA ASIGNARLES COSAS */
       importedMeshes.forEach(newMesh => {
 
-        console.log("MESH NAME " + newMesh.name);
+        //console.log("MESH NAME " + newMesh.name);
 
         if(newMesh.material != null){
           let meshMaterial = new PBRMaterial("Mat", scene);
@@ -1011,6 +1026,15 @@ const main = async () => {
       apuntador.position = new Vector3(apuntador.position.x, apuntadorPosition, apuntador.position.z);
       apuntador.rotation.y = (apuntador.rotation.y + Tools.ToRadians(1))%Tools.ToRadians(360);
 
+      if(Date.now() < playTimeLine + autoPlayDuration){
+
+        let timelinePercent: number = 1 - (Date.now() - playTimeLine)/autoPlayDuration;
+        timelinePercent = timelinePercent*100;
+        //console.log("AUTOPLAY TIMER: " + Math.floor(timelinePercent*100));
+        document.getElementById("autoPlayTimeline").style.width = timelinePercent + "%";
+
+      }
+
       // NO BORRAR: POSIBLE USO
       /** Camera colides with wall and return */
        /* camera.onCollide = function(collider) {
@@ -1133,7 +1157,10 @@ const main = async () => {
           case "p":
             guiVI.setCameraAutoPlay();
             break;
-            case "v":
+          case "m":
+            sound.stop();
+            break;
+          case "v":
               console.log("Virtual Insanity Engine Version 0.9.3")
               console.log("Developed by Sebastian Gonzalez Dixon and Carlos Adrian Serna")
               console.log("Setian Technologies")
