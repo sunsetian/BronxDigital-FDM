@@ -1,4 +1,4 @@
-/** Versión: 0.9.3.5.Seb.4 */
+/** Versión: 0.9.3.5.Seb.5 */
 
 //imports
 import 'pepjs';
@@ -20,7 +20,6 @@ const scene = createScene()
 let room:Mesh;
 let limits:Mesh;
 let sceneModel: Mesh;
-let arbol: Mesh;
 
 let targetBox: Mesh;
 let targetPosition: Vector3;
@@ -39,6 +38,8 @@ let actualAbsoluteCuadro: number = 0;
 let movies: Movie[] = []
 let numMovies: number = 0;
 let actualMovie: number = -1;
+let currentCuadroAbsoluteIndex: number = 0;
+let currentCuadroPrevAbsoluteIndex: number = 0;
 
 const numVentanas: number = 0;
 
@@ -470,10 +471,10 @@ class GuiSceneBabylon{
   showCuadroInfo(thisCuadroSlug){
     canvas.classList.remove('resetPosition');
     canvas.classList.add('horizTranslate');
+    cameraLevel = 3;
     try {
       globalThis.bronxControl.showInfoByPostSlug(thisCuadroSlug,175);
       console.log("Show Info de: " + thisCuadroSlug);
-      cameraLevel = 3;
     } catch (error) {
       console.log("No hay informacion detallada del cuadro")
     }
@@ -502,7 +503,7 @@ class GuiSceneBabylon{
     //cameraAtCenter = true;
     cameraLevel = 0;
     camera.angularSensibilityX = -3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
-    camera.angularSensibilityY = 3000;
+    camera.angularSensibilityY = -3000;
     /* if(sceneName == "voltaje"){
       camera.angularSensibilityX = -3000;
     } */
@@ -527,10 +528,18 @@ class GuiSceneBabylon{
   /** AUTO PLAY CAMERA */
 
   private intervalID: NodeJS.Timeout;
-  public autoPlaySetted: boolean = false;
+  public autoPlaySetted: boolean = true;
 
-  setCameraAutoPlay(set: boolean): void{
-    if(set && !this.autoPlaySetted){
+  setCameraAutoPlay(set?: boolean): void{
+
+    if(set === undefined){
+      this.autoPlaySetted = !this.autoPlaySetted;
+    }
+    else{
+      this.autoPlaySetted = set;
+    }
+    console.log("auto play: " + this.autoPlaySetted );
+    if(this.autoPlaySetted){
       if(cameraLevel != 0){
         this.intervalID = setInterval( function() {
           if(cameraLevel < 2){
@@ -541,14 +550,11 @@ class GuiSceneBabylon{
           }
         }, 8000);
       }
-      
-      this.autoPlaySetted = true; 
-      document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "stop auto";
-      document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#00ff00";
+
       if(cameraLevel == 0){
         camera.useAutoRotationBehavior = true;
         camera.angularSensibilityX = -3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
-        camera.angularSensibilityY = 3000;
+        camera.angularSensibilityY = -3000;
 
         let rotationSpeed = 0.05;
         if(sceneName == "voltaje"){
@@ -565,6 +571,11 @@ class GuiSceneBabylon{
       else{
         this.next_cuadro();
       }
+
+      this.autoPlaySetted = true; 
+      document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "stop auto";
+      document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#00ff00";
+
     }
     else{
       if(this.autoPlaySetted){
@@ -572,22 +583,11 @@ class GuiSceneBabylon{
         this.autoPlaySetted = false;
         document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "auto play";
         document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#d6d6d6";      
+      }
+      camera.useAutoRotationBehavior = false;
     }
   }
-}
 
-  // PROXIMAMENTE DEPRECATED
-  toggle_camera(): void{
-    if(scene.activeCamera !== null){
-      if( scene.activeCamera.name === "ArcCamera"){
-        //scene.activeCamera = camera02;
-      }
-      else if( scene.activeCamera.name === "FreeCamera"){
-        //scene.activeCamera = camera01;
-      }
-    }
-
-  }
 }
 
 var guiVI = new GuiSceneBabylon()
@@ -850,7 +850,7 @@ const main = async () => {
               let iCuadroOrdered = parseInt(currentMesh.id.split("_")[1])-1;
 
               camera.angularSensibilityX = 3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
-              camera.angularSensibilityY = -3000;
+              camera.angularSensibilityY = 3000;
 
               let rotationSpeed = 0.05;
               if(sceneName == "voltaje"){
@@ -879,7 +879,8 @@ const main = async () => {
               else{
                 let cuadroIndex:number = guiVI.getCuadroIndexByOrder(iCuadroOrdered, artist[currentArtistIndex]);
                 currentCuadro = artist[currentArtistIndex].cuadro[cuadroIndex];
-                let currentCuadroAbsoluteIndex: number = artist[currentArtistIndex].cuadro[cuadroIndex].absoluteOrder
+                currentCuadroPrevAbsoluteIndex = currentCuadroAbsoluteIndex;
+                currentCuadroAbsoluteIndex = artist[currentArtistIndex].cuadro[cuadroIndex].absoluteOrder
 
                 if(cameraLevel == 1){
 
@@ -895,15 +896,12 @@ const main = async () => {
                     currentCuadro.videoTexture.video.play();
                     currentCuadro.videoTexturePlaying = true;
                   }
-                  
                 }
                 else{
-                  if(cameraLevel == 2){
-                    
-                      guiVI.showCuadroInfo(currentCuadro.slug);
-                    
+                  if(cameraLevel == 2 && currentCuadroPrevAbsoluteIndex == currentCuadroAbsoluteIndex){      
+                    guiVI.showCuadroInfo(currentCuadro.slug);       
                   }
-                  else if(cameraLevel == 3){
+                  else{
                     guiVI.selectCuadro(currentCuadroAbsoluteIndex);
                   }
                 }
@@ -919,7 +917,7 @@ const main = async () => {
                 currentMovieViewPos = guiVI.getMovieViewPositionsByName(hit.pickedMesh.name);
                 currentMovieIndex = guiVI.getMovieIndexByName(hit.pickedMesh.name);
                 camera.useAutoRotationBehavior = false;
-             }
+              }
 
               let movieIndex:number = guiVI.getMovieIndexByID(parseInt(hit.pickedMesh.id), movies);
 
@@ -991,11 +989,9 @@ const main = async () => {
               }
           }
           
-
           if (oldTargetCameraPosition !== targetCameraPosition){
               camera.position = new Vector3(camera.position.x*(1-cameraSpeed) + targetCameraPosition.x*cameraSpeed, camera.position.y*(1-cameraSpeed) + targetCameraPosition.y*cameraSpeed, camera.position.z*(1-cameraSpeed) + targetCameraPosition.z*cameraSpeed);
               
-              //console.log("targetCameraPosition.x: " + targetCameraPosition.x);
               if(Math.abs(camera.position.x - targetCameraPosition.x) < 0.05 && Math.abs(camera.position.y - targetCameraPosition.y) < 0.05 && Math.abs(camera.position.z - targetCameraPosition.z) < 0.05){
                 oldTargetCameraPosition = targetCameraPosition;
               }
@@ -1071,7 +1067,7 @@ const main = async () => {
        break; 
     } 
     case 'VI_GUI_Play': { 
-      guiVI.setCameraAutoPlay(true);
+      guiVI.setCameraAutoPlay();
       console.log("VI_GUI_Play at Babylon");
        break; 
     }
@@ -1135,11 +1131,13 @@ const main = async () => {
             guiVI.prev_view_level();
             break;
           case "p":
-            guiVI.setCameraAutoPlay(true);
+            guiVI.setCameraAutoPlay();
             break;
-          case "s":
-            guiVI.setCameraAutoPlay(false);
-            break;
+            case "v":
+              console.log("Virtual Insanity Engine Version 0.9.3")
+              console.log("Developed by Sebastian Gonzalez Dixon and Carlos Adrian Serna")
+              console.log("Setian Technologies")
+              break;
           default:
             break;
         }       

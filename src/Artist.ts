@@ -111,11 +111,11 @@ export class Cuadro {
     	//console.log ("mouse over "+unit_mesh.meshUnderPointer.id);
     	//console.log (unit_mesh);
     	if (unit_mesh.meshUnderPointer !== null) {
-        	unit_mesh.meshUnderPointer.renderOutline = true;	
-            unit_mesh.meshUnderPointer.outlineWidth = 0.1;
-            unit_mesh.meshUnderPointer.outlineColor = new Color3(0,1,0);
-            //unit_mesh.material.emissiveColor = new Color3(0,1,0);
-            setTimeout(function(){unit_mesh.source.renderOutline = false;},1000);
+        	//unit_mesh.meshUnderPointer.renderOutline = true;	
+            //unit_mesh.meshUnderPointer.outlineWidth = 0.1;
+            //unit_mesh.meshUnderPointer.outlineColor = new Color3(0,1,0);
+            unit_mesh.meshUnderPointer.material.emissiveColor = new Color3(0,0.09,0);
+            setTimeout(function(){unit_mesh.meshUnderPointer.material.emissiveColor = new Color3(0,0,0);},1000);
     	}
     }
     
@@ -123,8 +123,8 @@ export class Cuadro {
         //console.log("mouse out "+unit_mesh.meshUnderPointer.id);
     	//console.log (unit_mesh);
     	if (unit_mesh.source !== null) {
-        	unit_mesh.source.renderOutline = false;	
-            //unit_mesh.material.emissiveColor = new Color3(0,1,0);
+        	//unit_mesh.source.renderOutline = false;	
+            unit_mesh.meshUnderPointer.material.emissiveColor = new Color3(0,0,0);
     	}
     }
     
@@ -213,12 +213,12 @@ export class Cuadro {
     // NO BORRAR: CODIGO ALTERNATIVO PARA RESALTAR LOS BORDES DEL CUADRO   
       
 
-	let action = new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, this.mouseOverUnit);
-	let action2 = new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, this.mouseOutUnit);
+	let actionOver = new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, this.mouseOverUnit);
+	let actionOut = new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, this.mouseOutUnit);
 
     this.mesh.actionManager = new ActionManager(scene);	
-	this.mesh.actionManager.registerAction(action);
-    this.mesh.actionManager.registerAction(action2); 
+	this.mesh.actionManager.registerAction(actionOver);
+    this.mesh.actionManager.registerAction(actionOut); 
     
 
         /*  let overAction = new InterpolateValueAction(ActionManager.OnPointerOverTrigger, this.mesh.material, "emissiveColor", new Color3(0.05, 0.05, 0.05), 200);
