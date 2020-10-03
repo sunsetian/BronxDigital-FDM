@@ -1,4 +1,4 @@
-/** Versión: 0.9.4.Adr */
+/** Versión: 0.9.6.Seb.1 */
 
 //imports
 import 'pepjs';
@@ -65,6 +65,8 @@ var oldTargetPosition: Vector3;
 var oldTargetCameraPosition: Vector3;
 
 let sound: Sound;
+let soundIsActive = false;
+let soundIsPlaying = false;
 
 let idIlluminated = false;
 
@@ -359,7 +361,7 @@ class GuiSceneBabylon{
 
   selectCuadro(cuadroAbsoluteID: number): void{
 
-
+    console.log("cuadroAbsoluteID " + cuadroAbsoluteID);
     let pos = this.getCuadroPositionsByID(cuadroAbsoluteID);
     let viewPos = this.getCuadroViewerPositionsByID(cuadroAbsoluteID);
     actualAbsoluteCuadro = cuadroAbsoluteID;
@@ -529,7 +531,19 @@ class GuiSceneBabylon{
     
     cameraLevel = 0;
   }
+  
+  /** SOUND STATE */
 
+  setSoundState():void{
+    if(soundIsPlaying){
+      sound.stop();
+      soundIsPlaying = false;
+    }
+    else{
+      sound.play();
+      soundIsPlaying = false;
+    }
+  }
   /** AUTO PLAY CAMERA */
 
   private intervalID: NodeJS.Timeout;
@@ -599,6 +613,23 @@ class GuiSceneBabylon{
 var guiVI = new GuiSceneBabylon()
 /** SCENE GUI CLASS END */ 
 
+/** DETECTAR SI LA VENTANA ESTA VISIBLE PARA DETENER SONIDO */
+
+document.addEventListener("visibilitychange", function() {
+  if(sound !== null && soundIsActive){
+    if(document.hidden){
+      sound.stop();
+      soundIsPlaying = false;
+    }
+    else{
+      sound.play();
+      soundIsPlaying = true;
+    }
+  }
+});
+
+playTimeLine = Date.now();
+
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 /** MAIN SCENE 
@@ -607,7 +638,7 @@ Main function that is async so we can call the scene manager with await
 
 const main = async () => {
   
-  let sceneModulesNames = ["thisBronxScene.babylon","contents.babylon","gadgets.babylon"];
+  let sceneModulesNames = ["thisBronxScene.babylon","thisBronxScene02.babylon","thisBronxScene03.babylon"];
 
   targetBox = Mesh.CreateBox("TargetBox.000", 0.5, scene);
   let baseMat = new StandardMaterial("BaseMaterial", scene);
@@ -618,7 +649,7 @@ const main = async () => {
 
    sound = new Sound("sound",  URL_SCENE_JS + "data/sound/texturas-feria_01.mp3", scene, null, {
     loop: true,
-    autoplay: true,
+    autoplay: false
     //spatialSound: true,
     //distanceModel: "lineal",
     //rolloffFactor: 0.1
@@ -859,6 +890,12 @@ const main = async () => {
         return false;
       }
       return true;
+    }
+
+    if(!soundIsActive){
+      sound.play();
+      soundIsActive = true;
+      soundIsPlaying = true;
     }
 
     let pickMesh: Ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);
@@ -1126,6 +1163,11 @@ const main = async () => {
       console.log("VI_GUI_Play at Babylon");
        break; 
     }
+    case 'VI_GUI_Sound': { 
+      guiVI.setSoundState();
+      console.log("VI_GUI_Play at Babylon");
+       break; 
+    }
     default: { 
       if(guiVI.isIndexButton(buttonClickData)){
         
@@ -1189,7 +1231,8 @@ const main = async () => {
             guiVI.setCameraAutoPlay();
             break;
           case "m":
-            sound.stop();
+            guiVI.setSoundState();
+            
             break;
           case "v":
               console.log("Virtual Insanity Engine Version 0.9.3")

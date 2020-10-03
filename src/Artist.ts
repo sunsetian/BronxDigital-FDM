@@ -10,7 +10,7 @@ export class Artist {
     public id: number = 0;
     /** Orden de aparicion de los artistas */ 
     public order: number = 0;
-    public firstCuadroAbsoluteOrder: number = -1;
+    public firstCuadroAbsoluteOrder: number = 0;
     public slug: string = "";
     public name: string = "";
     public numCuadros: number = 0;
