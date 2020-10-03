@@ -1,4 +1,4 @@
-/** Versión: 0.9.4.Adr */
+/** Versión: 0.9.3.6.Seb */
 
 //imports
 import 'pepjs';
@@ -65,6 +65,8 @@ var oldTargetPosition: Vector3;
 var oldTargetCameraPosition: Vector3;
 
 let sound: Sound;
+let soundIsActive = false;
+let soundIsPlaying = false;
 
 let idIlluminated = false;
 
@@ -530,6 +532,19 @@ class GuiSceneBabylon{
     cameraLevel = 0;
   }
 
+  /** SOUND STATE */
+
+  setSoundState():void{
+    if(soundIsPlaying){
+      sound.stop();
+      soundIsPlaying = false;
+    }
+    else{
+      sound.play();
+      soundIsPlaying = false;
+    }
+  }
+
   /** AUTO PLAY CAMERA */
 
   private intervalID: NodeJS.Timeout;
@@ -599,6 +614,23 @@ class GuiSceneBabylon{
 var guiVI = new GuiSceneBabylon()
 /** SCENE GUI CLASS END */ 
 
+/** DETECTAR SI LA VENTANA ESTA VISIBLE PARA DETENER SONIDO */
+
+document.addEventListener("visibilitychange", function() {
+  if(sound !== null && soundIsActive){
+    if(document.hidden){
+      sound.stop();
+      soundIsPlaying = false;
+    }
+    else{
+      sound.play();
+      soundIsPlaying = true;
+    }
+  }
+});
+
+playTimeLine = Date.now();
+
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 /** MAIN SCENE 
@@ -606,399 +638,381 @@ Main function that is async so we can call the scene manager with await
 */
 
 const main = async () => {
-  
-  let sceneModulesNames = ["thisBronxScene.babylon","contents.babylon","gadgets.babylon"];
-
-  targetBox = Mesh.CreateBox("TargetBox.000", 0.5, scene);
-  let baseMat = new StandardMaterial("BaseMaterial", scene);
-  baseMat.alpha = 0.0;
-  targetBox.material = baseMat;
-
-  createSkybox(URL_SCENE_JS);
-
-   sound = new Sound("sound",  URL_SCENE_JS + "data/sound/texturas-feria_01.mp3", scene, null, {
-    loop: true,
-    autoplay: true,
-    //spatialSound: true,
-    //distanceModel: "lineal",
-    //rolloffFactor: 0.1
-  });
-  /**Funciones generales */
-  function getMeshByName(name: string,importedMeshes: AbstractMesh[]): AbstractMesh{
-    for(let i=0; i<importedMeshes.length;i++){
-      if(importedMeshes[i].name===name){
-        return importedMeshes[i];
-      }
-    }
-    return null;
-  }
-
-  //sound.setPosition(new Vector3(0, 1.7, 1.5));
-  function afterLoadScene(importedMeshes: AbstractMesh[]) {
-    
-    let index = 0;
-    let movieIndex = 0;
-    let cuadroAbsoluteOrder = 0;
-
-    let sceneMaterials = getMeshesMaterials(importedMeshes);
-    setTimeout(function(){guiVI.cleanRoomIndex();},1000);
-    setTimeout(function(){guiVI.initPosArtist();},2000);
-
-    let room_ = getMeshByName("Room.000",importedMeshes);
-    if(room_){  
-      room = room_ as Mesh;
-      room.metadata = "sala";
-      //room.checkCollisions = true;
-      room.freezeWorldMatrix();
-      roomCenter = new Vector3(room.position.x, room.position.y + 1.9, room.position.z);
-    }
-    // INCLUIR EN EL MASTER
-    let voltajeScene = getMeshByName("Voltaje.000",importedMeshes)
-    if(voltajeScene){
-      sceneName = "voltaje";
-
-      sceneModel = voltajeScene as Mesh;
-      sceneModel.metadata = "scenario";
-      sceneModel.freezeWorldMatrix(); // ESTOS FreezWorldMatrix son para optimizar rendimiento en objetos inmoviles.
-
-      targetSpeed = targetVoltajeSpeed;
-      cameraSpeed = cameraVoltajeSpeed;
-
-      camera = setupVoltajeArcRotateCamera(camera, roomCenter);
-    }
-    let limits_= getMeshByName("Limits.000",importedMeshes)
-    if(limits_){
-      limits = limits_ as Mesh;
-      limits.metadata = "limits";
-      limits.name = "limits";
-      limits.checkCollisions = true;
-      limits.visibility=0;
-      limits.freezeWorldMatrix();
-    }
-    //loadCodedSceneElements(); // CONTINÚE LOADING DESPUES DE HABER DECLARADO EL NOMBRE DE LA ESCENA!!!
-    let light01: HemisphericLight;
-    let light02: HemisphericLight;
-    let light03: HemisphericLight;
-    if(sceneName == "voltaje"){
-      if(!idIlluminated){
-        light01 = new HemisphericLight("light1", new Vector3(0, 3, -15), scene);
-        light02 = new HemisphericLight("light2", new Vector3(-25, 7, 0), scene);
-        light03 = new HemisphericLight("light3", new Vector3(0, 3, 15), scene);
-        
-        light01.intensity = 0.1;
-        light02.intensity = 0.3;
-        light03.intensity = 0.1;
-
-        light01.diffuse = new Color3(0.0, 1, 0);
-        light02.diffuse = new Color3(0.5, 0.7, 0.7);
-        light03.diffuse = new Color3(1, 0, 0);
-        idIlluminated=true;
-      }
-    }
-    else{
-      if(!idIlluminated){
-        light01 = new HemisphericLight("light1", new Vector3(3, 1, 1), scene);
-        light02 = new HemisphericLight("light2", new Vector3(-3, 1, -1), scene);
-        light03 = new HemisphericLight("light3", new Vector3(0, 1, 0), scene);
-
-        light01.intensity = 0.5;
-        light02.intensity = 0.5;
-        light03.intensity = 0.5;
-        idIlluminated = true;
-      }
-    }
-
-    /** LOOP DE MESHES CARGADOS PARA ASIGNARLES COSAS */
-    importedMeshes.forEach(newMesh => {
-      if(newMesh.material != null){
-        let meshMaterial = new PBRMaterial("Mat", scene);
-        meshMaterial = newMesh.material as PBRMaterial;
-        meshMaterial.backFaceCulling = false;
-        meshMaterial.metallic = 0.2;
-        meshMaterial.roughness = 0.8;
-        newMesh.material =  meshMaterial;
-      }
-     
-      let meshNames: string[] = newMesh.name.split(".");
-      if( meshNames[0] === "Artist" ){
-        artist.push(new Artist(newMesh, index, sceneName, URL_SCENE_JS, scene));
-        index++;
-      }
-      if( meshNames[0] === "Movie" ){
-        movies.push(new Movie(newMesh as Mesh, movieIndex, URL_SCENE_JS, scene));
-        movieIndex++;
-      }
-
-      /** CARGA SHADERS COMO LOADING */
-     /*  if(newMesh.material){
-        let meshTexture = newMesh.material.getActiveTextures()[0] as Texture;
-        if(meshTexture ){
-          var shaderMaterial = new SampleMaterial("material", scene);
-          
-          var textureTest = new Texture(URL_SCENE_JS+"data/loadingMeshImage/loadingShader0.jpg", scene);
-          shaderMaterial.backFaceCulling = false;
-          shaderMaterial.setTexture("uHeightMap", textureTest);
-          shaderMaterial.setTexture("uDiffuseMap", meshTexture);
-          newMesh.material = shaderMaterial;
-        }
-      }  */
-
-      /***************/
-
-    });
-    
-    setTimeout(function(){
-     // setMeshesMaterials(importedMeshes,sceneMaterials);
-     document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "stop auto";
-     document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#00ff00";
-      try {
-        globalThis.bronxControl.showInfo(1946);
-      } catch (error) {
-        console.log("Información no disponible")
-      }
-      
-    },10000);
-    
-    for(let i=0; i < artist.length; i++){
-      let artistIndex = guiVI.getArtistIndexByOrder(i);
-      for(let j=0; j < artist[artistIndex].cuadro.length; j++){
-        let cuadroIndex = guiVI.getCuadroIndexByOrder(j, artist[artistIndex]);
-        if(j === 0){
-          artist[artistIndex].firstCuadroAbsoluteOrder = cuadroAbsoluteOrder;
-        }
-        artist[artistIndex].cuadro[cuadroIndex].absoluteOrder = cuadroAbsoluteOrder ;
-        cuadroAbsoluteOrder++;
-      }
-    }
-
-    numArtists = artist.length;
-    numCuadros = cuadroAbsoluteOrder;
-    numMovies = movies.length;
-    
-    if(roomCenter){
-      targetPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
-      targetCameraPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
-      oldTargetPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
-      oldTargetCameraPosition = targetCameraPosition;
-    
-      targetBox.position = targetPosition;
-    }
-    if(camera !== undefined && targetBox !== undefined && cameraSetted === false){
-      camera.setTarget(targetBox.position); /// USAR .position para mas compatibilidad
-      cameraSetted = true;
-
-    }
-    
-    /** FUNCION DE OBSERVACION DE EVENTOS DE CLICK
-     * Aqui se determina que mesh fue clickeado
-     */
-    
-    
-    
-  }
+ 
   /** IMPORTACIÓN DE LA ESCENA DE BLENDER 
    * 
    * Las mallas que llegan importadas desde Blender deben ser 
    * manipuladas dentro de la misma función que las importa.
    * 
   */
- 
-  function loadSceneParts(filesNames: string[], index: number){
-    console.log("INDICE DE CARGA: "+index);
-    if(index < filesNames.length){
-      let fileName = filesNames[index];
-      try {
-        SceneLoader.LoadAssetContainer(URL_SCENE_JS+"data/models/",fileName,scene,
-          function(container){
-            var loadMeshes = container.meshes;
-            console.groupCollapsed("CONTENTS CARGADOS")
-            afterLoadScene(loadMeshes);
-            container.addAllToScene();
-            loadSceneParts(filesNames, index+1);
-          }
-        );
-      } catch (error) {
-        console.log(fileName+ " no cargo. Error: "+error);
+
+  createSkybox(URL_SCENE_JS);
+
+   sound = new Sound("sound",  URL_SCENE_JS + "data/sound/texturas-feria_01.mp3", scene, null, {
+    loop: true,
+    autoplay: false,
+    //spatialSound: true,
+    //distanceModel: "lineal",
+    //rolloffFactor: 0.1
+  });
+
+
+  //sound.setPosition(new Vector3(0, 1.7, 1.5));
+
+  SceneLoader.ImportMesh(
+    "",
+    URL_SCENE_JS+"data/models/",
+    "thisBronxScene.babylon", // MEJOR UTILIZAR ESTE FORMATO DE NOMBRE PARA LOS MODELOS thisBabylonScene.babylon
+    //"thisBabylonScene.babylon", 
+    scene,
+    function (importedMeshes) {
+
+      let index = 0;
+      let movieIndex = 0;
+      let cuadroAbsoluteOrder = 0;
+
+      let sceneMaterials = getMeshesMaterials(importedMeshes);
+      setTimeout(function(){guiVI.cleanRoomIndex();},1000);
+      setTimeout(function(){guiVI.initPosArtist();},2000);
+
+      if(scene.getMeshByName("Room.000")){  
+        room = scene.getMeshByName("Room.000") as Mesh;
+        room.metadata = "sala";
+        //room.checkCollisions = true;
+        room.freezeWorldMatrix();
+
+        roomCenter = new Vector3(room.position.x, room.position.y + 1.9, room.position.z);
+      
       }
-    }
-  }
-  loadSceneParts(sceneModulesNames,0);
-/*
-  function loadAssets3D(fileName: string){
-    try {
-      SceneLoader.LoadAssetContainer(URL_SCENE_JS+"data/models/",fileName,scene,
-        function(container){
-          var loadMeshes = container.meshes;
-          console.groupCollapsed("CONTENTS CARGADOS")
-          afterLoadScene(loadMeshes);
-          container.addAllToScene();
-          loadAssets3D("gadgets.babylon");
+
+      // INCLUIR EN EL MASTER
+      if(scene.getMeshByName("Voltaje.000")){
+        sceneName = "voltaje";
+
+        sceneModel = scene.getMeshByName("Voltaje.000") as Mesh;
+        sceneModel.metadata = "scenario";
+        sceneModel.freezeWorldMatrix(); // ESTOS FreezWorldMatrix son para optimizar rendimiento en objetos inmoviles.
+
+        targetSpeed = targetVoltajeSpeed;
+        cameraSpeed = cameraVoltajeSpeed;
+
+        camera = setupVoltajeArcRotateCamera(camera, roomCenter);
+      }
+
+      //loadCodedSceneElements(); // CONTINÚE LOADING DESPUES DE HABER DECLARADO EL NOMBRE DE LA ESCENA!!!
+      let light01: HemisphericLight;
+      let light02: HemisphericLight;
+      let light03: HemisphericLight;
+
+      if(sceneName == "voltaje"){
+        if(!idIlluminated){
+          light01 = new HemisphericLight("light1", new Vector3(0, 3, -15), scene);
+          light02 = new HemisphericLight("light2", new Vector3(-25, 7, 0), scene);
+          light03 = new HemisphericLight("light3", new Vector3(0, 3, 15), scene);
+          
+          light01.intensity = 0.1;
+          light02.intensity = 0.3;
+          light03.intensity = 0.1;
+
+          light01.diffuse = new Color3(0.0, 1, 0);
+          light02.diffuse = new Color3(0.5, 0.7, 0.7);
+          light03.diffuse = new Color3(1, 0, 0);
+          idIlluminated=true;
         }
-      );
-    } catch (error) {
-      console.log(fileName+ " No cargo, error: "+error);
-    }
-  }
-  SceneLoader.LoadAssetContainer(URL_SCENE_JS+"data/models/","thisBronxScene.babylon",scene,
-    function(container){
-      var loadMeshes = container.meshes;
-      console.groupCollapsed("ESCENA CARGADA")
-      afterLoadScene(loadMeshes);
-      container.addAllToScene();
-      loadAssets3D("contents.babylon")
-    }
-  );
-  */
-  scene.onPointerDown = function selectMesh() {
-
-    canvas.classList.remove('horizTranslate');
-    canvas.classList.add('resetPosition');
-
-    function predicate(mesh: AbstractMesh){
-      if (mesh === targetBox || mesh === room || mesh === limits || mesh === sceneModel){
-        return false;
       }
-      return true;
-    }
+      else{
+        if(!idIlluminated){
+          light01 = new HemisphericLight("light1", new Vector3(3, 1, 1), scene);
+          light02 = new HemisphericLight("light2", new Vector3(-3, 1, -1), scene);
+          light03 = new HemisphericLight("light3", new Vector3(0, 1, 0), scene);
 
-    let pickMesh: Ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);
-    let hit: PickingInfo = scene.pickWithRay(pickMesh, predicate) as PickingInfo;
+          light01.intensity = 0.5;
+          light02.intensity = 0.5;
+          light03.intensity = 0.5;
+          idIlluminated = true;
+        }
+      }
 
-    let cuadrosName = "cuadro";
-    let moviesName = "movie";
-    let cuadrosMovieName = "cuadromovie";
+      apuntador= Mesh.CreateTorus("apuntador", 0.08, 0.02, 3, scene);
+      apuntador.rotation.x = Tools.ToRadians(90);
+      apuntador.position = new Vector3(0, 10, 0);
+      let apuntadorMat = new StandardMaterial("greenMat", scene);
+      apuntadorMat.diffuseColor = new Color3(0, 1, 0);
 
-    if(hit.pickedMesh != null){
-      guiVI.setCameraAutoPlay(false); 
-     
-      if(hit.pickedMesh.metadata != null){
+      apuntador.material = apuntadorMat;
+      
+      if(scene.getMeshByName("Limits.000")){
+        limits = scene.getMeshByName("Limits.000") as Mesh;
+        limits.metadata = "limits";
+        limits.name = "limits";
+        limits.checkCollisions = true;
+        limits.visibility = 0;
+        limits.freezeWorldMatrix();
+      }
 
-        if (hit.pickedMesh && (hit.pickedMesh.metadata === cuadrosName || hit.pickedMesh.metadata === cuadrosMovieName)) {
-          let currentMesh: AbstractMesh = new AbstractMesh("");
-          if(hit.pickedMesh!= null){  
-            currentMesh = hit.pickedMesh;
+
+      /** LOOP DE MESHES CARGADOS PARA ASIGNARLES COSAS */
+      importedMeshes.forEach(newMesh => {
+
+        //console.log("MESH NAME " + newMesh.name);
+
+        if(newMesh.material != null){
+          let meshMaterial = new PBRMaterial("Mat", scene);
+          meshMaterial = newMesh.material as PBRMaterial;
+          meshMaterial.backFaceCulling = false;
+          meshMaterial.metallic = 0.2;
+          meshMaterial.roughness = 0.8;
+          newMesh.material =  meshMaterial;
+        }
+       
+        let meshNames: string[] = newMesh.name.split(".");
+        if( meshNames[0] === "Artist" ){
+          artist.push(new Artist(newMesh, index, sceneName, URL_SCENE_JS, scene));
+          index++;
+        }
+        if( meshNames[0] === "Movie" ){
+          movies.push(new Movie(newMesh as Mesh, movieIndex, URL_SCENE_JS, scene));
+          movieIndex++;
+        }
+
+        /** CARGA SHADERS COMO LOADING */
+       /*  if(newMesh.material){
+          let meshTexture = newMesh.material.getActiveTextures()[0] as Texture;
+          if(meshTexture ){
+            var shaderMaterial = new SampleMaterial("material", scene);
+            
+            var textureTest = new Texture(URL_SCENE_JS+"data/loadingMeshImage/loadingShader0.jpg", scene);
+            shaderMaterial.backFaceCulling = false;
+            shaderMaterial.setTexture("uHeightMap", textureTest);
+            shaderMaterial.setTexture("uDiffuseMap", meshTexture);
+            newMesh.material = shaderMaterial;
           }
+        }  */
 
-          console.log("CUADRO NAME " + currentMesh.name)
+        /***************/
+
+      });
+
+      setTimeout(function(){
+       // setMeshesMaterials(importedMeshes,sceneMaterials);
+       document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "stop auto";
+       document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#00ff00";
+        try {
+          globalThis.bronxControl.showInfo(1946);
+        } catch (error) {
+          console.log("Información no disponible")
+        }
         
-          oldTargetPosition = targetPosition;
-          oldTargetCameraPosition = targetCameraPosition;
-
-          let iArtistOrdered = parseInt(currentMesh.id.split("_")[0]); 
-          let iCuadroOrdered = parseInt(currentMesh.id.split("_")[1])-1;
-
-          camera.angularSensibilityX = 3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
-          camera.angularSensibilityY = 3000;
-
-          let rotationSpeed = 0.05;
-          if(sceneName == "voltaje"){
-            rotationSpeed = -0.1;
-            //camera.angularSensibilityX = -3000;
+      },10000);
+      
+      for(let i=0; i < artist.length; i++){
+        let artistIndex = guiVI.getArtistIndexByOrder(i);
+        for(let j=0; j < artist[artistIndex].cuadro.length; j++){
+          let cuadroIndex = guiVI.getCuadroIndexByOrder(j, artist[artistIndex]);
+          if(j === 0){
+            artist[artistIndex].firstCuadroAbsoluteOrder = cuadroAbsoluteOrder;
           }
+          artist[artistIndex].cuadro[cuadroIndex].absoluteOrder = cuadroAbsoluteOrder ;
+          cuadroAbsoluteOrder++;
+        }
+      }
 
-          let currentArtistIndex: number = -1;
+      numArtists = artist.length;
+      numCuadros = cuadroAbsoluteOrder;
+      numMovies = movies.length;
+    
+      /* if(scene.getMeshByName("Limits.000")){
+        limits = scene.getMeshByName("Limits.000") as Mesh;
+        limits.metadata = "limits";
+        limits.name = "limits";
+        limits.checkCollisions = true;
+        limits.freezeWorldMatrix();
+      } */
 
-          if(hit.pickedMesh.parent != null){
-             currentArtistIndex = guiVI.getArtistIndexByName(hit.pickedMesh.parent.name);
+      /* if(scene.getMeshByName("Room.000")){
+        room = scene.getMeshByName("Room.000") as Mesh;
+        room.metadata = "sala";
+        //room.checkCollisions = true;
+        room.freezeWorldMatrix();
+      } */
+
+      targetPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
+      targetCameraPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
+      oldTargetPosition = new Vector3(roomCenter.x, roomCenter.y, roomCenter.z);
+      oldTargetCameraPosition = targetCameraPosition;
+
+      // TODO Sacar esto fuera del SceneImport
+
+      targetBox = Mesh.CreateBox("TargetBox.000", 0.5, scene);
+      let baseMat = new StandardMaterial("BaseMaterial", scene);
+
+      baseMat.alpha = 0.0;
+
+      targetBox.material = baseMat;
+
+      targetBox.position = targetPosition;
+
+      if(camera !== undefined && targetBox !== undefined && cameraSetted === false){
+        camera.setTarget(targetBox.position); /// USAR .position para mas compatibilidad
+        cameraSetted = true;
+  
+      }
+
+
+      /** FUNCION DE OBSERVACION DE EVENTOS DE CLICK
+       * 
+       * Aqui se determina que mesh fue clickeado
+       * 
+       */
+
+      scene.onPointerDown = function selectMesh() {
+
+        canvas.classList.remove('horizTranslate');
+        canvas.classList.add('resetPosition');
+
+        function predicate(mesh: AbstractMesh){
+          if (mesh === targetBox || mesh === room || mesh === limits || mesh === sceneModel){
+            return false;
           }
-          //console.log("iArtistOrdered " + iArtistOrdered);
-          //console.log("actualArtist " + actualArtist);
+          return true;
+        }
 
-          if(actualArtist !== iArtistOrdered || firstClick){
-            actualArtist = iArtistOrdered;
-            guiVI.selectArtist(actualArtist);
-            firstClick = false;
-            try {
-              globalThis.bronxControl.showInfo(1955);
-            } catch (error) {
-              console.log("Información no disponible")
-            }
-          }
-          else{
-            let cuadroIndex:number = guiVI.getCuadroIndexByOrder(iCuadroOrdered, artist[currentArtistIndex]);
-            currentCuadro = artist[currentArtistIndex].cuadro[cuadroIndex];
-            currentCuadroPrevAbsoluteIndex = currentCuadroAbsoluteIndex;
-            currentCuadroAbsoluteIndex = artist[currentArtistIndex].cuadro[cuadroIndex].absoluteOrder
+        if(!soundIsActive){
+          sound.play();
+          soundIsActive = true;
+          soundIsPlaying = true;
+        }
 
-            if(cameraLevel == 1){
+        let pickMesh: Ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);
+        let hit: PickingInfo = scene.pickWithRay(pickMesh, predicate) as PickingInfo;
 
-              guiVI.selectCuadro(currentCuadroAbsoluteIndex);
-              try {
-                globalThis.bronxControl.showInfo(1959);
-              } catch (error) {
-                console.log("Información no disponible")
+        let cuadrosName = "cuadro";
+        let moviesName = "movie";
+        let cuadrosMovieName = "cuadromovie";
+
+        if(hit.pickedMesh != null){
+          guiVI.setCameraAutoPlay(false); 
+         
+          if(hit.pickedMesh.metadata != null){
+
+            if (hit.pickedMesh && (hit.pickedMesh.metadata === cuadrosName || hit.pickedMesh.metadata === cuadrosMovieName)) {
+              let currentMesh: AbstractMesh = new AbstractMesh("");
+              if(hit.pickedMesh!= null){  
+                currentMesh = hit.pickedMesh;
               }
 
-              if(hit.pickedMesh.metadata === cuadrosMovieName){
-                console.log("play video cuadro");
-                currentCuadro.videoTexture.video.play();
-                currentCuadro.videoTexturePlaying = true;
+              console.log("CUADRO NAME " + currentMesh.name)
+            
+              oldTargetPosition = targetPosition;
+              oldTargetCameraPosition = targetCameraPosition;
+
+              let iArtistOrdered = parseInt(currentMesh.id.split("_")[0]); 
+              let iCuadroOrdered = parseInt(currentMesh.id.split("_")[1])-1;
+
+              camera.angularSensibilityX = 3000;  // SENTIDO EN EL QUE SE AGARRA Y ARRASTRA LA CAMARA
+              camera.angularSensibilityY = 3000;
+
+              let rotationSpeed = 0.05;
+              if(sceneName == "voltaje"){
+                rotationSpeed = -0.1;
+                //camera.angularSensibilityX = -3000;
               }
-            }
-            else{
-              if(cameraLevel == 2 && currentCuadroPrevAbsoluteIndex == currentCuadroAbsoluteIndex){      
-                guiVI.showCuadroInfo(currentCuadro.slug);       
+
+              let currentArtistIndex: number = -1;
+
+              if(hit.pickedMesh.parent != null){
+                 currentArtistIndex = guiVI.getArtistIndexByName(hit.pickedMesh.parent.name);
+              }
+              //console.log("iArtistOrdered " + iArtistOrdered);
+              //console.log("actualArtist " + actualArtist);
+
+              if(actualArtist !== iArtistOrdered || firstClick){
+                actualArtist = iArtistOrdered;
+                guiVI.selectArtist(actualArtist);
+                firstClick = false;
+                try {
+                  globalThis.bronxControl.showInfo(1955);
+                } catch (error) {
+                  console.log("Información no disponible")
+                }
               }
               else{
-                guiVI.selectCuadro(currentCuadroAbsoluteIndex);
+                let cuadroIndex:number = guiVI.getCuadroIndexByOrder(iCuadroOrdered, artist[currentArtistIndex]);
+                currentCuadro = artist[currentArtistIndex].cuadro[cuadroIndex];
+                currentCuadroPrevAbsoluteIndex = currentCuadroAbsoluteIndex;
+                currentCuadroAbsoluteIndex = artist[currentArtistIndex].cuadro[cuadroIndex].absoluteOrder
+
+                if(cameraLevel == 1){
+
+                  guiVI.selectCuadro(currentCuadroAbsoluteIndex);
+                  try {
+                    globalThis.bronxControl.showInfo(1959);
+                  } catch (error) {
+                    console.log("Información no disponible")
+                  }
+
+                  if(hit.pickedMesh.metadata === cuadrosMovieName){
+                    console.log("play video cuadro");
+                    currentCuadro.videoTexture.video.play();
+                    currentCuadro.videoTexturePlaying = true;
+                  }
+                }
+                else{
+                  if(cameraLevel == 2 && currentCuadroPrevAbsoluteIndex == currentCuadroAbsoluteIndex){      
+                    guiVI.showCuadroInfo(currentCuadro.slug);       
+                  }
+                  else{
+                    guiVI.selectCuadro(currentCuadroAbsoluteIndex);
+                  }
+                }
               }
             }
-          }
-        }
-        else if (hit.pickedMesh && hit.pickedMesh.metadata === moviesName) {
-          let currentMoviePos: Vector3 = new Vector3();
-          let currentMovieViewPos: Vector3 = new Vector3();
-          let currentMovieIndex: number = -1;
+            else if (hit.pickedMesh && hit.pickedMesh.metadata === moviesName) {
+              let currentMoviePos: Vector3 = new Vector3();
+              let currentMovieViewPos: Vector3 = new Vector3();
+              let currentMovieIndex: number = -1;
 
-          if(hit.pickedMesh != null){
-            currentMoviePos = guiVI.getMoviePositionsByName(hit.pickedMesh.name);
-            currentMovieViewPos = guiVI.getMovieViewPositionsByName(hit.pickedMesh.name);
-            currentMovieIndex = guiVI.getMovieIndexByName(hit.pickedMesh.name);
-            camera.useAutoRotationBehavior = false;
-          }
+              if(hit.pickedMesh != null){
+                currentMoviePos = guiVI.getMoviePositionsByName(hit.pickedMesh.name);
+                currentMovieViewPos = guiVI.getMovieViewPositionsByName(hit.pickedMesh.name);
+                currentMovieIndex = guiVI.getMovieIndexByName(hit.pickedMesh.name);
+                camera.useAutoRotationBehavior = false;
+              }
 
-          let movieIndex:number = guiVI.getMovieIndexByID(parseInt(hit.pickedMesh.id), movies);
+              let movieIndex:number = guiVI.getMovieIndexByID(parseInt(hit.pickedMesh.id), movies);
 
-          if(actualMovie !== movieIndex){
-            actualMovie = movieIndex;
-            targetCameraPosition = new Vector3(currentMovieViewPos.x, currentMovieViewPos.y, currentMovieViewPos.z);
-            targetPosition = new Vector3(currentMoviePos.x, currentMoviePos.y, currentMoviePos.z);
-          }
+              if(actualMovie !== movieIndex){
+                actualMovie = movieIndex;
+                targetCameraPosition = new Vector3(currentMovieViewPos.x, currentMovieViewPos.y, currentMovieViewPos.z);
+                targetPosition = new Vector3(currentMoviePos.x, currentMoviePos.y, currentMoviePos.z);
+              }
 
-          if(sceneName == "voltaje"){
-            movies.forEach(movie => {
-              movie.videoTexture.video.play();
-            });
+              if(sceneName == "voltaje"){
+                movies.forEach(movie => {
+                  movie.videoTexture.video.play();
+                });
+                }
+                else{
+                if(!movies[movieIndex].videoTexturePlaying){
+                  movies[movieIndex].videoTexture.video.play();
+                  movies[movieIndex].videoTexturePlaying = true;
+                }
+                else{
+                  movies[movieIndex].videoTexture.video.pause();
+                  movies[movieIndex].videoTexturePlaying = false;
+                }
+              }
+
             }
             else{
-            if(!movies[movieIndex].videoTexturePlaying){
-              movies[movieIndex].videoTexture.video.play();
-              movies[movieIndex].videoTexturePlaying = true;
-            }
-            else{
-              movies[movieIndex].videoTexture.video.pause();
-              movies[movieIndex].videoTexturePlaying = false;
+              guiVI.prev_navigation();
+              canvas.classList.remove('horizTranslate');
+              canvas.classList.add('resetPosition');
             }
           }
-
-        }
-        else{
-          guiVI.prev_navigation();
-          canvas.classList.remove('horizTranslate');
-          canvas.classList.add('resetPosition');
         }
       }
-    }
-  }
-
-  apuntador = Mesh.CreateTorus("apuntador", 0.08, 0.02, 3, scene);
-  apuntador.rotation.x = Tools.ToRadians(90);
-  apuntador.position = new Vector3(0, 10, 0);
-  let apuntadorMat = new StandardMaterial("greenMat", scene);
-  apuntadorMat.diffuseColor = new Color3(0, 1, 0);
-
-  apuntador.material = apuntadorMat;
-  /*
+    },
     function (evt) {
       // onProgress
       let loadedPercent: string = "";
@@ -1013,7 +1027,7 @@ const main = async () => {
         console.log("LOADED");
       }
     }
-  */
+  );
 
   //
 
@@ -1126,6 +1140,11 @@ const main = async () => {
       console.log("VI_GUI_Play at Babylon");
        break; 
     }
+    case 'VI_GUI_Sound': { 
+      guiVI.setSoundState();
+      console.log("VI_GUI_Play at Babylon");
+       break; 
+    }
     default: { 
       if(guiVI.isIndexButton(buttonClickData)){
         
@@ -1189,7 +1208,7 @@ const main = async () => {
             guiVI.setCameraAutoPlay();
             break;
           case "m":
-            sound.stop();
+            guiVI.setSoundState();
             break;
           case "v":
               console.log("Virtual Insanity Engine Version 0.9.3")
