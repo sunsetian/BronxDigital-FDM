@@ -1,4 +1,4 @@
-/** Versión: 0.9.3.6.Seb */
+/** Versión: 0.9.4.Adr */
 
 //imports
 import 'pepjs';
@@ -479,11 +479,11 @@ class GuiSceneBabylon{
     canvas.classList.remove('resetPosition');
     canvas.classList.add('horizTranslate');
     cameraLevel = 3;
+    console.log("Show Info de: " + thisCuadroSlug);
     try {
       globalThis.bronxControl.showInfoByPostSlug(thisCuadroSlug,175);
-      console.log("Show Info de: " + thisCuadroSlug);
     } catch (error) {
-      console.log("No hay informacion detallada del cuadro")
+      console.log("No hay informacion detallada del cuadro, error: "+error);
     }
   }
 
