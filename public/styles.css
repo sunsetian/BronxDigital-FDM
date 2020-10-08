@@ -56,6 +56,11 @@ button {
 
 /*** Wordpress ***/
 
+.page-content {
+  margin: 0;
+  padding: 0;
+}
+
 .info-container {
   display: block;
   top: 100px;
@@ -215,7 +220,7 @@ button {
 
 .button-right-top {
   position: absolute;
-  top: 80px;
+  top: 15px;
   right: 40px;
 }
 
@@ -307,6 +312,19 @@ button {
 
 .centered {
   margin-left: 45%;
+}
+
+#autoPlayTimeline {
+  width: 100%;
+  height: 10px;
+  background-color: #00ff00;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  z-index: -1;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 
@@ -419,6 +437,15 @@ p.VirtualIn_index_posts_letter.indexLetter {
 }
 
 
+/* TOOLTIPS */
+
+div#popmake-1946,
+div#popmake-1946,
+div#popmake-1959 {
+  max-height: 48px;
+}
+
+
 /* Menu responsive Plugin */
 
 @media screen and (max-width: 8000px) {
@@ -453,6 +480,9 @@ p.VirtualIn_index_posts_letter.indexLetter {
 .pum-theme-tooltips .pum-content {
   font-size: 0.7rem;
 }
+
+
+/*  PARA MOVILES  */
 
 @media screen and (max-width: 600px) {
   .pum-theme-171 .pum-container,
@@ -531,3 +561,488 @@ p.VirtualIn_index_posts_letter.indexLetter {
     left: 45%;
   }
 }
+
+
+/*FINAL DE MOVILES */
+
+
+/* FORMULARIOS. */
+
+.um .um-form input[type=text],
+.um .um-form input[type=search],
+.um .um-form input[type=tel],
+.um .um-form input[type=number],
+.um .um-form input[type=password],
+.um .um-form textarea,
+.select2-container .select2-choice,
+.select2-container-multi .select2-choices {
+  background-color: #000000;
+}
+
+a.um-button.um-disabled:active {
+  background: #00ff00;
+}
+
+.um .um-form input[type=text],
+.um .um-form input[type=search],
+.um .um-form input[type=tel],
+.um .um-form input[type=number],
+.um .um-form input[type=password],
+.um .um-form textarea,
+.select2-container .select2-choice,
+.select2-container-multi .select2-choices {
+  background-color: #000000;
+}
+
+.um input[type=submit].um-button,
+.um input[type=submit].um-button:focus,
+.um a.um-button,
+.um a.um-button.um-disabled:hover,
+.um a.um-button.um-disabled:focus,
+.um a.um-button.um-disabled:active {
+  background: #00ff00;
+}
+
+.um .um-form input[type=text],
+.um .um-form input[type=search],
+.um .um-form input[type=tel],
+.um .um-form input[type=number],
+.um .um-form input[type=password],
+.um .um-form textarea,
+.um .upload-progress,
+.select2-container .select2-choice,
+.select2-drop,
+.select2-container-multi .select2-choices,
+.select2-drop-active,
+.select2-drop.select2-drop-above {
+  border-top-color: #000000 !important;
+  border-top-style: solid !important;
+  border-top-width: 1px !important;
+  border-right-color: #000000 !important;
+  border-right-style: solid !important;
+  border-right-width: 1px !important;
+  border-bottom-color: #d6d6d6 !important;
+  border-bottom-style: solid !important;
+  border-bottom-width: 1px !important;
+  border-left-color: #000000 !important;
+  border-left-style: solid !important;
+  border-left-width: 1px !important;
+  border-image-source: initial !important;
+}
+
+.um .um-field-label {
+  color: #d6d6d6;
+}
+
+.um-field-checkbox-option,
+.um-field-radio-option {
+  margin: 0px 0px 0px 36px;
+  line-height: 24px;
+  color: #d6d6d6 !important;
+  display: block;
+}
+
+.um .um-button {
+  color: #000000;
+}
+
+input[type=submit].um-button,
+input[type=submit].um-button:focus {
+  vertical-align: middle !important;
+  height: auto !important;
+  font-size: 15px;
+  font-weight: bolder !important;
+  cursor: pointer !important;
+  width: 100%;
+  box-shadow: none;
+  text-shadow: none;
+  font-family: inherit;
+  outline: none !important;
+  margin: 0;
+  opacity: 1;
+}
+
+input[type=submit].um-button,
+input[type=submit].um-button {
+  border-radius: 0 !important;
+}
+
+.um input[type=submit].um-button:hover,
+.um a.um-button:hover {
+  background-color: #277327;
+}
+
+a.um-button {
+  font-size: 15px;
+  border: none !important;
+  display: block;
+  width: 150%;
+  line-height: 1em !important;
+  padding: 20px 20px !important;
+  text-decoration: none !important;
+  text-align: center;
+  text-transform: none !important;
+  font-weight: normal !important;
+  overflow: hidden;
+  position: relative;
+  transition: 0.25s;
+  box-sizing: border-box;
+}
+
+.um .um-button.um-alt,
+.um input[type=submit].um-button.um-alt {
+  background: #000000;
+}
+
+.um .um-button.um-alt,
+.um input[type=submit].um-button.um-alt {
+  color: #d6d6d6;
+}
+
+.um .um-button.um-alt:hover,
+.um input[type=submit].um-button.um-alt:hover {
+  background: #000000;
+}
+
+.um-icon-help-circled:before {
+  display: none;
+}
+
+.um-left.um-half {
+  width: 20%
+}
+
+.um-right {
+  float: none;
+}
+
+.page-content {
+  padding-top: 50px;
+}
+
+.um-field-checkbox-option,
+.um-field-radio-option {
+  margin: 0px 0px 10px 36px;
+  line-height: 24px;
+  color: #d6d6d6 !important;
+  display: block;
+}
+
+
+/* TRIVIS COLFONDOS */
+
+.fondo-colfondos {
+  background-color: #0d1c3a;
+}
+
+.caja-colfondos {
+  border-radius: 10px;
+  background-color: white;
+  padding: 10px;
+  margin: 10px;
+  height: auto;
+  min-height: 280px;
+  color: #2b325b;
+  box-sizing: content-box;
+}
+
+p.Cajita-colfondos-2 {
+  border-radius: 10px;
+  background-color: white;
+  padding: 10px;
+  margin: 10px;
+  height: px;
+  color: #2b325b;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+@media screen and (max-width: 2000px) {
+  p.Cajita-colfondos-2 {
+    margin-left: 200px;
+    margin-right: 200px;
+  }
+}
+
+h1.has-text-align-center.Observar-colfondos-2 {
+  font-weight: 900;
+  color: #ffdb58;
+}
+
+h2.has-text-align-center.titulos-colfondos-2 {
+  font-weight: bold;
+}
+
+.page-id-3157 {
+  background-color: #0d1c3a;
+  background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Splash-top-left-mobile.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-3.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-2.png);
+  background-position: left top, right top, right bottom;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+}
+
+.page-id-3157 .wp-block-button__link {
+  background-color: #d6d6d600;
+  color: #ffffff !important;
+  font-weight: normal;
+  font-size: 0.8rem;
+  border: solid 1px #ffdb58;
+  padding: 0.2rem 0.7rem 0.3rem 0.7rem;
+  box-shadow: none;
+}
+
+p.has-text-align-center.responsabilidad-colfondos-2 {
+  background-color: #212662;
+}
+
+.page-id-4135 .wp-block-button__link {
+  background-color: #d6d6d600;
+  color: #ffffff !important;
+  font-weight: normal;
+  font-size: 0.8rem;
+  border: solid 1px #ffdb58;
+  padding: 0.2rem 0.7rem 0.3rem 0.7rem;
+  box-shadow: none;
+}
+
+.page-id-4135 {
+  background-color: #0d1c3a;
+  background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-3.png);
+  background-position: center, right top;
+  background-repeat: no-repeat, no-repeat;
+}
+
+.titulos-colfondos-main {
+  color: #ffdb58;
+  font-weight: bold
+}
+
+.page-id-4135 .wp-block-column:not(:first-child) {
+  margin-left: -100px!important;
+}
+
+.responsabilidad-2-colfondos-2 {
+  background-color: #E0E0E0;
+  color: #2b325b;
+}
+
+.page-id-4135 p {
+  margin-top: 0;
+  margin-bottom: 0rem;
+}
+
+.page-id-2262 {
+  background-color: #0d1c3a;
+  background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Splash-top-left-mobile.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-3.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-2.png);
+  background-position: left top, right top, right bottom;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+}
+
+.page-id-2262 .wp-block-button__link {
+  background-color: #d6d6d600;
+  color: #ffffff !important;
+  font-weight: normal;
+  font-size: 1.3rem;
+  border: solid 1px #ffdb58;
+  padding: 0.2rem 0.7rem 0.3rem 0.7rem;
+  box-shadow: none;
+}
+
+.page-id-2262 .wp-block-media-text__content {
+  color: #2b325b!important;
+}
+
+.titulo-colfondos-3 {
+  color: #ffdb58;
+  font-weight: bold
+}
+
+.page-id-4398 {
+  background-color: #0d1c3a;
+  background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Splash-top-left-mobile.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-3.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-2.png);
+  background-position: left top, right top, right bottom;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+}
+
+.page-id-4398 .wp-block-button__link {
+  background-color: #d6d6d600;
+  color: #ffffff !important;
+  font-weight: normal;
+  font-size: 1.3rem;
+  border: solid 1px #ffdb58;
+  padding: 0.2rem 0.7rem 0.3rem 0.7rem;
+  box-shadow: none;
+}
+
+.page-id-4398 .wp-block-media-text__content {
+  color: #2b325b!important;
+}
+
+.page-id-4398 .caja-colfondos {
+  border-radius: 10px;
+  background-color: white;
+  padding: 10px;
+  margin: 10px;
+  height: auto;
+  min-height: 380px;
+  color: #2b325b;
+  box-sizing: content-box;
+}
+
+.responsabilidad-colfondos-3 {
+  background-color: #212662;
+}
+
+
+/* MENU CARPETAS */
+
+.menu-carpetas-container {
+  width: 100%;
+}
+
+.menu-carpetas {
+  position: absolute;
+  background-color: #d6d6d6;
+  border-style: solid;
+  border-color: black;
+  box-shadow: 6px 6px #000000;
+  padding: 20px;
+  width: 550px;
+}
+
+.menu-carpetas p {
+  font-size: 0.7rem;
+}
+
+.menu-carpetas-1 {
+  top: 10px;
+  left: 10px;
+}
+
+.menu-carpetas-2 {
+  top: 120px;
+  left: 360px;
+}
+
+.menu-carpetas-3 {
+  top: 300px;
+  left: 25%;
+}
+
+@media (max-width: 1024px) {
+  .menu-carpetas {
+    position: relative;
+    margin: 0;
+  }
+  .menu-carpetas-1 {
+    top: auto;
+    left: 10px;
+    margin: 0 auto;
+  }
+  .menu-carpetas-2 {
+    top: auto;
+    left: 10px;
+    margin: 0 auto;
+  }
+  .menu-carpetas-3 {
+    top: auto;
+    left: 10px;
+    margin: 0 auto;
+  }
+}
+
+
+/* INFO ARTISTAS */
+
+.artWorkContainer {
+  margin-top: 25px;
+}
+
+.imageContainerSheet {}
+
+.technicalSheet {}
+
+
+/*
+.menu-carpertas-1 {
+  position: absolute;
+  top: 0px;
+  left: 5%;
+  width: 450px;
+  border-style: solid;
+  border-color: black;
+  padding: 10px 30px;
+  background-color: lightgrey;
+  box-shadow: 6px 6px #000000;
+}
+
+.menu-carpertas-1 .wp-block-column {
+  margin: 10px !important;
+}
+
+.menu-carpertas-1 p {
+  font-size: 0.7rem;
+}
+
+.menu-carpertas-3 p {
+  font-size: 0.7rem;
+}
+
+.menu-carpetas-2{
+  width: 450px;
+  border-style: solid;
+  border-color: black;
+  margin-left: 400px;
+  margin-top: 200px;
+  padding: 10px 30px;
+  background-color: lightgrey;
+  box-shadow: 6px 6px #000000;
+}
+
+
+.menu-carpertas-2 p {
+  font-size: 0.7rem;
+}
+
+
+.menu-carpetas-3 {
+  border-style: solid;
+  border-color: #0a0a0a;
+  margin-left: 350px;
+  margin-right: 35px;
+  margin-top: 190px;
+  background-color: lightgrey;
+  box-shadow: 6px 6px #000000;
+}
+
+wp-block-image .aligncenter>figcaption,
+.wp-block-image .alignleft>figcaption,
+.wp-block-image .alignright>figcaption,
+.wp-block-image.is-resized>figcaption {
+  display: table-row-group;
+  caption-side: bottom;
+}
+
+figcaption {
+  font-size: 10px;
+  color: #333;
+  line-height: 1.4;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.wp-block-column:not(:first-child) {
+  margin-left: 2px;
+}
+
+figure.wp-block-image.size-large.is-resized {
+  margin: 0 40px;
+}
+*/
+
+
+/*
+@media (max-width: 991px) {
+  .menu-carpetas{
+	position: absolute;
+}
+}*/
