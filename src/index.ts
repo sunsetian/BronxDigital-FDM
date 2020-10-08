@@ -1,4 +1,4 @@
-/** Versión: 0.9.3.6.Seb.2 */
+/** Versión: 0.9.4.2.Seb.2 */
 
 //imports
 import 'pepjs';
@@ -16,6 +16,7 @@ import { SampleMaterial } from "./Materials/SampleMaterial"
 const canvas: HTMLCanvasElement = document.getElementById('virtualInsanityCanvas') as HTMLCanvasElement
 const engine = createEngine(canvas)
 const scene = createScene()
+const ID_POPUP_INFO = 175;
 
 let room:Mesh;
 let limits:Mesh;
@@ -85,8 +86,8 @@ class GuiSceneBabylon{
     if(initArtistSlug){
       this.gotoArtistBySlug(removeAccents(initArtistSlug));
       
-      //setTimeout(function(){globalThis.bronxControl.loadInfoByPostSlug(initArtistSlug,175);},3000);
-      //setTimeout(function(){globalThis.bronxControl.showInfo(175) ;},4000);
+      //setTimeout(function(){globalThis.bronxControl.loadInfoByPostSlug(initArtistSlug,ID_POPUP_INFO);},3000);
+      //setTimeout(function(){globalThis.bronxControl.showInfo(ID_POPUP_INFO) ;},4000);
     }
   }
   
@@ -162,7 +163,7 @@ class GuiSceneBabylon{
       {
         let cuadroElement = artistElement.cuadro[i];
         if(cuadroElement.slug === slugFlat){
-          this.selectCuadro(cuadroElement.absoluteOrder);
+          this.selectCuadro(cuadroElement.absoluteOrder,cuadroElement.slug);
           break;
         }
       }
@@ -359,8 +360,9 @@ class GuiSceneBabylon{
     this.selectArtist(actualArtist);
   }
 
-  selectCuadro(cuadroAbsoluteID: number): void{
+  selectCuadro(cuadroAbsoluteID: number, cuadroSlug = ""): void{
 
+    if(cuadroSlug!="") guiVI.loadCuadroInfo(cuadroSlug);
 
     let pos = this.getCuadroPositionsByID(cuadroAbsoluteID);
     let viewPos = this.getCuadroViewerPositionsByID(cuadroAbsoluteID);
@@ -408,7 +410,8 @@ class GuiSceneBabylon{
 
   next_cuadro(): void{  
     actualAbsoluteCuadro = (actualAbsoluteCuadro + 1)% numCuadros;
-    this.selectCuadro(actualAbsoluteCuadro);
+    let currentCuadroSlug = guiVI.getActualCuadroSlugByAbsOrder(actualAbsoluteCuadro);
+    this.selectCuadro(actualAbsoluteCuadro,currentCuadroSlug);
   }
 
   prev_cuadro(): void{ 
@@ -418,7 +421,8 @@ class GuiSceneBabylon{
     else{
       actualAbsoluteCuadro = numCuadros - 1; 
     }
-    this.selectCuadro(actualAbsoluteCuadro);
+    let currentCuadroSlug = guiVI.getActualCuadroSlugByAbsOrder(actualAbsoluteCuadro);
+    this.selectCuadro(actualAbsoluteCuadro,currentCuadroSlug);
   }
 
   next_navigation(): void{
@@ -454,11 +458,12 @@ class GuiSceneBabylon{
       this.selectArtist(actualArtist);
     }
     else if(cameraLevel == 1){
-      this.selectCuadro(actualAbsoluteCuadro);
+      let currentCuadroSlug = guiVI.getActualCuadroSlugByAbsOrder(actualAbsoluteCuadro);
+      this.selectCuadro(actualAbsoluteCuadro,currentCuadroSlug);
     }
     else if(cameraLevel == 2){
       let currentCuadroSlug = guiVI.getActualCuadroSlugByAbsOrder(actualAbsoluteCuadro);
-      this.showCuadroInfo(currentCuadroSlug)
+      this.showCuadroInfo()
     }
   }
 
@@ -475,16 +480,20 @@ class GuiSceneBabylon{
     }
   }
 
-  showCuadroInfo(thisCuadroSlug){
+  loadCuadroInfo(thisCuadroSlug){
+    console.log("Load Info de: " + thisCuadroSlug);
+    try {
+      globalThis.bronxControl.loadInfoByPostSlug(thisCuadroSlug,ID_POPUP_INFO);
+    } catch (error) {
+      console.log("No hay informacion detallada del cuadro, error: "+error);
+    }
+  }
+
+  showCuadroInfo(){
     canvas.classList.remove('resetPosition');
     canvas.classList.add('horizTranslate');
     cameraLevel = 3;
-    try {
-      globalThis.bronxControl.showInfoByPostSlug(thisCuadroSlug,175);
-      console.log("Show Info de: " + thisCuadroSlug);
-    } catch (error) {
-      console.log("No hay informacion detallada del cuadro")
-    }
+    globalThis.bronxControl.showInfo(ID_POPUP_INFO)
   }
 
   getMovieIndexByID(id: number, movies: Movie[]):number{
@@ -595,20 +604,24 @@ class GuiSceneBabylon{
       }
 
       this.autoPlaySetted = true; 
-      document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "stop auto";
-      document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#00ff00";
-
+      let VI_GUI_Play = document.getElementById("VI_GUI_Play");
+      if(VI_GUI_Play){
+        VI_GUI_Play.getElementsByTagName('a')[0].textContent = "stop auto";
+        VI_GUI_Play.getElementsByTagName('a')[0].style.backgroundColor = "#00ff00";
+      }
     }
     else{
     
       clearInterval(this.intervalID);
       this.autoPlaySetted = false;
-      document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "auto play";
-      document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#d6d6d6";      
+      let VI_GUI_Play = document.getElementById("VI_GUI_Play");
+      if(VI_GUI_Play){
+        VI_GUI_Play.getElementsByTagName('a')[0].textContent = "auto play";
+        VI_GUI_Play.getElementsByTagName('a')[0].style.backgroundColor = "#d6d6d6";      
+      }
       camera.useAutoRotationBehavior = false;
     }
   }
-
 }
 
 var guiVI = new GuiSceneBabylon()
@@ -797,8 +810,11 @@ const main = async () => {
 
       setTimeout(function(){
        // setMeshesMaterials(importedMeshes,sceneMaterials);
-       document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].textContent = "stop auto";
-       document.getElementById("VI_GUI_Play").getElementsByTagName('a')[0].style.backgroundColor = "#00ff00";
+       let VI_GUI_Play = document.getElementById("VI_GUI_Play");
+       if(VI_GUI_Play){
+        VI_GUI_Play.getElementsByTagName('a')[0].textContent = "stop auto";
+        VI_GUI_Play.getElementsByTagName('a')[0].style.backgroundColor = "#00ff00";
+       }
         try {
           globalThis.bronxControl.showInfo(1946);
         } catch (error) {
@@ -946,7 +962,7 @@ const main = async () => {
 
                 if(cameraLevel == 1){
 
-                  guiVI.selectCuadro(currentCuadroAbsoluteIndex);
+                  guiVI.selectCuadro(currentCuadroAbsoluteIndex,currentCuadro.slug);
                   try {
                     globalThis.bronxControl.showInfo(1959);
                   } catch (error) {
@@ -961,10 +977,10 @@ const main = async () => {
                 }
                 else{
                   if(cameraLevel == 2 && currentCuadroPrevAbsoluteIndex == currentCuadroAbsoluteIndex){      
-                    guiVI.showCuadroInfo(currentCuadro.slug);       
+                    guiVI.showCuadroInfo();       
                   }
                   else{
-                    guiVI.selectCuadro(currentCuadroAbsoluteIndex);
+                    guiVI.selectCuadro(currentCuadroAbsoluteIndex,currentCuadro.slug);
                   }
                 }
               }
@@ -1078,7 +1094,10 @@ const main = async () => {
         let timelinePercent: number = 1 - (Date.now() - playTimeLine)/autoPlayDuration;
         timelinePercent = timelinePercent*100;
         //console.log("AUTOPLAY TIMER: " + Math.floor(timelinePercent*100));
-        document.getElementById("autoPlayTimeline").style.width = timelinePercent + "%";
+        let autoPlayTimeline = document.getElementById("autoPlayTimeline");
+        if(autoPlayTimeline){
+          autoPlayTimeline.style.width = timelinePercent + "%";
+        }
 
       }
 
@@ -1154,8 +1173,8 @@ const main = async () => {
         if(guiVI.isArtistInThisRoom(buttonClickData.slug)){
           guiVI.gotoArtistBySlug(buttonClickData.slug);
           globalThis.bronxControl.closeInfo(1521);
-          globalThis.bronxControl.loadInfoByPostSlug(buttonClickData.slug,175);
-          setTimeout(function(){globalThis.bronxControl.showInfo(175) ;},1000);
+          globalThis.bronxControl.loadInfoByPostSlug(buttonClickData.slug,ID_POPUP_INFO);
+          setTimeout(function(){globalThis.bronxControl.showInfo(ID_POPUP_INFO) ;},1000);
         }else {
           /**Get roomSlug */
           console.log(buttonClickData);
