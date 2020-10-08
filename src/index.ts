@@ -1,4 +1,4 @@
-/** Versión: 0.9.3.6.Seb */
+/** Versión: 0.9.3.6.Seb.2 */
 
 //imports
 import 'pepjs';
@@ -656,7 +656,6 @@ const main = async () => {
     //rolloffFactor: 0.1
   });
 
-
   //sound.setPosition(new Vector3(0, 1.7, 1.5));
 
   SceneLoader.ImportMesh(
@@ -685,13 +684,14 @@ const main = async () => {
       
       }
 
-      // INCLUIR EN EL MASTER
       if(scene.getMeshByName("Voltaje.000")){
         sceneName = "voltaje";
 
-        sceneModel = scene.getMeshByName("Voltaje.000") as Mesh;
-        sceneModel.metadata = "scenario";
-        sceneModel.freezeWorldMatrix(); // ESTOS FreezWorldMatrix son para optimizar rendimiento en objetos inmoviles.
+        console.log("sceneName " + sceneName);
+
+        //sceneModel = scene.getMeshByName("Voltaje.000") as Mesh;
+        //sceneModel.metadata = "scenario";
+        //sceneModel.freezeWorldMatrix(); // ESTOS FreezWorldMatrix son para optimizar rendimiento en objetos inmoviles.
 
         targetSpeed = targetVoltajeSpeed;
         cameraSpeed = cameraVoltajeSpeed;
@@ -714,9 +714,9 @@ const main = async () => {
           light02.intensity = 0.3;
           light03.intensity = 0.1;
 
-          light01.diffuse = new Color3(0.0, 1, 0);
+          light01.diffuse = new Color3(0.6, 0.6, 0.3);
           light02.diffuse = new Color3(0.5, 0.7, 0.7);
-          light03.diffuse = new Color3(1, 0, 0);
+          light03.diffuse = new Color3(0.4, 0.4, 0.2);
           idIlluminated=true;
         }
       }
@@ -726,9 +726,10 @@ const main = async () => {
           light02 = new HemisphericLight("light2", new Vector3(-3, 1, -1), scene);
           light03 = new HemisphericLight("light3", new Vector3(0, 1, 0), scene);
 
-          light01.intensity = 0.5;
-          light02.intensity = 0.5;
-          light03.intensity = 0.5;
+          light01.intensity = 0.8;
+          light02.intensity = 0.85;
+          light03.intensity = 0.8;
+
           idIlluminated = true;
         }
       }
@@ -755,15 +756,16 @@ const main = async () => {
       importedMeshes.forEach(newMesh => {
 
         //console.log("MESH NAME " + newMesh.name);
-
+        
         if(newMesh.material != null){
           let meshMaterial = new PBRMaterial("Mat", scene);
           meshMaterial = newMesh.material as PBRMaterial;
           meshMaterial.backFaceCulling = false;
-          meshMaterial.metallic = 0.2;
-          meshMaterial.roughness = 0.8;
+          //meshMaterial.metallic = 0.2;
+          //meshMaterial.roughness = 0.8;
           newMesh.material =  meshMaterial;
         }
+        
        
         let meshNames: string[] = newMesh.name.split(".");
         if( meshNames[0] === "Artist" ){

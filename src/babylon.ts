@@ -59,6 +59,7 @@ export const setupVoltajeArcRotateCamera = (camera: ArcRotateCamera, roomCenter:
   camera.wheelPrecision = 250;
   camera.angularSensibilityX = -3000;
   camera.angularSensibilityY = -3000;
+  //camera.fov = 0.8;
 
   camera.useAutoRotationBehavior = true;
   if(camera.autoRotationBehavior != null){
@@ -81,8 +82,7 @@ export const createArcRotateCamera = () => {
 
     camera.position = new Vector3(Math.random()-0.5, 1.7, Math.random()-0.5)
     camera.attachControl(canvas, false)
-
-    //camera.inputs.removeByType("ArcRotateCameraKeyboardMoveInput");
+    //camera.fov = 0.8;
 
     // Set some basic camera settings
     camera.minZ = 0.1;

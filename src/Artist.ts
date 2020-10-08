@@ -173,7 +173,7 @@ export class Cuadro {
             this.videoTexture = new VideoTexture("video" + this.id, [scenePath + "data/movies/movie_" + this.id + ".mp4"], scene, true, false, VideoTexture.TRILINEAR_SAMPLINGMODE, myVideoSettings);
             videoMaterial.emissiveTexture = this.videoTexture;
             videoMaterial.roughness = 1;
-            videoMaterial.specularColor = new Color3(0, 0, 0);
+            //videoMaterial.specularColor = new Color3(0, 0, 0);
             this.mesh.material = videoMaterial;
             this.videoTexturePlaying = false;
             this.mesh.metadata = "cuadromovie";
