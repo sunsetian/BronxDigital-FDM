@@ -1,4 +1,4 @@
-/** Versión: 0.9.4.2.Seb.2 */
+/** Versión: 0.9.4.2.Seb.3 */
 
 //imports
 import 'pepjs';
@@ -6,7 +6,7 @@ import 'pepjs';
 import { Artist, Cuadro, Movie } from './Artist';
 //import * as cannon from 'cannon';
 
-import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, KeyboardEventTypes, Color3, PBRMaterial, Sound} from '@babylonjs/core'
+import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, KeyboardEventTypes, Color3, PBRMaterial, Sound, Color4} from '@babylonjs/core'
 import { createEngine, createScene, createSkybox, createArcRotateCamera, getMeshesMaterials, setMeshesMaterials, setupVoltajeArcRotateCamera} from './babylon'
 
 import { SampleMaterial } from "./Materials/SampleMaterial"
@@ -17,6 +17,7 @@ const canvas: HTMLCanvasElement = document.getElementById('virtualInsanityCanvas
 const engine = createEngine(canvas)
 const scene = createScene()
 const ID_POPUP_INFO = 175;
+const ID_POPUP_VOLTAJE_INFO = 8336;
 
 let room:Mesh;
 let limits:Mesh;
@@ -48,8 +49,8 @@ let autoPlayDuration: number = 8000.0;
 let targetSpeed: number = 0.03;
 let cameraSpeed: number = 0.027;
 
-const targetVoltajeSpeed: number = 0.04;
-const cameraVoltajeSpeed: number = 0.03;
+const targetVoltajeSpeed: number = 0.03;
+const cameraVoltajeSpeed: number = 0.027;
 
 let sceneName: string = "auto";
 
@@ -764,20 +765,37 @@ const main = async () => {
         limits.freezeWorldMatrix();
       }
 
+      if(scene.getMeshByName("domo_wireframe")){
+        let wireframeMaterial: StandardMaterial = new StandardMaterial("wireframeMat_domo", scene);
+        wireframeMaterial.wireframe = true;
+        let domoWireframe = scene.getMeshByName("domo_wireframe") as Mesh;
+
+        domoWireframe.material = wireframeMaterial;
+
+        domoWireframe.enableEdgesRendering(.9999999999);	
+        domoWireframe.edgesWidth = 0.1;
+        domoWireframe.edgesColor = new Color4(1, 1, 1, 1);
+
+        domoWireframe.metadata = "domoWireFrame";
+      }
+
 
       /** LOOP DE MESHES CARGADOS PARA ASIGNARLES COSAS */
       importedMeshes.forEach(newMesh => {
 
         //console.log("MESH NAME " + newMesh.name);
         
-        if(newMesh.material != null){
-          let meshMaterial = new PBRMaterial("Mat", scene);
-          meshMaterial = newMesh.material as PBRMaterial;
-          meshMaterial.backFaceCulling = false;
-          //meshMaterial.metallic = 0.2;
-          //meshMaterial.roughness = 0.8;
-          newMesh.material =  meshMaterial;
-        }
+        
+          if(newMesh.material != null){
+            let meshMaterial = new PBRMaterial("Mat", scene);
+            meshMaterial = newMesh.material as PBRMaterial;
+            meshMaterial.backFaceCulling = false;
+            if(sceneName != "voltaje"){
+              meshMaterial.metallic = 0.2;
+            //meshMaterial.roughness = 0.8;
+            }
+            newMesh.material =  meshMaterial;
+          }
         
        
         let meshNames: string[] = newMesh.name.split(".");
@@ -970,9 +988,12 @@ const main = async () => {
                   }
 
                   if(hit.pickedMesh.metadata === cuadrosMovieName){
-                    console.log("play video cuadro");
+                    //console.log("play video cuadro");
                     currentCuadro.videoTexture.video.play();
                     currentCuadro.videoTexturePlaying = true;
+                  }
+                  else if(hit.pickedMesh.metadata === "domo"){
+                 // TODO: PLAY 3 VIDEOS A LA VEZ
                   }
                 }
                 else{
@@ -1005,10 +1026,10 @@ const main = async () => {
                 targetPosition = new Vector3(currentMoviePos.x, currentMoviePos.y, currentMoviePos.z);
               }
 
-              if(sceneName == "voltaje"){
-                movies.forEach(movie => {
-                  movie.videoTexture.video.play();
-                });
+                if(sceneName == "voltaje"){
+                  movies.forEach(movie => {
+                    movie.videoTexture.video.play();
+                  });
                 }
                 else{
                 if(!movies[movieIndex].videoTexturePlaying){

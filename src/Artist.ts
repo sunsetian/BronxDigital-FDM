@@ -1,4 +1,4 @@
-import { Mesh, AbstractMesh, Vector3, Scene, PBRMetallicRoughnessMaterial, StandardMaterial, VideoTextureSettings, VideoTexture, InterpolateValueAction, ActionManager, Color3, ExecuteCodeAction, PBRMaterial } from "@babylonjs/core";
+import { Mesh, AbstractMesh, Vector3, Scene, PBRMetallicRoughnessMaterial, StandardMaterial, VideoTextureSettings, VideoTexture, InterpolateValueAction, ActionManager, Color3, ExecuteCodeAction, PBRMaterial, Color4, Texture } from "@babylonjs/core";
 const removeAccents = (str) => {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   } 
@@ -172,16 +172,36 @@ export class Cuadro {
             let myVideoSettings: VideoTextureSettings = new Object({autoPlay: false, loop: true, clickToPlay: true, poster: scenePath + "data/models/premovie_" + this.id + ".jpg", autoUpdateTexture: true}) as VideoTextureSettings;
             this.videoTexture = new VideoTexture("video" + this.id, [scenePath + "data/movies/movie_" + this.id + ".mp4"], scene, true, false, VideoTexture.TRILINEAR_SAMPLINGMODE, myVideoSettings);
             videoMaterial.emissiveTexture = this.videoTexture;
-            videoMaterial.roughness = 1;
+            videoMaterial.roughness = 0.9;
+            videoMaterial.disableLighting = true;
+            
             //videoMaterial.specularColor = new Color3(0, 0, 0);
             this.mesh.material = videoMaterial;
+            
             this.videoTexturePlaying = false;
             this.mesh.metadata = "cuadromovie";
 
         }
 
          if(sceneName == "voltaje"){  
-  
+
+            if(cuadro.name.split("@")[0].split(".")[1] === "mesh"){  
+                let wireframeMaterial: StandardMaterial = new StandardMaterial("wireframeMat" + this.id, scene);
+                wireframeMaterial.wireframe = true;
+                this.mesh.material = wireframeMaterial;
+                this.mesh.enableEdgesRendering(.9999999999);	
+		        this.mesh.edgesWidth = 2.0;
+                this.mesh.edgesColor = new Color4(1, 1, 1, 1);
+
+                //this.mesh.material.disableLighting = true;
+
+                this.mesh.metadata = "mesh";
+            }
+            else if(cuadro.name.split("@")[0].split(".")[1] === "domo"){  
+              
+                this.mesh.id = "domo";
+            }
+           
             if(cuadro.name.split("@")[0].split(".")[0] === "arbol"){  
                 //arbol = scene.getMeshByName("Artist.007.arbol_ariel") as Mesh;
                 //arbol.metadata = "arbol";
@@ -193,10 +213,10 @@ export class Cuadro {
                     meshMaterial = arbolPart.material as PBRMaterial;
                     //console.log("arbolPart.name " + arbolPart.name)
                     //let partColor: Color3 = meshMaterial.baseColor;
-                    if(arbolPart.name === "branches" || arbolPart.name === "leaves"){
+                    if(arbolPart.name.split("@")[0].split(".")[0] === "branches" || arbolPart.name.split("@")[0].split(".")[0] === "leaves"){
                         meshMaterial.emissiveColor = new Color3(0.061, 0.195, 0.15);
                     }
-                    else if(arbolPart.name === "flowers"){
+                    else if(arbolPart.name.split("@")[0].split(".")[0] === "flowers"){
                         meshMaterial.emissiveColor = new Color3(0.799, 0.056, 0.084);
                     }
                     //console.log("ARBOL Before asigne material")
@@ -205,8 +225,17 @@ export class Cuadro {
                 });
 
                 this.mesh.metadata = "arbol";
-                
-              }
+            
+            }
+            else{
+                let voltajeMeshMaterial = new PBRMaterial("voltajeCuadroMat", scene);
+                voltajeMeshMaterial = this.mesh.material as PBRMaterial;
+
+                voltajeMeshMaterial.roughness = 1;
+                voltajeMeshMaterial.metallic = 0.3;
+                let myTexture: Texture = voltajeMeshMaterial.getActiveTextures()[0] as Texture;
+                voltajeMeshMaterial.emissiveTexture = myTexture;
+            }
         } 
 
 
