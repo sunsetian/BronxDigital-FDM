@@ -1,4 +1,4 @@
-/** Versión: 0.9.4.2.Seb.3 */
+/** Versión: 0.9.4.2.Seb.4 */
 
 //imports
 import 'pepjs';
@@ -491,10 +491,15 @@ class GuiSceneBabylon{
   }
 
   showCuadroInfo(){
-    canvas.classList.remove('resetPosition');
-    canvas.classList.add('horizTranslate');
-    cameraLevel = 3;
-    globalThis.bronxControl.showInfo(ID_POPUP_INFO)
+    try {
+      canvas.classList.remove('resetPosition');
+      canvas.classList.add('horizTranslate');
+      cameraLevel = 3;
+      globalThis.bronxControl.showInfo(ID_POPUP_INFO)
+    } catch (error) {
+      console.log("Paila candonga arete calavera en al frente");
+    }
+    
   }
 
   getMovieIndexByID(id: number, movies: Movie[]):number{
@@ -784,7 +789,6 @@ const main = async () => {
       importedMeshes.forEach(newMesh => {
 
         //console.log("MESH NAME " + newMesh.name);
-        
         
           if(newMesh.material != null){
             let meshMaterial = new PBRMaterial("Mat", scene);
@@ -1095,14 +1099,13 @@ const main = async () => {
                 oldTargetCameraPosition = targetCameraPosition;
               }
           }
-          
       }
 
       time += 0.05;
       let apuntadorPosition: number;
 
       if(cameraLevel == 2){
-        apuntadorPosition = targetBox.position.y + 0.5 + Math.sin(time)*0.03;
+        apuntadorPosition = targetBox.position.y + currentCuadro.cuadroHeight + 0.1 + Math.sin(time)*0.03;
       }
       else{
         apuntadorPosition = targetBox.position.y + 5;
@@ -1119,7 +1122,6 @@ const main = async () => {
         if(autoPlayTimeline){
           autoPlayTimeline.style.width = timelinePercent + "%";
         }
-
       }
 
       // NO BORRAR: POSIBLE USO

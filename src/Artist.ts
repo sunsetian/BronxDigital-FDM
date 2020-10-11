@@ -92,7 +92,7 @@ export class Cuadro {
     public mesh: Mesh = new Mesh("");
     public myArtist: number = -1;
     private cuadroWidth: number = 1;
-    private cuadroHeight: number = 1;
+    public cuadroHeight: number = 1;
     private closeDistance = 1.71;
     public arrayIndex: number = -1; // posición en el array de cuadros del artista, diferente al orden de visualización
     public name: string = "";
