@@ -46,7 +46,8 @@ export const setupVoltajeArcRotateCamera = (camera: ArcRotateCamera, roomCenter:
   camera.alpha = Math.PI;
   camera.beta = Math.PI / 2;
   //camera.radius = 2
-  camera.position = new Vector3(roomCenter.x - 2, roomCenter.y + 1, roomCenter.z + 2)
+  //camera.position = new Vector3(roomCenter.x - 2, roomCenter.y + 1, roomCenter.z + 2)
+  camera.position = new Vector3(roomCenter.x+Math.random()-0.5, roomCenter.y + 1, roomCenter.z + Math.random()-0.5);
   //const camera = new ArcRotateCamera('camera', startAlpha, startBeta, startRadius, startPosition, scene, true)
 
   camera.attachControl(canvas, false);
@@ -80,7 +81,7 @@ export const createArcRotateCamera = () => {
     const startPosition = new Vector3(0, 0, 0)
     const camera = new ArcRotateCamera('camera', startAlpha, startBeta, startRadius, startPosition, scene, true);
 
-    camera.position = new Vector3(Math.random()-0.5, 1.7, Math.random()-0.5)
+    camera.position = new Vector3(Math.random()-0.5, 1.7, Math.random()-0.5);
     camera.attachControl(canvas, false)
     //camera.fov = 0.8;
 
