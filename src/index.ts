@@ -1,4 +1,4 @@
-/** Versión: 0.9.4.2.Seb.5 */
+/** Versión: 0.9.4.2.Seb.6 */
 
 //imports
 import 'pepjs';

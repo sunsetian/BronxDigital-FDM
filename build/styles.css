@@ -3,6 +3,10 @@
   src: url("https://storage.googleapis.com/wp-bronx-storage/1/2020/09/GT-America-Mono-Regular.woff");
 }
 
+button#babylonUnmuteIconBtn {
+  margin-left: -500px;
+}
+
 body.home #responsive-menu-button {
   display: none;
 }
@@ -99,6 +103,11 @@ button {
   display: none;
 }
 
+figure.wp-block-embed-youtube.wp-block-embed.is-type-video.is-provider-youtube.wp-embed-aspect-16-9.wp-has-aspect-ratio {
+  padding: 0;
+  margin: 0;
+}
+
 
 /* Setian */
 
@@ -116,6 +125,23 @@ button {
 
 .full-screen-centered img {
   object-fit: cover;
+}
+
+.half-screen-centered {
+  width: 50%;
+  height: 50%;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.page-content .iframeVideoProfile {
+  width: 100%;
+  height: 260px;
 }
 
 #mapa-iframe-container {
@@ -222,6 +248,12 @@ button {
   position: absolute;
   top: 15px;
   right: 40px;
+}
+
+.button-right-top-2 {
+  position: absolute;
+  top: 15px;
+  right: 120px;
 }
 
 .button-up {
@@ -384,6 +416,10 @@ button {
   color: #000;
 }
 
+.button-buy {
+  margin-bottom: 20px;
+}
+
 
 /******ARTIST INDEX*********/
 
@@ -420,7 +456,7 @@ p.VirtualIn_index_posts_letter.indexLetter {
   position: absolute;
   left: 18%;
   top: 15%;
-  pointer-events: all;
+  /*pointer-events: all;*/
   z-index: 9999999990;
   height: 36px;
   width: 36px;
@@ -456,14 +492,26 @@ div#popmake-1959 {
 }
 
 #responsive-menu-container {
-  padding: 12% 0;
+  padding: 8% 0;
 }
 
 
 /*  Popup Maker Plugin  */
 
-.pum-close {
-  pointer-events: none;
+.spritespin-stage,
+.spritespin-canvas,
+.spritespin,
+.spritespin-instance,
+container-360 {
+  cursor: url('https://storage.googleapis.com/wp-bronx-storage/1/2020/09/cursor-grab-32x32.png') 10 0, auto !important;
+}
+
+#pum-2082 {
+  cursor: url('https://storage.googleapis.com/wp-bronx-storage/1/2020/09/cursor-grab-32x32.png') 10 0, auto !important;
+}
+
+#pum-2082:active:hover {
+  cursor: url('https://storage.googleapis.com/wp-bronx-storage/1/2020/09/cursor-grabbing-32x32.png') 10 0, auto !important;
 }
 
 .pum-content,
@@ -560,6 +608,11 @@ div#popmake-1959 {
     bottom: 25%;
     left: 45%;
   }
+  .button-right-top-2 {
+    position: absolute;
+    top: 55px;
+    right: 60px;
+  }
 }
 
 
@@ -653,7 +706,7 @@ input[type=submit].um-button:focus {
   font-size: 15px;
   font-weight: bolder !important;
   cursor: pointer !important;
-  width: 100%;
+  width: fit-content;
   box-shadow: none;
   text-shadow: none;
   font-family: inherit;
@@ -667,18 +720,22 @@ input[type=submit].um-button {
   border-radius: 0 !important;
 }
 
+.page-id-134 p {
+  margin-top: 0;
+  margin-bottom: 0px;
+}
+
 .um input[type=submit].um-button:hover,
 .um a.um-button:hover {
   background-color: #277327;
 }
 
 a.um-button {
-  font-size: 15px;
+  font-size: 14px;
   border: none !important;
   display: block;
-  width: 150%;
+  width: 100%;
   line-height: 1em !important;
-  padding: 20px 20px !important;
   text-decoration: none !important;
   text-align: center;
   text-transform: none !important;
@@ -687,37 +744,36 @@ a.um-button {
   position: relative;
   transition: 0.25s;
   box-sizing: border-box;
+  font-weight: bolder !important;
+  border-radius: 0!important;
 }
 
 .um .um-button.um-alt,
 .um input[type=submit].um-button.um-alt {
-  background: #000000;
+  background: #d6d6d6;
 }
 
 .um .um-button.um-alt,
 .um input[type=submit].um-button.um-alt {
-  color: #d6d6d6;
+  color: #000000;
 }
 
 .um .um-button.um-alt:hover,
 .um input[type=submit].um-button.um-alt:hover {
-  background: #000000;
+  background: #d6d6d65c;
 }
 
 .um-icon-help-circled:before {
   display: none;
 }
 
-.um-left.um-half {
-  width: 20%
-}
-
-.um-right {
-  float: none;
+.page-id-134 .wp-block-button__link {
+  color: #00ff00 !important;
+  font-weight: 200;
 }
 
 .page-content {
-  padding-top: 50px;
+  padding-top: 0px;
 }
 
 .um-field-checkbox-option,
@@ -764,6 +820,13 @@ p.Cajita-colfondos-2 {
   }
 }
 
+@media screen and (max-width: 600px) {
+  p.Cajita-colfondos-2 {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+}
+
 h1.has-text-align-center.Observar-colfondos-2 {
   font-weight: 900;
   color: #ffdb58;
@@ -774,8 +837,9 @@ h2.has-text-align-center.titulos-colfondos-2 {
 }
 
 .page-id-3157 {
+  font-family: Arial, Helvetica, sans-serif;
   background-color: #0d1c3a;
-  background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Splash-top-left-mobile.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-3.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-2.png);
+  background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Splash-top-left-mobile.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/logocolfondos-e1602121430189.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-2.png);
   background-position: left top, right top, right bottom;
   background-repeat: no-repeat, no-repeat, no-repeat;
 }
@@ -785,13 +849,15 @@ h2.has-text-align-center.titulos-colfondos-2 {
   color: #ffffff !important;
   font-weight: normal;
   font-size: 0.8rem;
-  border: solid 1px #ffdb58;
+  border: solid 2px #ffdb58;
   padding: 0.2rem 0.7rem 0.3rem 0.7rem;
   box-shadow: none;
 }
 
 p.has-text-align-center.responsabilidad-colfondos-2 {
-  background-color: #212662;
+  background-color: #0d1c3a;
+  margin-top: 50px;
+  margin-bottom: 0px;
 }
 
 .page-id-4135 .wp-block-button__link {
@@ -799,14 +865,15 @@ p.has-text-align-center.responsabilidad-colfondos-2 {
   color: #ffffff !important;
   font-weight: normal;
   font-size: 0.8rem;
-  border: solid 1px #ffdb58;
+  border: solid 2px #ffdb58;
   padding: 0.2rem 0.7rem 0.3rem 0.7rem;
   box-shadow: none;
 }
 
 .page-id-4135 {
+  font-family: Arial, Helvetica, sans-serif;
   background-color: #0d1c3a;
-  background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-3.png);
+  background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/logocolfondos-e1602121430189.png);
   background-position: center, right top;
   background-repeat: no-repeat, no-repeat;
 }
@@ -831,8 +898,9 @@ p.has-text-align-center.responsabilidad-colfondos-2 {
 }
 
 .page-id-2262 {
+  font-family: Arial, Helvetica, sans-serif;
   background-color: #0d1c3a;
-  background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Splash-top-left-mobile.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-3.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-2.png);
+  background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Splash-top-left-mobile.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/logocolfondos-e1602121430189.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-2.png);
   background-position: left top, right top, right bottom;
   background-repeat: no-repeat, no-repeat, no-repeat;
 }
@@ -842,7 +910,7 @@ p.has-text-align-center.responsabilidad-colfondos-2 {
   color: #ffffff !important;
   font-weight: normal;
   font-size: 1.3rem;
-  border: solid 1px #ffdb58;
+  border: solid 2px #ffdb58;
   padding: 0.2rem 0.7rem 0.3rem 0.7rem;
   box-shadow: none;
 }
@@ -857,8 +925,9 @@ p.has-text-align-center.responsabilidad-colfondos-2 {
 }
 
 .page-id-4398 {
+  font-family: Arial, Helvetica, sans-serif;
   background-color: #0d1c3a;
-  background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Splash-top-left-mobile.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-3.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-2.png);
+  background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Splash-top-left-mobile.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/logocolfondos-e1602121430189.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-2.png);
   background-position: left top, right top, right bottom;
   background-repeat: no-repeat, no-repeat, no-repeat;
 }
@@ -868,7 +937,7 @@ p.has-text-align-center.responsabilidad-colfondos-2 {
   color: #ffffff !important;
   font-weight: normal;
   font-size: 1.3rem;
-  border: solid 1px #ffdb58;
+  border: solid 2px #ffdb58;
   padding: 0.2rem 0.7rem 0.3rem 0.7rem;
   box-shadow: none;
 }
@@ -888,8 +957,29 @@ p.has-text-align-center.responsabilidad-colfondos-2 {
   box-sizing: content-box;
 }
 
+.page-id-2055 {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #0d1c3a;
+  background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Splash-top-left-mobile.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/logocolfondos-e1602121430189.png), url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/Webp.net-resizeimage-2.png);
+  background-position: left top, right top, right bottom;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+}
+
+.qmn_quiz_container .qmn_btn,
+.qmn_quiz_container .btn {
+  background-color: #d6d6d600;
+  color: #ffffff !important;
+  font-weight: normal;
+  font-size: 1.3rem;
+  border: solid 2px #ffdb58;
+  padding: 0.2rem 0.7rem 0.3rem 0.7rem;
+  box-shadow: none;
+}
+
 .responsabilidad-colfondos-3 {
-  background-color: #212662;
+  background-color: #0d1c3a;
+  margin-top: 50px;
+  margin-bottom: 0px;
 }
 
 
@@ -955,6 +1045,10 @@ p.has-text-align-center.responsabilidad-colfondos-2 {
 
 .artWorkContainer {
   margin-top: 25px;
+}
+
+.technicalSheet {
+  margin-top: 20px;
 }
 
 .imageContainerSheet {}
@@ -1046,3 +1140,41 @@ figure.wp-block-image.size-large.is-resized {
 	position: absolute;
 }
 }*/
+
+
+/* FORO */
+
+.page-id-1781 {
+  height: 100%;
+  background-color: #000;
+  background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/fondo-foro.jpg);
+  /* Full height */
+  height: -webkit-fill-available;
+  /* Center and scale the image nicely */
+  background-position: bottom;
+  background-repeat: repeat;
+  background-size: cover;
+}
+
+.page-id-1781 .wp-block-image img {
+  margin-top: -18px;
+}
+
+.video-foro {
+  width: 1000px;
+  margin-bottom: -200px;
+}
+
+
+/* Boton Trivia Post Artistas */
+
+.boton-artista-trivia {
+  background-color: transparent;
+  text-decoration: none;
+  color: #0f0;
+  cursor: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/09/cursor-manito-32x32.png) 10 0, auto !important;
+  user-select: none;
+  border: solid 0.5px !important;
+  padding: 10px 10px;
+  font-weight: bold;
+}
