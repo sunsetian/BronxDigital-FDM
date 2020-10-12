@@ -1,4 +1,4 @@
-/** Versión: 0.9.4.2.Seb.4 */
+/** Versión: 0.9.4.2.Seb.5 */
 
 //imports
 import 'pepjs';
@@ -7,7 +7,7 @@ import { Artist, Cuadro, Movie } from './Artist';
 //import * as cannon from 'cannon';
 
 import { HemisphericLight, Vector3, SceneLoader, AbstractMesh, Mesh, StandardMaterial, PickingInfo, Ray, Matrix, ArcRotateCamera, Tools, KeyboardEventTypes, Color3, PBRMaterial, Sound, Color4} from '@babylonjs/core'
-import { createEngine, createScene, createSkybox, createArcRotateCamera, getMeshesMaterials, setMeshesMaterials, setupVoltajeArcRotateCamera} from './babylon'
+import { createEngine, createScene, createSkybox, createArcRotateCamera, getMeshesMaterials, setMeshesMaterials, setupVoltajeArcRotateCamera, setupFlautaArcRotateCamera} from './babylon'
 
 import { SampleMaterial } from "./Materials/SampleMaterial"
 
@@ -53,6 +53,7 @@ const targetVoltajeSpeed: number = 0.03;
 const cameraVoltajeSpeed: number = 0.027;
 
 let sceneName: string = "auto";
+let sceneNameChild: string = "auto";
 
 let cameraSetted: boolean = false;
 
@@ -706,7 +707,7 @@ const main = async () => {
       if(scene.getMeshByName("Voltaje.000")){
         sceneName = "voltaje";
 
-        console.log("sceneName " + sceneName);
+        //console.log("sceneName " + sceneName);
 
         //sceneModel = scene.getMeshByName("Voltaje.000") as Mesh;
         //sceneModel.metadata = "scenario";
@@ -716,6 +717,22 @@ const main = async () => {
         cameraSpeed = cameraVoltajeSpeed;
 
         camera = setupVoltajeArcRotateCamera(camera, roomCenter);
+      }
+
+      if(scene.getMeshByName("Flauta.000")){
+        sceneName = "voltaje";
+        sceneNameChild = "flauta";
+
+        //console.log("sceneName " + sceneName);
+
+        //sceneModel = scene.getMeshByName("Voltaje.000") as Mesh;
+        //sceneModel.metadata = "scenario";
+        //sceneModel.freezeWorldMatrix(); // ESTOS FreezWorldMatrix son para optimizar rendimiento en objetos inmoviles.
+
+        targetSpeed = targetVoltajeSpeed;
+        cameraSpeed = cameraVoltajeSpeed;
+
+        camera = setupFlautaArcRotateCamera(camera, roomCenter);
       }
 
       //loadCodedSceneElements(); // CONTINÚE LOADING DESPUES DE HABER DECLARADO EL NOMBRE DE LA ESCENA!!!
@@ -798,13 +815,26 @@ const main = async () => {
               meshMaterial.metallic = 0.2;
             //meshMaterial.roughness = 0.8;
             }
-            newMesh.material =  meshMaterial;
+            if(sceneNameChild == "flauta"){
+              if(newMesh.name.split("@")[0].split(".")[0] === "antena"){
+                let meshMaterial = new PBRMaterial("emmisiveMat", scene);
+                meshMaterial = newMesh.material as PBRMaterial;
+                //console.log("arbolPart.name " + arbolPart.name)
+                //let partColor: Color3 = meshMaterial.baseColor;
+                meshMaterial.emissiveColor = new Color3(0.2, 0.2, 0.2);
+                
+                //console.log("ARBOL Before asigne material")
+                newMesh.material = meshMaterial;
+                console.log("Antena SETTED")
+              }
+            }
+          newMesh.material =  meshMaterial;
           }
         
        
         let meshNames: string[] = newMesh.name.split(".");
         if( meshNames[0] === "Artist" ){
-          artist.push(new Artist(newMesh, index, sceneName, URL_SCENE_JS, scene));
+          artist.push(new Artist(newMesh, index, sceneName, sceneNameChild, URL_SCENE_JS, scene));
           index++;
         }
         if( meshNames[0] === "Movie" ){

@@ -21,7 +21,7 @@ export class Artist {
     public arrayIndex: number = -1;
     public closeDistance = 4;
 
-    constructor(cuadrosGroup: AbstractMesh, arrayIndex: number, sceneName: string, scenePath: string, scene: Scene) {
+    constructor(cuadrosGroup: AbstractMesh, arrayIndex: number, sceneName: string, sceneNameChild: string, scenePath: string, scene: Scene) {
 
         this.arrayIndex = arrayIndex;
         this.id = parseInt(cuadrosGroup.name.split(".")[1]); 
@@ -38,8 +38,12 @@ export class Artist {
 
         if(sceneName == "voltaje"){  
             this.closeDistance = 18;
-
         }
+        if(sceneName == "voltaje" && sceneNameChild){
+
+            this.closeDistance = 6;
+        }
+
         this.firstBoundingBox = cuadrosArray[0].getBoundingInfo().boundingBox.extendSize;
         const calculateViewerPosition = (): Vector3 => {
 
@@ -190,7 +194,7 @@ export class Cuadro {
                 wireframeMaterial.wireframe = true;
                 this.mesh.material = wireframeMaterial;
                 this.mesh.enableEdgesRendering(.9999999999);	
-		        this.mesh.edgesWidth = 2.0;
+		        this.mesh.edgesWidth = 0.5;
                 this.mesh.edgesColor = new Color4(1, 1, 1, 1);
 
                 //this.mesh.material.disableLighting = true;
