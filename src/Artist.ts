@@ -39,7 +39,7 @@ export class Artist {
         if(sceneName == "voltaje"){  
             this.closeDistance = 18;
         }
-        if(sceneName == "voltaje" && sceneNameChild){
+        if(sceneName == "voltaje" && sceneNameChild == "flauta"){
 
             this.closeDistance = 6;
         }
@@ -190,9 +190,9 @@ export class Cuadro {
          if(sceneName == "voltaje"){  
 
             if(cuadro.name.split("@")[0].split(".")[1] === "mesh"){  
-                let wireframeMaterial: StandardMaterial = new StandardMaterial("wireframeMat" + this.id, scene);
-                wireframeMaterial.wireframe = true;
-                this.mesh.material = wireframeMaterial;
+                //let wireframeMaterial: StandardMaterial = new StandardMaterial("wireframeMat" + this.id, scene);
+                //wireframeMaterial.wireframe = true;
+                //this.mesh.material = wireframeMaterial;
                 this.mesh.enableEdgesRendering(.9999999999);	
 		        this.mesh.edgesWidth = 0.5;
                 this.mesh.edgesColor = new Color4(1, 1, 1, 1);
@@ -203,7 +203,7 @@ export class Cuadro {
             }
             else if(cuadro.name.split("@")[0].split(".")[1] === "domo"){  
               
-                this.mesh.id = "domo";
+                //this.mesh.id = "domo";
             }
            
             if(cuadro.name.split("@")[0].split(".")[0] === "arbol"){  
