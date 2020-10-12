@@ -1,4 +1,4 @@
-/** Versión: 0.9.4.2.Seb.6 */
+/** Versión: 0.9.4.2.Seb.8 */
 
 //imports
 import 'pepjs';
@@ -22,6 +22,7 @@ const ID_POPUP_VOLTAJE_INFO = 8336;
 let room:Mesh;
 let limits:Mesh;
 let sceneModel: Mesh;
+let maya: Mesh;
 
 let targetBox: Mesh;
 let targetPosition: Vector3;
@@ -495,6 +496,7 @@ class GuiSceneBabylon{
     try {
       canvas.classList.remove('resetPosition');
       canvas.classList.add('horizTranslate');
+      guiVI.setSoundState(false);
       cameraLevel = 3;
       globalThis.bronxControl.showInfo(ID_POPUP_INFO)
     } catch (error) {
@@ -550,7 +552,13 @@ class GuiSceneBabylon{
 
   /** SOUND STATE */
 
-  setSoundState():void{
+  setSoundState(setSound?: boolean):void{
+     if(setSound != null){
+      if(setSound == false){
+        soundIsPlaying = true;
+        console.log("STOPING AUDIO");
+      }
+    } 
     if(soundIsPlaying){
       sound.stop();
       soundIsPlaying = false;
@@ -787,18 +795,18 @@ const main = async () => {
         limits.freezeWorldMatrix();
       }
 
-      if(scene.getMeshByName("domo_wireframe")){
-        let wireframeMaterial: StandardMaterial = new StandardMaterial("wireframeMat_domo", scene);
-        wireframeMaterial.wireframe = true;
-        let domoWireframe = scene.getMeshByName("domo_wireframe") as Mesh;
+      if(scene.getMeshByName("Maya.000")){
 
-        domoWireframe.material = wireframeMaterial;
+        maya = scene.getMeshByName("Maya.000") as Mesh;
+        //let wireframeMaterial: StandardMaterial = new StandardMaterial("wireframeMat01", scene);
+        //wireframeMaterial.wireframe = true;
+        //maya.material = wireframeMaterial;
 
-        domoWireframe.enableEdgesRendering(.9999999999);	
-        domoWireframe.edgesWidth = 0.1;
-        domoWireframe.edgesColor = new Color4(1, 1, 1, 1);
+        maya.enableEdgesRendering(.9999999999);	
+        maya.edgesWidth = 0.1;
+        maya.edgesColor = new Color4(1, 1, 1, 1);
 
-        domoWireframe.metadata = "domoWireFrame";
+        maya.metadata = "maya";
       }
 
 
@@ -941,7 +949,7 @@ const main = async () => {
         canvas.classList.add('resetPosition');
 
         function predicate(mesh: AbstractMesh){
-          if (mesh === targetBox || mesh === room || mesh === limits || mesh === sceneModel){
+          if (mesh === targetBox || mesh === room || mesh === limits || mesh === sceneModel || mesh == maya){
             return false;
           }
           return true;
