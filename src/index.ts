@@ -1,4 +1,4 @@
-/** Versión: 0.9.4.2.Seb.8 */
+/** Versión: 0.9.4.3.Adr.1 */
 
 //imports
 import 'pepjs';
@@ -17,7 +17,7 @@ const canvas: HTMLCanvasElement = document.getElementById('virtualInsanityCanvas
 const engine = createEngine(canvas)
 const scene = createScene()
 const ID_POPUP_INFO = 175;
-const ID_POPUP_VOLTAJE_INFO = 8336;
+const ID_POPUP_INFO_EXPANDIDA = 8336;
 
 let room:Mesh;
 let limits:Mesh;
@@ -132,7 +132,7 @@ class GuiSceneBabylon{
     return result;
   }
 
-  cleanRoomIndex(){
+  cleanRoomIndex(){//Borra los artistas que no estan en la sala de la lista.
     console.log("CleanRoomIndex");
     let indexContainer = document.getElementsByClassName("indexRoom")[0];
     console.log(indexContainer);
@@ -140,7 +140,7 @@ class GuiSceneBabylon{
       let indexRoom = indexContainer.children;
       for (let i = 0; i < indexRoom.length; i++){
         let a = indexRoom[i].getElementsByTagName("a")[0];
-        console.log("artistas en la sala" + a.textContent);
+        //console.log("artistas en la sala " + a.textContent);
         let slugFlat = removeAccents(a.getAttribute("slug"));
         if(!this.isArtistInThisRoom(slugFlat)){
           indexContainer.removeChild(indexRoom[i]);
@@ -148,7 +148,6 @@ class GuiSceneBabylon{
         }
       }
     }
-
   }
   
   gotoPageByArtistSlugs(artistSlug: string, roomSlug: string):void{
@@ -485,8 +484,43 @@ class GuiSceneBabylon{
 
   loadCuadroInfo(thisCuadroSlug){
     console.log("Load Info de: " + thisCuadroSlug);
+    var haveMoreInfo = false;
+    let indexContainer = document.getElementsByClassName("indexRoom")[0];
+    
+    if(indexContainer){
+      let indexRoom = indexContainer.children;
+      for (let i = 0; i < indexRoom.length; i++){
+        let a = indexRoom[i].getElementsByTagName("a")[0];
+        let slugFlat = removeAccents(a.getAttribute("slug"));
+        if(thisCuadroSlug.indexOf(slugFlat)!=-1){ //comprobar cuando el slug del artista esta contenido en el slug de la obra
+          let tags = a.getAttribute("tags");
+          let tagsVector = tags.split(" ");
+          tagsVector.forEach(element => {
+            var tagVector = element.split(":");
+            var slugVector:Array<string> = thisCuadroSlug.split("_");
+            let indexSlug = slugVector.pop();
+
+            if(tagVector[0] === "info-expandida"){
+              for(let i=1; i<tagVector.length; i++){
+                if(tagVector[i]==indexSlug){
+                  haveMoreInfo=true;
+                  break;
+                }
+              }
+            }
+          });
+        }
+      }
+    }
     try {
       globalThis.bronxControl.loadInfoByPostSlug(thisCuadroSlug,ID_POPUP_INFO);
+      let aditionalInfo = document.getElementById("adicional_info_popup");
+      if(haveMoreInfo){
+        aditionalInfo.style.visibility = "visible";
+        globalThis.bronxControl.loadInfoByPostSlug(thisCuadroSlug+"_more",ID_POPUP_INFO_EXPANDIDA);
+      }else{
+        aditionalInfo.style.visibility = "hidden";
+      }
     } catch (error) {
       console.log("No hay informacion detallada del cuadro, error: "+error);
     }
@@ -498,11 +532,10 @@ class GuiSceneBabylon{
       canvas.classList.add('horizTranslate');
       guiVI.setSoundState(false);
       cameraLevel = 3;
-      globalThis.bronxControl.showInfo(ID_POPUP_INFO)
+      globalThis.bronxControl.showInfo(ID_POPUP_INFO);
     } catch (error) {
-      console.log("Paila candonga arete calavera en al frente");
+      console.log("Paila candonga arete calavera en al frente: "+error);
     }
-    
   }
 
   getMovieIndexByID(id: number, movies: Movie[]):number{
@@ -1011,7 +1044,7 @@ const main = async () => {
                 try {
                   globalThis.bronxControl.showInfo(1955);
                 } catch (error) {
-                  console.log("Información no disponible")
+                  console.log("Error al abrir tooltip de ayuda")
                 }
               }
               else{
@@ -1026,7 +1059,7 @@ const main = async () => {
                   try {
                     globalThis.bronxControl.showInfo(1959);
                   } catch (error) {
-                    console.log("Información no disponible")
+                    console.log("Error al abrir tooltip de ayuda")
                   }
 
                   if(hit.pickedMesh.metadata === cuadrosMovieName){
@@ -1234,8 +1267,8 @@ const main = async () => {
         if(guiVI.isArtistInThisRoom(buttonClickData.slug)){
           guiVI.gotoArtistBySlug(buttonClickData.slug);
           globalThis.bronxControl.closeInfo(1521);
-          globalThis.bronxControl.loadInfoByPostSlug(buttonClickData.slug,ID_POPUP_INFO);
-          setTimeout(function(){globalThis.bronxControl.showInfo(ID_POPUP_INFO) ;},1000);
+          //globalThis.bronxControl.loadInfoByPostSlug(buttonClickData.slug,ID_POPUP_INFO);
+          //setTimeout(function(){globalThis.bronxControl.showInfo(ID_POPUP_INFO) ;},1000);
         }else {
           /**Get roomSlug */
           console.log(buttonClickData);
