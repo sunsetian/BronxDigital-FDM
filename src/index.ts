@@ -1,4 +1,4 @@
-/** Versión: 0.9.4.3.Adr.1 */
+/** Versión: 0.9.4.3.Seb.1 */
 
 //imports
 import 'pepjs';
@@ -23,6 +23,7 @@ let room:Mesh;
 let limits:Mesh;
 let sceneModel: Mesh;
 let maya: Mesh;
+let domoWireframe: Mesh;
 
 let targetBox: Mesh;
 let targetPosition: Vector3;
@@ -803,9 +804,9 @@ const main = async () => {
           light02 = new HemisphericLight("light2", new Vector3(-3, 1, -1), scene);
           light03 = new HemisphericLight("light3", new Vector3(0, 1, 0), scene);
 
-          light01.intensity = 0.8;
-          light02.intensity = 0.85;
-          light03.intensity = 0.8;
+          light01.intensity = 0.6;
+          light02.intensity = 0.6;
+          light03.intensity = 0.6;
 
           idIlluminated = true;
         }
@@ -842,6 +843,25 @@ const main = async () => {
         maya.metadata = "maya";
       }
 
+      if(scene.getMeshByName("DomoWireframe.000")){
+
+        domoWireframe = scene.getMeshByName("DomoWireframe.000") as Mesh;
+        try {     
+          let wireframeMaterial: StandardMaterial = new StandardMaterial("wireframeMat01", scene);
+          wireframeMaterial.wireframe = true;
+          domoWireframe.material = wireframeMaterial;
+        } catch (error) {
+          console.log("Wireframe Error")
+        }
+       
+
+        domoWireframe.enableEdgesRendering(.9999999999);	
+        domoWireframe.edgesWidth = 0.1;
+        domoWireframe.edgesColor = new Color4(1, 1, 1, 1);
+
+        domoWireframe.metadata = "domowireframe";
+      }
+
 
       /** LOOP DE MESHES CARGADOS PARA ASIGNARLES COSAS */
       importedMeshes.forEach(newMesh => {
@@ -852,10 +872,15 @@ const main = async () => {
             let meshMaterial = new PBRMaterial("Mat", scene);
             meshMaterial = newMesh.material as PBRMaterial;
             meshMaterial.backFaceCulling = false;
+
             if(sceneName != "voltaje"){
               meshMaterial.metallic = 0.2;
             //meshMaterial.roughness = 0.8;
             }
+            else{
+              meshMaterial.roughness = 0.8;
+            }
+            
             if(sceneNameChild == "flauta"){
               if(newMesh.name.split("@")[0].split(".")[0] === "antena"){
                 let meshMaterial = new PBRMaterial("emmisiveMat", scene);
@@ -915,6 +940,8 @@ const main = async () => {
         }
         
       },10000);
+
+      /**  LA FUNCION MAS IMPORTANTE DE TODAS - LA QUE ORDENA LOS CUADROS */
       
       for(let i=0; i < artist.length; i++){
         let artistIndex = guiVI.getArtistIndexByOrder(i);
@@ -923,8 +950,14 @@ const main = async () => {
           if(j === 0){
             artist[artistIndex].firstCuadroAbsoluteOrder = cuadroAbsoluteOrder;
           }
-          artist[artistIndex].cuadro[cuadroIndex].absoluteOrder = cuadroAbsoluteOrder ;
-          cuadroAbsoluteOrder++;
+          try {
+            artist[artistIndex].cuadro[cuadroIndex].absoluteOrder = cuadroAbsoluteOrder ;
+            cuadroAbsoluteOrder++;
+          } catch (error) {
+            console.log("problem in artistIndex: " + artistIndex);
+            //console.log("problem: " + artist[artistIndex].cuadro[cuadroIndex].mesh.name);
+          }
+          
         }
       }
 
@@ -982,7 +1015,7 @@ const main = async () => {
         canvas.classList.add('resetPosition');
 
         function predicate(mesh: AbstractMesh){
-          if (mesh === targetBox || mesh === room || mesh === limits || mesh === sceneModel || mesh == maya){
+          if (mesh === targetBox || mesh === room || mesh === limits || mesh === sceneModel || mesh == maya || mesh ==domoWireframe){
             return false;
           }
           return true;
@@ -1102,9 +1135,19 @@ const main = async () => {
               }
 
                 if(sceneName == "voltaje"){
-                  movies.forEach(movie => {
-                    movie.videoTexture.video.play();
-                  });
+                  if(!movies[movieIndex].videoTexturePlaying){
+                    movies.forEach(movie => {
+                      movie.videoTexture.video.play();
+                      movie.videoTexturePlaying = true;
+                      actualArtist = 4;
+                    });
+                  }
+                  else{
+                    movies.forEach(movie => {
+                      movie.videoTexture.video.pause();
+                      movie.videoTexturePlaying = false;
+                    });
+                  }
                 }
                 else{
                 if(!movies[movieIndex].videoTexturePlaying){
@@ -1326,7 +1369,7 @@ const main = async () => {
             guiVI.setSoundState();
             break;
           case "v":
-              console.log("Virtual Insanity Engine Version 0.9.3")
+              console.log("Virtual Insanity Engine Version 0.9.4.3")
               console.log("Developed by Sebastian Gonzalez Dixon and Carlos Adrian Serna")
               console.log("Setian Technologies")
               break;
