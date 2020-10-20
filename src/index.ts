@@ -1,4 +1,4 @@
-/** Versión: 0.9.4.3.Seb.1 */
+/** Versión: 0.9.4.3.Seb.2 */
 
 //imports
 import 'pepjs';
@@ -531,7 +531,9 @@ class GuiSceneBabylon{
     try {
       canvas.classList.remove('resetPosition');
       canvas.classList.add('horizTranslate');
-      guiVI.setSoundState(false);
+      if(sceneName == "voltaje"){
+        guiVI.setSoundState(false);
+      }
       cameraLevel = 3;
       globalThis.bronxControl.showInfo(ID_POPUP_INFO);
     } catch (error) {
