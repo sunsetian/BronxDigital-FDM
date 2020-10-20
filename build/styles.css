@@ -19,6 +19,13 @@ body {
   cursor: url('https://storage.googleapis.com/wp-bronx-storage/1/2020/09/cursor-32x32.png') 10 0, auto !important;
 }
 
+h1,
+h2,
+h3,
+h4 {
+  font-size: 1.1rem;
+}
+
 a {
   background-color: transparent;
   text-decoration: none;
@@ -36,6 +43,22 @@ a {
   /* Internet Explorer/Edge */
   user-select: none;
   /* Non-prefixed version, currently */
+}
+
+a:hover {
+  color: #0f0;
+}
+
+.white-text {
+  color: #fff;
+}
+
+.white-text a {
+  color: #fff;
+}
+
+.white-text a:hover {
+  color: #0f0;
 }
 
 button {
@@ -76,6 +99,31 @@ button {
   padding: 0;
 }
 
+
+/*Obra arbol*/
+
+.post-8111 .page-header {
+  display: none;
+}
+
+.post-8111 {
+  max-width: 100% !important;
+}
+
+
+/*Temblores*/
+
+.post-8658 .page-header {
+  display: none;
+}
+
+.post-8658 {
+  max-width: 100% !important;
+}
+
+
+/**/
+
 .entry-title {
   font-size: 1.2rem;
   color: #0f0;
@@ -106,6 +154,13 @@ button {
 figure.wp-block-embed-youtube.wp-block-embed.is-type-video.is-provider-youtube.wp-embed-aspect-16-9.wp-has-aspect-ratio {
   padding: 0;
   margin: 0;
+  height: auto;
+}
+
+figure.wp-block-embed.is-type-video.is-provider-vimeo {
+  margin: 0;
+  padding: 0;
+  height: auto;
 }
 
 
@@ -230,6 +285,16 @@ figure.wp-block-embed-youtube.wp-block-embed.is-type-video.is-provider-youtube.w
   pointer-events: all;
   font-size: 0.4rem;
   text-align: left;
+}
+
+.button-fdm a:hover {
+  background-color: #0f0;
+}
+
+.long-button {
+  width: 100%;
+  border-radius: 0px;
+  padding: 5px;
 }
 
 .button-left {
@@ -526,7 +591,12 @@ container-360 {
 
 .pum-theme-1951 .pum-content,
 .pum-theme-tooltips .pum-content {
-  font-size: 0.7rem;
+  font-size: 0.8rem;
+  max-height: 250px;
+}
+
+#popmake-175 button.pum-close.popmake-close {
+  pointer-events: none;
 }
 
 
@@ -784,6 +854,11 @@ a.um-button {
   display: block;
 }
 
+button.um-button:hover {
+  background-color: #0f0;
+  color: #000;
+}
+
 
 /* TRIVIS COLFONDOS */
 
@@ -834,6 +909,11 @@ h1.has-text-align-center.Observar-colfondos-2 {
 
 h2.has-text-align-center.titulos-colfondos-2 {
   font-weight: bold;
+}
+
+.page-id-8522 .page-content {
+  height: 100%;
+  margin: 0px;
 }
 
 .page-id-3157 {
@@ -1144,19 +1224,20 @@ figure.wp-block-image.size-large.is-resized {
 
 /* FORO */
 
-.page-id-1781 {
-  height: 100%;
+.page-id-8522 .page-content {
+  margin: 120px;
   background-color: #000;
+}
+
+.page-id-8522 {
+  height: 100%;
   background-image: url(https://storage.googleapis.com/wp-bronx-storage/1/2020/10/fondo-foro.jpg);
-  /* Full height */
-  height: -webkit-fill-available;
-  /* Center and scale the image nicely */
-  background-position: bottom;
-  background-repeat: repeat;
+  background-position: absolute;
+  background-repeat: no-repeat;
   background-size: cover;
 }
 
-.page-id-1781 .wp-block-image img {
+.page-id-8522 .wp-block-image img {
   margin-top: -18px;
 }
 
@@ -1177,4 +1258,13 @@ figure.wp-block-image.size-large.is-resized {
   border: solid 0.5px !important;
   padding: 10px 10px;
   font-weight: bold;
+}
+
+
+/* Boton Mayor de 18 */
+
+.pum-theme-167 .pum-content+.pum-close,
+.pum-theme-tema-por-defecto .pum-content+.pum-close {
+  color: #000000;
+  background-color: #00ff00;
 }
