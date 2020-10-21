@@ -1,4 +1,4 @@
-/** Versión: 0.9.4.3.Seb.2 */
+/** Versión: 0.9.5.Seb.1 */
 
 //imports
 import 'pepjs';
@@ -877,11 +877,9 @@ const main = async () => {
 
             if(sceneName != "voltaje"){
               meshMaterial.metallic = 0.2;
-            //meshMaterial.roughness = 0.8;
-            }
-            else{
               meshMaterial.roughness = 0.8;
             }
+            
             
             if(sceneNameChild == "flauta"){
               if(newMesh.name.split("@")[0].split(".")[0] === "antena"){
