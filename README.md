@@ -1,4 +1,4 @@
-# TypeBaby-Starter
+# Bronx Digital y Virtual Insanity de la Feria del Millon 2020
 A Babylon and Typescript starter transpiled with webpack, results in a javascript, with connection interfaces of its main functions, to be accessible from external scripts and events.
 
 It is still in the development process and focused on a very specific project. Its more general use is not yet intuitive.
